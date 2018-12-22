@@ -19,6 +19,8 @@ const Forms = () => import('@/views/base/Forms')
 const Switches = () => import('@/views/base/Switches')
 const Tables = () => import('@/views/base/Tables')
 const Tabs = () => import('@/views/base/Tabs')
+const TreeTable = () => import('@/views/base/TreeTable')
+// const TreeTable1 = () => import('@/views/base/TreeTable1')
 const Breadcrumbs = () => import('@/views/base/Breadcrumbs')
 const Carousels = () => import('@/views/base/Carousels')
 const Collapses = () => import('@/views/base/Collapses')
@@ -153,6 +155,18 @@ export default new Router({
               name: 'Tables',
               component: Tables
             },
+            {
+              path: 'treetable',
+              name: 'TreeTable',
+              component: TreeTable
+            },
+            /*
+            {
+              path: 'treetable1',
+              name: 'TreeTable1',
+              component: TreeTable1
+            },
+            */
             {
               path: 'tabs',
               name: 'Tabs',

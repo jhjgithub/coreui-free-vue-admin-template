@@ -113,6 +113,16 @@ export default {
           icon: 'icon-puzzle'
         },
         {
+          name: 'TreeTable',
+          url: '/base/treetable',
+          icon: 'icon-puzzle'
+        },
+        // {
+        //   name: 'TreeTable1',
+        //   url: '/base/treetable1',
+        //   icon: 'icon-puzzle'
+        // },
+        {
           name: 'Tabs',
           url: '/base/tabs',
           icon: 'icon-puzzle'

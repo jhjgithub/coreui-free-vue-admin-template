@@ -1,16 +1,17 @@
 <template>
   <div class="animated fadeIn">
 
-    <b-row>
+    <!-- <b-row> -->
       <b-col lg="6">
         <c-table :table-data="items" :fields="fields" caption="<i class='fa fa-align-justify'></i> Simple Table"></c-table>
       </b-col>
 
-      <b-col lg="6">
+      <!-- <b-col lg="6">
         <c-table :table-data="items" striped caption="<i class='fa fa-align-justify'></i> Striped Table"></c-table>
-      </b-col>
-    </b-row><!--/.row-->
+      </b-col> -->
+    <!-- </b-row> -->
 
+    <!--
     <b-row>
       <b-col lg="6">
         <c-table :table-data="items" small caption="<i class='fa fa-align-justify'></i> Condensed Table"></c-table>
@@ -31,6 +32,7 @@
         <c-table dark :table-data="itemsArray" :per-page=10 hover striped bordered small fixed caption="<i class='fa fa-align-justify'></i> Dark Table"></c-table>
       </b-col>
     </b-row>
+  -->
   </div>
 
 </template>
