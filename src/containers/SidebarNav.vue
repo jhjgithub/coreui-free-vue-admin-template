@@ -20,7 +20,7 @@
                   <template v-if="childL1.children">
                     <!-- Second level dropdown -->
                     <SidebarNavDropdown :key="index1" :name="childL1.name" :url="childL1.url" :icon="childL1.icon">
-                      <li :key="index2" class="nav-item navbar-light" v-for="(childL2, index2) in childL1.children">
+                      <li :key="index2" class="nav-item" v-for="(childL2, index2) in childL1.children">
                         <SidebarNavLink :name="childL2.name" :url="childL2.url" :icon="childL2.icon" :badge="childL2.badge" :variant="childL2.variant" :attributes="childL2.attributes" />
                       </li>
                     </SidebarNavDropdown>
@@ -47,8 +47,9 @@
 </template>
 
 <script>
-// import SidebarNavDivider from './SidebarNavDivider'
 import { SidebarNavDivider, SidebarNavDropdown, SidebarNavLink, SidebarNavTitle, SidebarNavItem, SidebarNavLabel, VuePerfectScrollbar}  from '@coreui/vue'
+
+// import SidebarNavDivider from './SidebarNavDivider'
 // import SidebarNavDropdown from './SidebarNavDropdown'
 // import SidebarNavLink from './SidebarNavLink'
 // import SidebarNavTitle from './SidebarNavTitle'
@@ -104,3 +105,5 @@ export default {
     margin: auto;
   }
 </style>
+
+
