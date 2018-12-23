@@ -4,6 +4,9 @@ export default {
       name: 'Dashboard',
       url: '/dashboard',
       icon: 'icon-speedometer',
+      // class: 'text-dark',
+      // variant: 'secondary',    // background 
+      // type: 'text-dark',        
       badge: {
         variant: 'primary',
         text: 'NEW'
