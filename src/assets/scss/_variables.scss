@@ -1,1 +1,43 @@
 // Variable overrides
+
+// for sidebar color
+// you can find names of the color variable in below
+// E:\src\vue\coreui-free-vue-admin-template\node_modules\@coreui\coreui\scss\_sidebar.scss
+// figure out the color code defined in below
+// E:\src\vue\coreui-free-vue-admin-template\node_modules\@coreui\coreui\scss\_variables.scss
+
+// $sidebar-bg:                          $gray-800 !default;
+$sidebar-bg:                        rgb(251, 251, 255);
+
+// $sidebar-color:                       #fff !default;
+// $sidebar-color:                     rgb(0, 0, 0);
+
+// $sidebar-nav-color:                   #fff !default;
+// $sidebar-nav-color:                   rgb(0, 0, 0);
+
+// $sidebar-nav-dropdown-bg:             rgba(0,0,0,.2) !default;
+$sidebar-nav-dropdown-bg:             rgb(251, 251, 255);
+
+// $sidebar-footer-bg:                   rgba(0,0,0,.2) !default;
+// $sidebar-footer-bg:                   rgba(236, 234, 234, 0.2);
+
+// $sidebar-form-color:                  #fff !default;
+// $sidebar-form-color:                  red;
+
+// $sidebar-nav-dropdown-color:          #fff !default;
+$sidebar-nav-dropdown-color:          rgb(0, 0, 0);
+
+// $sidebar-nav-link-color:              #fff !default;
+$sidebar-nav-link-color:             rgb(0, 0, 0);
+
+// $sidebar-nav-title-color:             $gray-200 !default;
+$sidebar-nav-title-color:             rgb(0, 0, 0);
+
+//$sidebar-nav-link-icon-color:         $gray-600 !default;
+$sidebar-nav-link-icon-color:         green;
+
+// $sidebar-nav-link-active-bg:          lighten($sidebar-bg, 5%) !default;
+$sidebar-nav-link-active-bg:          lighten(#5bc0de, 10%);
+
+// $sidebar-nav-link-hover-bg:           theme-color("primary") !default;
+$sidebar-nav-link-hover-bg:           lighten($sidebar-nav-link-active-bg, 10%);

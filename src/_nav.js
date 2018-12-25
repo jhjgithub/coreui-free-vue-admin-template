@@ -3,7 +3,11 @@ export default {
     {
       name: 'Dashboard',
       url: '/dashboard',
-      icon: 'icon-speedometer',
+      icon: 'fa fa-tachometer fa-5x',
+      // icon: 'icon-speedometer',
+      // label: {
+      //   class: 'text-success'
+      // },
       // class: 'text-dark',
       // variant: 'secondary',    // background 
       // type: 'text-dark',        
@@ -25,11 +29,18 @@ export default {
       name: 'Colors',
       url: '/theme/colors',
       icon: 'icon-drop'
+      // label: {
+      //   class: 'text-dark'
+      // },
     },
     {
       name: 'Typography',
       url: '/theme/typography',
       icon: 'icon-pencil'
+      // label: {
+      //   class: 'text-success'
+      // },
+
     },
     {
       title: true,
@@ -279,20 +290,20 @@ export default {
       },
       attributes: { disabled: true },
     },
-    {
-      name: 'Download CoreUI',
-      url: 'http://coreui.io/vue/',
-      icon: 'icon-cloud-download',
-      class: 'mt-auto',
-      variant: 'success',
-      attributes: { target: '_blank', rel: 'noopener' }
-    },
-    {
-      name: 'Try CoreUI PRO',
-      url: 'http://coreui.io/pro/vue/',
-      icon: 'icon-layers',
-      variant: 'danger',
-      attributes: { target: '_blank', rel: 'noopener' }
-    },
+    // {
+    //   name: 'Download CoreUI',
+    //   url: 'http://coreui.io/vue/',
+    //   icon: 'icon-cloud-download',
+    //   class: 'mt-auto',
+    //   variant: 'success',
+    //   attributes: { target: '_blank', rel: 'noopener' }
+    // },
+    // {
+    //   name: 'Try CoreUI PRO',
+    //   url: 'http://coreui.io/pro/vue/',
+    //   icon: 'icon-layers',
+    //   variant: 'danger',
+    //   attributes: { target: '_blank', rel: 'noopener' }
+    // },
   ]
 }
