@@ -16,7 +16,10 @@ $sidebar-bg:                        rgb(251, 251, 255);
 // $sidebar-nav-color:                   rgb(0, 0, 0);
 
 // $sidebar-nav-dropdown-bg:             rgba(0,0,0,.2) !default;
-$sidebar-nav-dropdown-bg:             rgb(251, 251, 255);
+// $sidebar-nav-dropdown-bg:             rgb(251, 251, 255);
+$sidebar-nav-dropdown-bg:             rgb(216, 215, 215);
+
+$enable-sidebar-nav-rounded:          true;
 
 // $sidebar-footer-bg:                   rgba(0,0,0,.2) !default;
 // $sidebar-footer-bg:                   rgba(236, 234, 234, 0.2);
@@ -41,3 +44,7 @@ $sidebar-nav-link-active-bg:          lighten(#5bc0de, 10%);
 
 // $sidebar-nav-link-hover-bg:           theme-color("primary") !default;
 $sidebar-nav-link-hover-bg:           lighten($sidebar-nav-link-active-bg, 10%);
+
+// my own define
+$sidebar-nav-dropdown-padding-left:  10px;
+$sidebar-nav-dropdown-items-bg:  rgb(238, 236, 236);
