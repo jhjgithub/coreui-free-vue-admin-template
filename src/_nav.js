@@ -3,14 +3,14 @@ export default {
     {
       name: 'Dashboard',
       url: '/dashboard',
-      icon: 'fa fa-tachometer fa-5x',
+      icon: 'fa fa-tachometer fa-3x dashboard-icon-color',
       // icon: 'icon-speedometer',
       // label: {
       //   class: 'text-success'
       // },
       // class: 'text-dark',
       // variant: 'secondary',    // background 
-      // type: 'text-dark',        
+      // type: 'secondary',        
       badge: {
         variant: 'primary',
         text: 'NEW'
@@ -28,7 +28,7 @@ export default {
     {
       name: 'Colors',
       url: '/theme/colors',
-      icon: 'icon-drop'
+      icon: 'icon-drop color-icon-color'
       // label: {
       //   class: 'text-dark'
       // },
@@ -240,7 +240,7 @@ export default {
     {
       name: 'Widgets',
       url: '/widgets',
-      icon: 'icon-calculator',
+      icon: 'icon-calculator widgets-icon-color',
       badge: {
         variant: 'primary',
         text: 'NEW'

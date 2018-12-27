@@ -37,7 +37,7 @@ $sidebar-nav-link-color:             rgb(0, 0, 0);
 $sidebar-nav-title-color:             rgb(0, 0, 0);
 
 //$sidebar-nav-link-icon-color:         $gray-600 !default;
-$sidebar-nav-link-icon-color:         green;
+// $sidebar-nav-link-icon-color:         green;
 
 // $sidebar-nav-link-active-bg:          lighten($sidebar-bg, 5%) !default;
 $sidebar-nav-link-active-bg:          lighten(#5bc0de, 10%);
@@ -48,3 +48,17 @@ $sidebar-nav-link-hover-bg:           lighten($sidebar-nav-link-active-bg, 10%);
 // my own define
 $sidebar-nav-dropdown-padding-left:  10px;
 $sidebar-nav-dropdown-items-bg:  rgb(238, 236, 236);
+// $sidebar-nav-link-padding-x: 30px;
+
+
+.dashboard-icon-color {
+  color:blue;
+}
+
+.color-icon-color {
+  color:rgb(60, 255, 0);
+}
+
+.widgets-icon-color {
+  color:rgb(17, 182, 204);
+}
