@@ -80,7 +80,8 @@
 
   .nav-dropdown-items {
     max-height: 0;
-    padding: 0;
+    // padding: 0;
+    padding-left: $sidebar-nav-dropdown-padding-left;
     margin: 0;
     overflow-y: hidden;
     transition: max-height .3s ease-in-out;
@@ -107,7 +108,7 @@
       width: ($font-size-base * 1.25);
       margin: 0 ($sidebar-nav-link-padding-x / 2) 0 0;
       font-size: $font-size-base;
-      color: $sidebar-nav-link-icon-color;
+      // color: $sidebar-nav-link-icon-color;
       text-align: center;
     }
 
@@ -121,9 +122,10 @@
       background: $sidebar-nav-link-active-bg;
       @include borders($sidebar-nav-link-active-borders);
 
-      .nav-icon {
-        color: $sidebar-nav-link-active-icon-color;
-      }
+      // add by patrick: to enable color of each icon
+      // .nav-icon {
+      //   color: $sidebar-nav-link-active-icon-color;
+      // }
     }
 
     &:hover {
@@ -131,9 +133,9 @@
       background: $sidebar-nav-link-hover-bg;
       @include borders($sidebar-nav-link-hover-borders);
 
-      .nav-icon {
-        color: $sidebar-nav-link-hover-icon-color;
-      }
+      // .nav-icon {
+      //   color: $sidebar-nav-link-hover-icon-color;
+      // }
 
       &.nav-dropdown-toggle::before {
         background-image: $sidebar-nav-dropdown-indicator-hover;
@@ -211,6 +213,9 @@
       border-radius: $border-radius;
     }
     > .nav-dropdown-items {
+      // add patrick
+      padding-left: $sidebar-nav-dropdown-padding-left;
+      background: $sidebar-nav-dropdown-items-bg;      
       max-height: 1500px;
     }
 
@@ -391,7 +396,8 @@
         bottom: 0;
         width: $sidebar-minimized-width;
         height: $sidebar-minimizer-height;
-        background-color: darken($sidebar-bg, 5%);
+        background-color: $sidebar-minimizer-bg;
+        // background-color: darken($sidebar-bg, 5%);
       }
       // stylelint-disable no-duplicate-selectors
       .sidebar-nav {
@@ -415,9 +421,9 @@
           > .nav-link {
             background: $sidebar-nav-link-hover-bg;
 
-            .nav-icon {
-              color: $sidebar-nav-link-hover-color;
-            }
+            // .nav-icon {
+            //   color: $sidebar-nav-link-hover-color;
+            // }
           }
           .nav-link {
 
@@ -480,6 +486,7 @@
 
       .nav-dropdown-items {
         .nav-item {
+          padding: 0px;
           width: $sidebar-width;
 
           .nav-link {
@@ -491,6 +498,7 @@
       .nav > .nav-dropdown {
         > .nav-dropdown-items {
           display: none;
+          padding: 0px;
           max-height: 1000px;
           background: $sidebar-bg;
         }
