@@ -20,7 +20,8 @@ const Switches = () => import('@/views/base/Switches')
 const Tables = () => import('@/views/base/Tables')
 const Tabs = () => import('@/views/base/Tabs')
 const TreeTable = () => import('@/views/base/TreeTable')
-const NetworkObject = () => import('@/views/base/NetworkObject')
+const NetobjDxTreeList = () => import('@/views/base/NetobjDxTreeList')
+const NetobjJqxTreeGrid = () => import('@/views/base/NetobjJqxTreeGrid')
 // const TreeTable1 = () => import('@/views/base/TreeTable1')
 const Breadcrumbs = () => import('@/views/base/Breadcrumbs')
 const Carousels = () => import('@/views/base/Carousels')
@@ -131,7 +132,20 @@ export default new Router({
         {
           path: 'networkobject',
           name: 'NetworkObject',
-          component: NetworkObject
+          redirect: '/networkobject/dxtreelist',
+          component: {
+            render (c) { return c('router-view') }
+          },
+          children: [
+            {
+              path: 'dxtreelist',
+              component: NetobjDxTreeList,
+            },
+            {
+              path: 'jqxtreegrid',
+              component: NetobjJqxTreeGrid,
+            },            
+          ]          
         },
         {
           path: 'base',

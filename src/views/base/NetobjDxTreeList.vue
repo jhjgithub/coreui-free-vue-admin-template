@@ -7,7 +7,6 @@
       :data-source="netobjs"
       :show-borders="true"
       :show-row-lines="true"
-      :column-auto-width="true"
       :word-wrap-enabled="true"
       :expanded-row-keys="expandedRowKeys"
       :selected-row-keys="selectedRowKeys"
@@ -22,6 +21,7 @@
       :columns="columns"
     >
 
+      <!-- :column-auto-width="true" -->
 
       <dx-search-panel :visible="true" :width="250"/>
       <dx-header-filter :visible="false"/>
@@ -97,7 +97,7 @@ import "devextreme/dist/css/dx.common.css";
 // import 'devextreme/dist/css/dx.light.compact.css';
 import "devextreme/dist/css/dx.softblue.css";
 
-import { netobjs } from "./netobj_data.js";
+import { netobjs } from "./netobj_data_dxtreelist.js";
 // import EmployeeCell from "./EmployeeCell.vue";
 
 const statuses = [
@@ -195,7 +195,7 @@ export default {
           caption: "Desc",
           dataField: "desc",
           hidingPriority: 0,
-          // width: "200px",
+          width: "200px",
         },
         {
           caption: "...",

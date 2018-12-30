@@ -54,7 +54,19 @@ export default {
     {
       name: 'Network Objects',
       url: '/networkobject',
-      icon: 'icon-puzzle'
+      icon: 'icon-puzzle',
+      children: [
+        {
+          name: 'dxTreeList',
+          url: '/networkobject/dxtreelist',
+          icon: 'icon-puzzle'
+        },
+        {
+          name: 'jqxTreeGrid',
+          url: '/networkobject/jqxtreegrid',
+          icon: 'icon-puzzle'
+        },
+      ]
     },
     {
       name: 'Base',
