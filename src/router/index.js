@@ -20,6 +20,7 @@ const Switches = () => import('@/views/base/Switches')
 const Tables = () => import('@/views/base/Tables')
 const Tabs = () => import('@/views/base/Tabs')
 const TreeTable = () => import('@/views/base/TreeTable')
+const NetworkObject = () => import('@/views/base/NetworkObject')
 // const TreeTable1 = () => import('@/views/base/TreeTable1')
 const Breadcrumbs = () => import('@/views/base/Breadcrumbs')
 const Carousels = () => import('@/views/base/Carousels')
@@ -126,6 +127,11 @@ export default new Router({
               component: User,
             },
           ]
+        },
+        {
+          path: 'networkobject',
+          name: 'NetworkObject',
+          component: NetworkObject
         },
         {
           path: 'base',

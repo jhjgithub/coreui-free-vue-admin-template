@@ -8,7 +8,7 @@
     <b-badge v-if="badge && badge.text" :variant="badge.variant">{{badge.text}}</b-badge>
   </a>
   <router-link :to="url" :class="classList" v-bind="attributes" v-else>
-    <i :class="classIcon"></i> url-{{name}}
+    <i :class="classIcon"></i> {{name}}
     <b-badge v-if="badge && badge.text" :variant="badge.variant">{{badge.text}}</b-badge>
   </router-link>
 </template>

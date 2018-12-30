@@ -52,6 +52,11 @@ export default {
       }
     },
     {
+      name: 'Network Objects',
+      url: '/networkobject',
+      icon: 'icon-puzzle'
+    },
+    {
       name: 'Base',
       url: '/base',
       icon: 'icon-puzzle',
