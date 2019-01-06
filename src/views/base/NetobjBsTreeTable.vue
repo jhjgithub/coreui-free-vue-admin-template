@@ -16,10 +16,22 @@
         <b-col cols="10"  class="d-flex justify-content-end toolbtn-box">
           <span>
               <b-button-group size="sm">
-                <b-btn @click.stop="onNew" v-b-tooltip.hover title="New item"><i class="fa fa-plus fa-lg"></i> </b-btn>              
-                <b-btn @click.stop="onEdit" v-b-tooltip.hover title="Edit item"><i class="fa fa-edit fa-lg"></i> </b-btn>
-                <b-btn @click.stop="onClone" v-b-tooltip.hover title="Clone item"><i class="fa fa-clone fa-lg"></i> </b-btn>              
-                <b-btn @click.stop="onDelete" v-b-tooltip.hover title="Delete item"><i class="fa fa-trash fa-lg"></i> </b-btn>              
+                <b-btn @click.stop="onNew" v-b-tooltip.hover title="New item">
+                  <!-- <i class="fas fa-plus fa-lg"></i> -->
+                  <font-awesome-icon  icon="plus"  size="lg" />
+                </b-btn>
+                <b-btn @click.stop="onEdit" v-b-tooltip.hover title="Edit item">
+                  <!-- <i class="fa fa-edit fa-lg"></i>  -->
+                  <font-awesome-icon  icon="edit"  size="lg" />
+                  </b-btn>
+                <b-btn @click.stop="onClone" v-b-tooltip.hover title="Clone item">
+                  <!-- <i class="fa fa-clone fa-lg"></i>  -->
+                  <font-awesome-icon :icon="['far', 'clone']"  size="lg" />
+                  </b-btn>              
+                <b-btn @click.stop="onDelete" v-b-tooltip.hover title="Delete item">
+                  <!-- <i class="fa fa-trash fa-lg"></i>  -->
+                  <font-awesome-icon :icon="['far', 'trash-alt']"  size="lg" />
+                  </b-btn>              
               </b-button-group>
           </span>
         </b-col>
@@ -50,8 +62,12 @@
         />
       </template>
       <template slot="HEAD_netobj_id" slot-scope="row">
-        <i v-if="row.field.icon" :class="row.field.icon" />
+        <!-- <i v-if="row.field.icon" :class="row.field.icon" /> -->
+        <font-awesome-icon :icon="row.field.icon"  size="sm"  />
         {{row.label}} 
+        <span v-if="get_sort_by() == row.column">
+          <font-awesome-icon :icon="sort_icon" size="sm" :style="{ color: 'red' }"/>
+        </span>
       </template>
       <template slot="HEAD_details" slot-scope="row">
         ...
@@ -67,16 +83,19 @@
         <!-- :filter="filterGrid"         -->
         <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
         <span>
-        <i style="cursor:pointer" class="row-expand-btn fa fa-chevron-right" @click.stop="toggleShowChild(row.item)"></i>
+        <!-- <i style="cursor:pointer" class="row-expand-btn fa fa-chevron-right" @click.stop="toggleShowChild(row.item)"/> -->
+        <font-awesome-icon style="cursor:pointer" class="row-expand-btn" @click.stop="toggleShowChild(row.item)" icon="caret-right"  size="lg" />
         </span>
         {{row.item.netobj_id}}        
       </template>
 
       <template slot="details" slot-scope="row">
         <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
-        <b-button size="sm" @click.stop="row.toggleDetails" class="mr-2">
+        <!-- <b-button size="sm" @click.stop="row.toggleDetails" class="mr-2">
           {{ row.detailsShowing ? 'Hide' : 'Show'}}
-        </b-button>
+        </b-button> -->
+        <font-awesome-icon style="cursor:pointer" @click.stop="row.toggleDetails" icon="info-circle"  size="lg" />
+
         <!-- In some circumstances you may need to use @click.native.stop instead -->
         <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @change -->
         <!-- <b-form-checkbox  @click.native.stop @change="row.toggleDetails" v-model="row.detailsShowing">
@@ -132,6 +151,8 @@ import {
   netobj_data
 } from "./netobj_data_bstreetable.js";
 
+import "../../fa-config.js";
+
 export default {
   components: {
     // BInputGroup
@@ -149,6 +170,7 @@ export default {
       selectedItems: [],
       selectAll: false,
       indeterminate: false,
+      sort_icon: "sort-up",
 
       fields: netobj_fields,
       items: netobj_data,
@@ -171,6 +193,18 @@ export default {
       // this.$refs.NetobjGrid.expandRow(2);
     },
 
+    get_sort_by() {
+      console.log("get sort by: " + this.sort_by);
+      return this.sort_by;
+
+      // if (this.sort_desc) {
+      //   console.log("sort_down");
+      //   return "sort_down";
+      // }
+
+      // console.log("sort_up");
+      // return "sort_up";
+    },
     onNew() {
       console.log("click edit");
     },
@@ -270,6 +304,12 @@ export default {
         this.sort_by = ctx.sortBy;
       }
 
+      if (this.sort_desc)
+        this.sort_icon = "sort-amount-down";
+      else
+        this.sort_icon = "sort-amount-up";        
+
+      console.log("sort by: " + this.sort_by + ", sort desc: " + this.sort_desc);
       // console.log(this.sort_changed + ": cur by: " + this.sort_by + ", cur desc: " + this.sort_desc);
     },
 
@@ -283,7 +323,7 @@ export default {
     },
     
     toggleShowChild: function(item) {
-      // console.log("clicked first_name:" + item.first_name);
+      console.log("clicked first_name:" + item.netobj_id);
       // this.items.splice(2, 1);
 
       if (item) {
@@ -344,7 +384,8 @@ table.b-table > tfoot > tr > th.sorting::after {
     /* bottom: 0; */
     /* top: 0.25em; */
     right: 0.75em;
-    display: block;
+    /* display: block; */
+    display: none;
     opacity: 0.4;
     padding-bottom: inherit;
     font-size: inherit;

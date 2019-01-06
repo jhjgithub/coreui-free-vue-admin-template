@@ -10,7 +10,8 @@ export const netobj_fields = {
 
   netobj_id: {
     label: 'ID',
-    icon: 'fa fa-home fa-lg',    
+    // icon: 'fa fa-home fa-lg',    
+    icon: 'user',    
     sortable: true,
     thStyle: { width: '30px', maxWidth: '200px', minWidth: '50px' },    
   },
