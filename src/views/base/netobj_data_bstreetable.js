@@ -10,19 +10,14 @@ export const netobj_fields = {
 
   netobj_id: {
     label: 'ID',
+    icon: 'fa fa-home fa-lg',    
     sortable: true,
     thStyle: { width: '30px', maxWidth: '200px', minWidth: '50px' },    
   },
 
-  parent_id: {
-    label: '',
-    sortable: false,
-    class: 'hide-col',
-    thStyle: { width: '0px', maxWidth: '0px', minWidth: '0px' },        
-  },
-
   netobj_name: {
     label: 'Name',
+    icon: 'fa fa-camera-retro fa-lg',  
     sortable: true,
     thStyle: { width: '50px', maxWidth: '100px', minWidth: '50px' },    
   },
@@ -62,20 +57,7 @@ export const netobj_fields = {
       minWidth: '20px'
     },
   },
-    
-  /*
-  desc: {
-    label: 'Desc',
-    sortable: true,
-    thStyle: { width: '100px', maxWidth: '200px', minWidth: '50px' },    
-  },
-  */
 };
-
-export const netobj_field_icons = {
-  'ID' : 'fa fa-home fa-lg',
-  'Name' : 'fa fa-camera-retro fa-lg',  
-}
 
 export const netobj_data = [
   {

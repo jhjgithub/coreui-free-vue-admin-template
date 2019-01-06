@@ -1,21 +1,21 @@
-<template>
+ <template>
 
   <b-card header-tag="header">
     <h3 slot="header" class="mb-0">{{caption}}</h3>
 
-    <b-container>      
+    <b-container class="toolbar-box" fluid>      
       <b-row>
-        <b-col cols="4">
-          <b-input-group size="sm" class="search-box">
+        <b-col cols="2" class="search-box">
+          <b-input-group size="sm">
             <b-input-group-text slot="prepend">
               <span class="fa fa-search text-black"/>
             </b-input-group-text>
             <b-form-input type="search" v-model.lazy="search_keyword"></b-form-input>
           </b-input-group>
         </b-col>
-        <b-col cols="8"  class="d-flex justify-content-end">
+        <b-col cols="10"  class="d-flex justify-content-end toolbtn-box">
           <span>
-              <b-button-group size="sm" class="toolbar-box">
+              <b-button-group size="sm">
                 <b-btn @click.stop="onNew" v-b-tooltip.hover title="New item"><i class="fa fa-plus fa-lg"></i> </b-btn>              
                 <b-btn @click.stop="onEdit" v-b-tooltip.hover title="Edit item"><i class="fa fa-edit fa-lg"></i> </b-btn>
                 <b-btn @click.stop="onClone" v-b-tooltip.hover title="Clone item"><i class="fa fa-clone fa-lg"></i> </b-btn>              
@@ -48,6 +48,10 @@
           :indeterminate="indeterminate"
           @change="toggleSelectAll"                  
         />
+      </template>
+      <template slot="HEAD_netobj_id" slot-scope="row">
+        <i v-if="row.field.icon" :class="row.field.icon" />
+        {{row.label}} 
       </template>
       <template slot="HEAD_details" slot-scope="row">
         ...
@@ -83,18 +87,23 @@
       <template slot="row-details" slot-scope="row">
         <b-card>
           <b-row class="mb-2">
-            <b-col sm="3" class="text-sm-right">
-              <b>Age:</b>
+            <b-col sm="2" class="text-sm-right">
+              <b>Desc:</b>
             </b-col>
-            <b-col>{{ row.item.age }}</b-col>
+            <b-col>{{ row.item.desc }}</b-col>
           </b-row>
+          <!--           
           <b-row class="mb-2">
-            <b-col sm="3" class="text-sm-right">
+            <b-col sm="2" class="text-sm-right">
               <b>Is Active:</b>
             </b-col>
             <b-col>{{ row.item.isActive }}</b-col>
-          </b-row>
-          <b-button size="sm" @click="row.toggleDetails">Hide</b-button>
+          </b-row> -->
+          <b-row align-h="end">
+            <b-col cols="1">
+              <b-button size="sm" @click="row.toggleDetails">Hide</b-button>
+            </b-col>          
+          </b-row>                    
         </b-card>
       </template>
     </b-table>
@@ -373,7 +382,6 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
 .table td {
   vertical-align: middle;
   border-bottom: 1px solid #c8ced3;  
-
 }
 
 .custom-control {
@@ -395,14 +403,24 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
   /* padding-left: 2em; */
 }
 
-.search-box {
-  width: 100%; 
-  padding: 5px 0px;
+.toolbar-box.container-fluid {
+  padding: 0 1em;
+  /* padding-left: 1em; */
+  /* margin: 0; */
+  /* width: 100%;  */
+  /* background-color: rgb(121, 240, 116);   */
 }
 
-.toolbar-box {
+.search-box {
+  /* padding: 0; */
+  /* width: 10%;  */
+  padding: 5px 0px 5px 10px;
+  /* background-color: brown;   */
+}
+
+.toolbtn-box {
   width: 100%;
-  padding: 5px 0px;
+  padding: 5px 10px 5px 0px;
   /* background-color: brown; */
   /* color: rgba(184, 34, 34, 0.753); */
   /* font-size: 10px; */
