@@ -22,6 +22,7 @@ const Tabs = () => import('@/views/base/Tabs')
 const TreeTable = () => import('@/views/base/TreeTable')
 const NetobjDxTreeList = () => import('@/views/base/NetobjDxTreeList')
 const NetobjJqxTreeGrid = () => import('@/views/base/NetobjJqxTreeGrid')
+const NetobjBsTreeTable = () => import('@/views/base/NetobjBsTreeTable')
 // const TreeTable1 = () => import('@/views/base/TreeTable1')
 const Breadcrumbs = () => import('@/views/base/Breadcrumbs')
 const Carousels = () => import('@/views/base/Carousels')
@@ -137,6 +138,10 @@ export default new Router({
             render (c) { return c('router-view') }
           },
           children: [
+            {
+              path: 'bstreetable',
+              component: NetobjBsTreeTable,
+            },
             {
               path: 'dxtreelist',
               component: NetobjDxTreeList,

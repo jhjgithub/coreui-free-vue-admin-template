@@ -57,6 +57,11 @@ export default {
       icon: 'icon-puzzle',
       children: [
         {
+          name: 'bsTreeTable',
+          url: '/networkobject/bstreetable',
+          icon: 'icon-puzzle'
+        },
+        {
           name: 'dxTreeList',
           url: '/networkobject/dxtreelist',
           icon: 'icon-puzzle'
