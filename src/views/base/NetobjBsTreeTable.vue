@@ -141,81 +141,10 @@ export default {
 
       fields: netobj_fields,
       items: netobj_data,
-      /*
-      fields: {
-        selection: {
-          sortable: false,
-          label: "",
-          class: "options-column",
-          thStyle: {
-            width: '7px',
-            maxWidth: '10px',
-            minWidth: '5px'
-          },
-        },
-
-        first_name: {
-          label: 'First Name',
-          sortable: true,
-          thStyle: {
-            width: '50px',
-            maxWidth: '200px',
-            minWidth: '50px'
-          },
-        },
-
-        last_name:{
-          label: 'Last Name',
-          sortable: true,
-          thStyle: {
-            width: '150px',            
-            maxWidth: '200px',
-            minWidth: '100px'
-          },
-        }, 
-        show_details: {
-          label: 'Show Details',
-          sortable: false,
-          thStyle: {
-            width: '80px',            
-            maxWidth: '100px',
-            minWidth: '50px'
-          },
-        },
-      },
-
-      items: [
-        {
-          isActive: true, age: 40, first_name: "Dickerson", last_name: "Macdonald", showChild: false, selected: false,
-          children: [
-            {
-              isActive: true, age: 40, first_name: "Dickerson-1", last_name: "Macdonald", showChild: true, selected: false,
-              children: []
-            },
-            {
-              isActive: true, age: 40, first_name: "Dickerson-2", last_name: "Macdonald", showChild: true, selected: false,
-              children: []
-            },
-          ]
-        },
-        {
-          isActive: false, age: 21, first_name: "Larsen", last_name: "Shaw", showChild: false, selected: false,
-        },
-        {
-          isActive: false, age: 89, first_name: "Geneva", last_name: "Wilson",showChild: false, selected: false,
-        },
-        {
-          isActive: true, age: 38, first_name: "Jami", last_name: "Carney", showChild: false, selected: false,
-        }
-      ],
-      */
-
       currentPage: 1,
       perPage: 2,
-      // totalRows: items.length,
       totalRows: 0,      
       pageOptions: [ 5, 10, 15 ],
-
     };
   },
 
@@ -434,6 +363,20 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
     color: rgb(0, 162, 255);
 }
 
+.table thead th {
+  vertical-align: middle;
+}
+
+.table td {
+  vertical-align: middle;
+  border-bottom: 1px solid #c8ced3;  
+
+}
+
+.custom-control {
+    padding-left: 2rem;
+}
+
 .row-expand-btn {
   color: rgba(0, 0, 0, 0.753);
   /* font-size: 10px; */
@@ -445,15 +388,13 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
 }
 
 .custom-control, .custom-checkbox, .custom-control-inline, .options-column {
-  padding: 0;
-  margin: 0;
-  padding-left: 2em;
+  padding-top: 0.15em;
+  /* padding-left: 2em; */
 }
 
 .search-box {
   width: 100%; 
   padding: 5px 0px;
-  /* background-color: rgb(115, 196, 99); */
 }
 
 .toolbar-box {
