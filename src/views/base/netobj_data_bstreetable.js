@@ -24,7 +24,7 @@ export const netobj_fields = {
   netobj_name: {
     label: 'Name',
     sortable: true,
-    thStyle: { width: '70px', maxWidth: '100px', minWidth: '50px' },    
+    thStyle: { width: '50px', maxWidth: '100px', minWidth: '50px' },    
   },
 
   network_type: {
@@ -36,23 +36,33 @@ export const netobj_fields = {
   network_start: {
     label: 'Start Address',
     sortable: true,
-    thStyle: { width: '30px', maxWidth: '100px', minWidth: '50px' },    
+    thStyle: { width: '50px', maxWidth: '100px', minWidth: '50px' },    
   },
   network_end: {
     label: 'End Address',
     sortable: true,
-    thStyle: { width: '30px', maxWidth: '100px', minWidth: '50px' },    
+    thStyle: { width: '50px', maxWidth: '100px', minWidth: '50px' },    
   },
   netmask: {
     label: 'Network Mask',
     sortable: true,
-    thStyle: { width: '20px', maxWidth: '100px', minWidth: '50px' },    
+    thStyle: { width: '50px', maxWidth: '100px', minWidth: '50px' },    
   },
   create_date: {
     label: 'Created Date',
     sortable: true,
     thStyle: { width: '50px', maxWidth: '100px', minWidth: '50px' },    
   },
+  details: {
+    label: 'Details',
+    sortable: false,
+    thStyle: {
+      width: '20px',            
+      maxWidth: '20px',
+      minWidth: '20px'
+    },
+  },
+    
   /*
   desc: {
     label: 'Desc',

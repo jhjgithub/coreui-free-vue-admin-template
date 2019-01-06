@@ -40,7 +40,8 @@
       class="table-area" 
       >
 
-      <template slot="HEAD_selected" slot-scope="col">
+      <!-- Checkbox column of the Table Header -->
+      <template slot="HEAD_selected" slot-scope="row">
         <b-form-checkbox 
           @click.native.stop
           v-model="selectAll"
@@ -48,29 +49,29 @@
           @change="toggleSelectAll"                  
         />
       </template>
-
-      <template slot="selected" slot-scope="col">
-        <b-form-checkbox 
-          @click.native.stop
-          v-model="col.item.selected"
-          @change="selectRow(col.item)"
-        />
-
+      <template slot="HEAD_details" slot-scope="row">
+        ...
       </template>
 
-      <template slot="first_name" slot-scope="col">
+      <!-- Checkbox column of the rows -->
+      <template slot="selected" slot-scope="row">
+        <b-form-checkbox @click.native.stop v-model="row.item.selected" @change="selectRow(row.item)" />
+      </template>
+
+      <template slot="netobj_id" slot-scope="row">
         <!-- :tbody-tr-class="rowClass" -->
         <!-- :filter="filterGrid"         -->
         <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
         <span>
-        <i style="cursor:pointer" class="row-expand-btn fa fa-chevron-right" @click.stop="toggleShowChild(col.item)"></i>
+        <i style="cursor:pointer" class="row-expand-btn fa fa-chevron-right" @click.stop="toggleShowChild(row.item)"></i>
         </span>
-        {{col.item.first_name}}        
+        {{row.item.netobj_id}}        
       </template>
-      <template slot="show_details" slot-scope="col">
+
+      <template slot="details" slot-scope="row">
         <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
-        <b-button size="sm" @click.stop="col.toggleDetails" class="mr-2">
-          {{ col.detailsShowing ? 'Hide' : 'Show'}} Details
+        <b-button size="sm" @click.stop="row.toggleDetails" class="mr-2">
+          {{ row.detailsShowing ? 'Hide' : 'Show'}}
         </b-button>
         <!-- In some circumstances you may need to use @click.native.stop instead -->
         <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @change -->
@@ -78,21 +79,22 @@
           Details via check
         </b-form-checkbox> -->
       </template>
-      <template slot="row-details" slot-scope="col">
+
+      <template slot="row-details" slot-scope="row">
         <b-card>
           <b-row class="mb-2">
             <b-col sm="3" class="text-sm-right">
               <b>Age:</b>
             </b-col>
-            <b-col>{{ col.item.age }}</b-col>
+            <b-col>{{ row.item.age }}</b-col>
           </b-row>
           <b-row class="mb-2">
             <b-col sm="3" class="text-sm-right">
               <b>Is Active:</b>
             </b-col>
-            <b-col>{{ col.item.isActive }}</b-col>
+            <b-col>{{ row.item.isActive }}</b-col>
           </b-row>
-          <b-button size="sm" @click="col.toggleDetails">Hide Details</b-button>
+          <b-button size="sm" @click="row.toggleDetails">Hide</b-button>
         </b-card>
       </template>
     </b-table>
@@ -328,6 +330,7 @@ table.b-table > thead > tr > th.sorting::after,
 table.b-table > tfoot > tr > th.sorting::before,
 table.b-table > tfoot > tr > th.sorting::after {
     position: absolute;
+    /* position: relative; */
 
     /* bottom: 0; */
     /* top: 0.25em; */
