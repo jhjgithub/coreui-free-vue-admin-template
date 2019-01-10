@@ -8,7 +8,8 @@
         <b-col cols="2" class="search-box">
           <b-input-group size="sm">
             <b-input-group-text slot="prepend">
-              <span class="fa fa-search text-black"/>
+              <!-- <span class="fa fa-search text-black"/> -->
+              <font-awesome-icon  icon="search"  size="sm" />
             </b-input-group-text>
             <b-form-input type="search" v-model.lazy="search_keyword"></b-form-input>
           </b-input-group>
@@ -48,8 +49,9 @@
       @sort-changed="sortingChanged"
       :current-page="currentPage"
       :per-page="perPage"
-      thead-class="table-text"     
+      thead-class="table-text"
       class="table-area" 
+      @filtered="onFiltered"
       >
 
       <!-- Checkbox column of the Table Header -->
@@ -78,15 +80,25 @@
         <b-form-checkbox @click.native.stop v-model="row.item.selected" @change="selectRow(row.item)" />
       </template>
 
+      <!-- <template slot="netobj_id" slot-scope="row" :tbody-tr-class="hide-col">         -->
       <template slot="netobj_id" slot-scope="row">
-        <!-- :tbody-tr-class="rowClass" -->
-        <!-- :filter="filterGrid"         -->
-        <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
-        <span>
-        <!-- <i style="cursor:pointer" class="row-expand-btn fa fa-chevron-right" @click.stop="toggleShowChild(row.item)"/> -->
-        <font-awesome-icon style="cursor:pointer" class="row-expand-btn" @click.stop="toggleShowChild(row.item)" icon="caret-right"  size="lg" />
-        </span>
-        {{row.item.netobj_id}}        
+        <div :style="get_left_padding(row.item)">
+          <!-- :tbody-tr-class="rowClass" -->
+          <!-- :filter="filterGrid"         -->
+          <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
+          <span>
+            <!-- <i style="cursor:pointer" class="row-expand-btn fa fa-chevron-right" @click.stop="toggleShowChild(row.item)"/> -->
+            <!-- have-children -->
+            <font-awesome-icon 
+            :style="get_child_style(row.item)" 
+            @click.stop="toggleShowChild(row.item)" 
+            :icon="get_child_icon(row.item)"
+            size="lg" />
+          </span>
+          <span>
+            {{row.item.netobj_id}}        
+          </span>
+        </div>
       </template>
 
       <template slot="details" slot-scope="row">
@@ -148,7 +160,8 @@
 import {
   netobj_fields,
   netobj_field_icons,
-  netobj_data
+  netobj_data,
+  netobj_data1,
 } from "./netobj_data_bstreetable.js";
 
 import "../../fa-config.js";
@@ -175,7 +188,7 @@ export default {
       fields: netobj_fields,
       items: netobj_data,
       currentPage: 1,
-      perPage: 2,
+      perPage: 5,
       totalRows: 0,      
       pageOptions: [ 5, 10, 15 ],
     };
@@ -194,7 +207,7 @@ export default {
     },
 
     get_sort_by() {
-      console.log("get sort by: " + this.sort_by);
+      // console.log("get sort by: " + this.sort_by);
       return this.sort_by;
 
       // if (this.sort_desc) {
@@ -314,6 +327,7 @@ export default {
     },
 
     rowClass( item, type ) {
+      console.log("item:" + item);
       // https://github.com/bootstrap-vue/bootstrap-vue/issues/1795
       // https://github.com/bootstrap-vue/bootstrap-vue/pull/1797
       // if ( !item )
@@ -322,12 +336,55 @@ export default {
       //   return 'table-success';
     },
     
+    get_tdclass(value, key, item) {
+      // console.log("key=" + key + ',value=' + value + ", item=" + JSON.stringify(item));
+
+      /*
+      if (item.parent_id == null || !item.children || item.children.length() == 0) {
+        return null;
+      }
+      else if (0){
+
+      }
+
+      return 'hide-col';
+      */      
+    },
+
+    get_left_padding(item) {
+      // 'padding-left': (1 + this.column.collapseIcon * this.row.countParents() * 1.5) + 'rem'
+      return { 'padding-left': (item.depth * 0.8) + 'rem' };
+    },
+
+    get_child_style(item) {
+      if (item.children && item.children.length > 0) {
+        return { 
+          'cursor': 'pointer',
+          'color': 'black'
+        };
+      }
+
+      return {'color': '#cccccc'}
+    },
+ 
+    get_child_icon(item) {
+      if (item.children && item.children.length > 0) {
+        if (item.show_child) {
+          return "angle-down"
+        }
+
+        return "angle-right"
+      }
+
+      return "angle-right"
+    },
+
     toggleShowChild: function(item) {
-      console.log("clicked first_name:" + item.netobj_id);
+      // console.log("clicked first_name:" + item.netobj_id);
       // this.items.splice(2, 1);
 
       if (item) {
-        item.showChild = !item.showChild;
+        item.show_child = !item.show_child;
       }
       /*
       for (var i = 0, item; (item = this.items[i]); i++) {
@@ -337,20 +394,34 @@ export default {
       */
     },
 
-    getItems(items) {
-      var ii = [];
+    onFiltered (filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length
+      this.currentPage = 1
+    },
+
+    getItems(all_items) {
+      var show_items = [];
+      var depth = 0;
       
-      return items;
-      
-      // <b-table :row-class="(row, index) => row.id === 1 ? 'is-hidden' : ''"> .... </b-table>
-      for (var i = 0, item; (item = items[i]); i++) {
-        // console.log(item);
-        if (item.showChild) {
-          ii.push(item);
+      function recursive_get_items(all_show_items, cur_items, depth) {
+
+        for (var i = 0, item; (item = cur_items[i]); i++) {
+          // console.log(item);
+          item.depth = depth;
+          all_show_items.push(item);
+
+          if (item.show_child && item.children && item.children.length > 0) {
+            all_show_items = recursive_get_items(all_show_items, item.children, depth + 1);
+          }
         }
+
+        return all_show_items;
       }
 
-      return ii;
+      show_items = recursive_get_items(show_items, all_items, depth);
+      
+      return show_items;
     },
   }
 };
@@ -429,15 +500,25 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
     padding-left: 2rem;
 }
 
-.row-expand-btn {
-  color: rgba(0, 0, 0, 0.753);
+.have-children {
+  cursor:pointer; 
+  color: rgb(24, 23, 23);
+}
+
+.no-children {
+  /* cursor:pointer;  */
+  color: rgb(175, 175, 175);
+}
+
+/* .row-expand-btn { */
+  /* color: rgba(0, 0, 0, 0.753); */
   /* font-size: 10px; */
-  font-style: normal;
+  /* font-style: normal; */
   /* text-align: justify; */
   /* display: table-cell; */
   /* vertical-align:middle; */
   /* text-align: center; */
-}
+/* } */
 
 .custom-control, .custom-checkbox, .custom-control-inline, .options-column {
   padding-top: 0.15em;

@@ -35,6 +35,8 @@
     "jquery": "^3.3.1",
     "jqwidgets-scripts": "^6.2.0",
     "perfect-scrollbar": "^1.4.0",
+    "postcss": "^7.0.8",
+    "postcss-loader": "^3.0.0",
     "simple-line-icons": "^2.4.1",
     "v-reset-input": "^1.1.2",
     "vue": "^2.5.19",
