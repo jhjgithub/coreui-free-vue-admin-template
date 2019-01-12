@@ -11,7 +11,8 @@ import {
   faPlus, faEdit, faClone, faTrashAlt,
   faSortUp, faSortDown,
   faSortAmountDown, faSortAmountUp,
-  faSearch,
+  faSearch,  
+  faIdBadge,
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -23,14 +24,15 @@ library.add(
   faSortUp, faSortDown,
   faSortAmountDown, faSortAmountUp,
   faSearch,
+  faIdBadge,
 );
 
 import { 
   faClone as faCloneR,
   faTrashAlt as faTrashAltR,
   faArrowAltCircleRight as faArrowAltCircleRightR,
-
 } from '@fortawesome/free-regular-svg-icons'
+
 library.add(
   faCloneR,
   faTrashAltR,
