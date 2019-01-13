@@ -35,26 +35,27 @@
     </b-container>
 
     <b-table striped hover small fixed show-empty 
-      :filter="search_keyword"
-      :items="items" 
+      ref="netobj_table"
+      :items="getItems" 
       :fields="fields" 
       :sort-by.sync="sort_by"
       :sort-desc.sync="sort_desc"      
       :sort-direction="sort_dir"
       @sort-changed="sortingChanged"
-      :no-local-sorting=true
       :current-page="currentPage"
       :per-page="perPage"
       thead-class="table-text"
       class="table-area" 
+      :filter="search_keyword"
       @filtered="onFiltered"
+      :no-provider-paging=true
+      :no-provider-filtering=true
       >
       <!-- :no-local-sorting=true -->
       <!-- :tbody-tr-class="rowClass" -->
-      <!-- :filter="filterGrid"         -->      
       
       <!-- Checkbox column of the Table Header -->
-      <template slot="HEAD_selected" slot-scope="row">
+      <template slot="HEAD__selected" slot-scope="row">
         <b-form-checkbox 
           @click.native.stop
           v-model="selectAll"
@@ -123,8 +124,8 @@
       </template>
 
       <!-- Checkbox column of the rows -->
-      <template slot="selected" slot-scope="row">
-        <b-form-checkbox @click.native.stop v-model="row.item.selected" @change="selectRow(row.item)" />
+      <template slot="_selected" slot-scope="row">
+        <b-form-checkbox @click.native.stop v-model="row.item._selected" @change="selectRow(row.item)" />
       </template>
 
       <!-- <template slot="netobj_id" slot-scope="row" :tbody-tr-class="hide-col"> -->
@@ -183,13 +184,8 @@
 // import Vue from "vue";
 // import BInputGroup from "bootstrap-vue/es/components/input-group/input-group";
 
-import { toggle_child } from "./nodeHelper.js";
-
-import {
-  netobj_fields,
-  netobj_field_icons,
-  netobj_data,
-} from "./netobj_data_bstreetable.js";
+import { normalize_items, toggle_child, sort_data, empty_array, print_json, deep_copy } from "./nodeHelper.js";
+import { netobj_fields, netobj_data, } from "./netobj_data_bstreetable.js";
 
 import "../../fa-config.js";
 
@@ -214,8 +210,9 @@ export default {
 
       fields: netobj_fields,
       items: netobj_data,
-      currentPage: 1,
-      perPage: 5,
+      org_items: [],
+      currentPage: 2,
+      perPage: 3,
       totalRows: 0,      
       pageOptions: [ 5, 10, 15 ],
     };
@@ -227,7 +224,8 @@ export default {
   mounted: function() {
     // console.log(d);
     this.totalRows = this.items.length;
-    this.calc_depth();
+    normalize_items(this.items);
+    print_json(this.items);
   },
   computed: {
 
@@ -237,6 +235,7 @@ export default {
       // this.$refs.NetobjGrid.expandRow(2);
     },
 
+    /*
     calc_depth() {
       var depth = 0;
       function recursive_get_items(cur_items, depth) {
@@ -244,10 +243,10 @@ export default {
         for (var i = 0, item; (item = cur_items[i]); i++) {
           // console.log(item);
           item.depth = depth;
-          item.visible_child = 'none';
+          item._visible_child = 'none';
 
           if (item.children && item.children.length > 0) {
-            item.visible_child = 'hide';
+            item._visible_child = 'hide';
             recursive_get_items(item.children, depth + 1);
           }
         }
@@ -255,6 +254,7 @@ export default {
 
       recursive_get_items(this.items, depth);
     },
+    */
     
     get_sort_by() {
       // console.log("get sort by: " + this.sort_by);
@@ -275,11 +275,11 @@ export default {
     },
 
     selectRow(item) {
-      item.selected = !item.selected;
-      if (item.selected) {
+      item._selected = !item._selected;
+      if (item._selected) {
         var all = true;
         for (var i = 0; i < this.items.length; i++) {
-          if (!this.items[i].selected)
+          if (!this.items[i]._selected)
             all = false;
         }
 
@@ -296,7 +296,7 @@ export default {
         // item._rowVariant = "default";
         var all = false;
         for (var i = 0; i < this.items.length; i++) {
-          if (this.items[i].selected)
+          if (this.items[i]._selected)
             all = true;
         }
 
@@ -315,19 +315,62 @@ export default {
       this.selectAll = checked;
       if (this.selectAll) {
         for (var i = 0; i < this.items.length; i++) {
-          this.items[i].selected = true;
+          this.items[i]._selected = true;
           // this.items[i]._rowVariant = "info";
         }
       } 
       else {
         for (var i = 0; i < this.items.length; i++) {
-          this.items[i].selected = false;
+          this.items[i]._selected = false;
           // this.items[i]._rowVariant = "default";
         }
       }
     },
 
-    sortingChanged (ctx) {
+    rowClass( item, type ) {
+      console.log("item:" + item);
+      // https://github.com/bootstrap-vue/bootstrap-vue/issues/1795
+      // https://github.com/bootstrap-vue/bootstrap-vue/pull/1797
+      // if ( !item )
+      //   return;
+      // if ( item.status === 'awesome' )
+      //   return 'table-success';
+    },
+    
+    get_left_padding(item) {
+      // 'padding-left': (1 + this.column.collapseIcon * this.row.countParents() * 1.5) + 'rem'
+      return { 'padding-left': (item._depth * 0.8) + 'rem' };
+    },
+
+    get_expand_icon_class(item) {
+      if (item._visible_child === 'none') {
+        return "no-children";        
+      }
+      
+      return "have-children";   
+    },
+ 
+    get_expand_icon(item) {
+      if (item._visible_child === 'show') {
+        return "angle-down"
+      }
+
+      return "angle-right"
+    },
+
+    toggleShowChild(item) {
+      // console.log("clicked first_name:" + item.netobj_id);
+      toggle_child(this.items, item.netobj_id);
+      this.$refs.netobj_table.refresh();
+    },
+
+    onFiltered(filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length;
+      this.currentPage = 1;
+    },
+
+    sortingChanged(ctx) {
       // console.log("by: " + ctx.sortBy + ", Desc: " + ctx.sortDesc);      
       // ctx.sortBy   ==> Field key for sorting by (or null for no sorting)
       // ctx.sortDesc ==> true if sorting descending, false otherwise
@@ -338,6 +381,10 @@ export default {
         this.sort_changed = 0;
         this.sort_desc = false;
         this.sort_by = null;
+
+        this.items = this.org_items;
+        empty_array(this.org_items);
+
         return
       }
 
@@ -367,84 +414,32 @@ export default {
       else
         this.sort_icon = "sort-amount-up";        
 
-      // test
-      // XXXX: compare with root items
-      // var item = this.items.pop();
-      // this.items.unshift(item);
-      // console.log("sort by: " + this.sort_by + ", sort desc: " + this.sort_desc);
-    },
-
-    rowClass( item, type ) {
-      console.log("item:" + item);
-      // https://github.com/bootstrap-vue/bootstrap-vue/issues/1795
-      // https://github.com/bootstrap-vue/bootstrap-vue/pull/1797
-      // if ( !item )
-      //   return;
-      // if ( item.status === 'awesome' )
-      //   return 'table-success';
-    },
-    
-    get_left_padding(item) {
-      // 'padding-left': (1 + this.column.collapseIcon * this.row.countParents() * 1.5) + 'rem'
-      return { 'padding-left': (item.depth * 0.8) + 'rem' };
-    },
-
-    get_expand_icon_class(item) {
-      if (item.visible_child === 'none') {
-        return "no-children";        
-      }
-      
-      return "have-children";   
-    },
- 
-    get_expand_icon(item) {
-      if (item.visible_child === 'show') {
-        return "angle-down"
-      }
-
-      return "angle-right"
-    },
-
-    toggleShowChild: function(item) {
-      // console.log("clicked first_name:" + item.netobj_id);
-      toggle_child(this.items, item.netobj_id);
-    },
-
-    onFiltered (filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length
-      this.currentPage = 1
-    },
-
-    /*
-    getItems(all_items) {
-      var show_items = [];
-      var depth = 0;
-      
-      return all_items;
-      
-      function recursive_get_items(all_show_items, cur_items, depth) {
-
-        for (var i = 0, item; (item = cur_items[i]); i++) {
-          // console.log(item);
-          item.depth = depth;
-          all_show_items.push(item);
-
-          if (item.show_child && item.children && item.children.length > 0) {
-            all_show_items = recursive_get_items(all_show_items, item.children, depth + 1);
-          }
+      if (this.sort_by) {
+        if (this.org_items.length == 0) {
+          this.org_items = deep_copy(this.items);
         }
 
-        return all_show_items;
+        sort_data(this.items, this.org_items, this.sort_by, this.sort_desc);
       }
-
-      show_items = recursive_get_items(show_items, all_items, depth);
-      
-      return show_items;
+      else {
+        empty_array(this.items);
+        this.items = deep_copy(this.org_items);
+        empty_array(this.org_items);
+      }
     },
-    */
+
+    getItems(ctx, callback) {
+      //let params = '?page=' + ctx.currentPage + '&size=' + ctx.perPage
+
+      //console.log(ctx);
+      // console.log("Called getItems: page=%d, perPage=%d", ctx.currentPage, ctx.perPage);
+
+      this.totalRows = this.items.length;
+      return this.items;
+    },
   }
 };
+
 </script>
 
 

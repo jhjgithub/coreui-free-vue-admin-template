@@ -2,7 +2,7 @@
 
 export const netobj_fields = [
   {
-    key: 'selected',
+    key: '_selected',
     label: '',
     sortable: false,
     class: "options-column",
@@ -70,9 +70,7 @@ export const netobj_fields = [
 
 export const netobj_data = [
   {
-    'selected': false,
     'netobj_id': 'netobj-1',
-    'parent_id': null,
     'netobj_name': 'WebServer',
     'network_type': 'range', // range, netmask, group
     'network_start': '1.1.1.1',
@@ -80,14 +78,14 @@ export const netobj_data = [
     'netmask': '',
     'create_date': '2018-12-30T13:02:10',
     'desc': 'network object 1',
-    'visible_child': 'hide',  // hide, show, none
-    'depth': 0,
-    'enable_expand_icon': false,
+
+    '_selected': false,
+    '_parent_id': null,
+    '_visible_child': 'hide',  // hide, show, none
+    '_depth': 0,
     'children': [
       {
-        'selected': false,
         'netobj_id': 'netobj-3',
-        'parent_id': 'netobj-1',
         'netobj_name': 'WebServer3',
         'create_date': '2018-12-31T13:10:10',
         'network_type': 'netmask', // range, netmask, group
@@ -95,13 +93,13 @@ export const netobj_data = [
         'network_end': '',
         'netmask': '24',
         'desc': 'network object 3',
-        'visible_child': 'hide',  // hide, show, none
-        'depth': 1,
+        '_selected': false,
+        '_parent_id': 'netobj-1',
+        '_visible_child': 'hide',  // hide, show, none
+        '_depth': 1,
         'children': [
           {
-            'selected': false,
             'netobj_id': 'netobj-5',
-            'parent_id': 'netobj-3',
             'netobj_name': 'WebServer5',
             'create_date': '2018-12-31T14:10:10',
             'network_type': 'group', // range, netmask, group
@@ -109,16 +107,16 @@ export const netobj_data = [
             'network_end': '',
             'netmask': '',
             'desc': 'network object 5',
-            'visible_child': 'none',  // hide, show, none
+            '_selected': false,
+            '_parent_id': 'netobj-3',
+            '_visible_child': 'none',  // hide, show, none
           },
         ],
       },
     ],
   },
   {
-    'selected': false,
     'netobj_id': 'netobj-2',
-    'parent_id': null,
     'netobj_name': 'WebServer1',
     'create_date': '2018-12-30T13:10:10',
     'network_type': 'netmask', // range, netmask, group
@@ -126,13 +124,13 @@ export const netobj_data = [
     'network_end': '1.1.1.254',
     'netmask': '24',
     'desc': 'network object 2',
-     'visible_child': 'none',  // hide, show, none
+    '_selected': false,
+    '_parent_id': null,
+    '_visible_child': 'none',  // hide, show, none
     'children': [],
   },
   {
-    'selected': false,
     'netobj_id': 'netobj-4',
-    'parent_id': null,
     'netobj_name': 'WebServer4',
     'create_date': '2018-12-31T14:10:10',
     'network_type': 'group', // range, netmask, group
@@ -140,7 +138,9 @@ export const netobj_data = [
     'network_end': '',
     'netmask': '',
     'desc': 'network object 4',
-    'visible_child': 'none',  // hide, show, none
+    '_selected': false,
+    '_parent_id': null,
+    '_visible_child': 'none',  // hide, show, none
   },
 ];
 
