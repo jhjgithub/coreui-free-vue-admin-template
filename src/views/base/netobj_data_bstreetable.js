@@ -80,7 +80,9 @@ export const netobj_data = [
     'netmask': '',
     'create_date': '2018-12-30T13:02:10',
     'desc': 'network object 1',
-    'show_child': false,
+    'visible_child': 'hide',  // hide, show, none
+    'depth': 0,
+    'enable_expand_icon': false,
     'children': [
       {
         'selected': false,
@@ -93,7 +95,8 @@ export const netobj_data = [
         'network_end': '',
         'netmask': '24',
         'desc': 'network object 3',
-        'show_child': false,
+        'visible_child': 'hide',  // hide, show, none
+        'depth': 1,
         'children': [
           {
             'selected': false,
@@ -106,7 +109,7 @@ export const netobj_data = [
             'network_end': '',
             'netmask': '',
             'desc': 'network object 5',
-            'show_child': false,
+            'visible_child': 'none',  // hide, show, none
           },
         ],
       },
@@ -123,7 +126,7 @@ export const netobj_data = [
     'network_end': '1.1.1.254',
     'netmask': '24',
     'desc': 'network object 2',
-    'show_child': false,
+     'visible_child': 'none',  // hide, show, none
     'children': [],
   },
   {
@@ -137,7 +140,7 @@ export const netobj_data = [
     'network_end': '',
     'netmask': '',
     'desc': 'network object 4',
-    'show_child': false,
+    'visible_child': 'none',  // hide, show, none
   },
 ];
 

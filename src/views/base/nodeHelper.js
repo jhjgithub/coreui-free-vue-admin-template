@@ -19,7 +19,7 @@ function expand_children(data, item_index, item) {
     data.splice(item_index, 0, child);
   });
 
-  item.show_child = true;
+  item.visible_child = 'show';
   item.children = [];
 
   // print_json(data, "after");
@@ -38,10 +38,10 @@ function collapse_children(data, start_index, parent) {
       // console.log("found item: nid=%d, pid=%d", item.id, item.pid);
       // console.log("%d: %s", i, JSON.stringify(item, null, 2));
 
-      if (item.show_child == true) {
+      if (item.visible_child === 'show') {
         // console.log("call recursive remove for %d", item.netobj_id);
         collapse_children(data, i, item);
-        item.show_child = false;
+        item.visible_child = 'hide';
       }
 
       begin_matched = true;
@@ -62,7 +62,7 @@ function collapse_children(data, start_index, parent) {
     }
   }
 
-  parent.show_child = false;
+  parent.visible_child = 'hide';
   // print_json(data, "after");
 }
 
@@ -80,18 +80,17 @@ export function toggle_child(table_data, nid) {
   // console.log("%d: %s", item_index, JSON.stringify(item, null, 2));
   // console.log("index: %s, nid: %s", item_index, item.netobj_id);
 
-  var show_child = item.show_child;
+  var visible_child = item.visible_child;
 
-  if (show_child == false && item.children != undefined && item.children.length > 0) {
+  if (visible_child === 'hide' && item.children != undefined && item.children.length > 0) {
     // console.log("--> expanding child: %s", item.netobj_id);
     expand_children(table_data, item_index, item);
   }
-  else if (show_child == true) {
+  else if (visible_child == 'show') {
     // console.log("--> collaping child: idx=%s, id=%s", item_index, item.netobj_id);
     collapse_children(table_data, item_index, item);
   }
 }
-
 
 
 

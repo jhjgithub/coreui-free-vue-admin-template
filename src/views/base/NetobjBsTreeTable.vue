@@ -49,6 +49,7 @@
       class="table-area" 
       @filtered="onFiltered"
       >
+      <!-- :no-local-sorting=true -->
       <!-- :tbody-tr-class="rowClass" -->
       <!-- :filter="filterGrid"         -->      
       
@@ -134,7 +135,7 @@
             <font-awesome-icon 
             :class="get_expand_icon_class(row.item)"
             @click.stop="toggleShowChild(row.item)" 
-            :icon="get_child_icon(row.item)"
+            :icon="get_expand_icon(row.item)"
             size="lg" />
           </span>
           <span>
@@ -243,10 +244,10 @@ export default {
         for (var i = 0, item; (item = cur_items[i]); i++) {
           // console.log(item);
           item.depth = depth;
-          item.enable_expand_icon = false;
+          item.visible_child = 'none';
 
           if (item.children && item.children.length > 0) {
-            item.enable_expand_icon = true;
+            item.visible_child = 'hide';
             recursive_get_items(item.children, depth + 1);
           }
         }
@@ -368,8 +369,8 @@ export default {
 
       // test
       // XXXX: compare with root items
-      var item = this.items.pop();
-      this.items.unshift(item);
+      // var item = this.items.pop();
+      // this.items.unshift(item);
       // console.log("sort by: " + this.sort_by + ", sort desc: " + this.sort_desc);
     },
 
@@ -389,15 +390,15 @@ export default {
     },
 
     get_expand_icon_class(item) {
-      if (item.enable_expand_icon) {
-        return "have-children";   
+      if (item.visible_child === 'none') {
+        return "no-children";        
       }
       
-      return "no-children";        
+      return "have-children";   
     },
  
-    get_child_icon(item) {
-      if (item.show_child) {
+    get_expand_icon(item) {
+      if (item.visible_child === 'show') {
         return "angle-down"
       }
 
@@ -415,6 +416,7 @@ export default {
       this.currentPage = 1
     },
 
+    /*
     getItems(all_items) {
       var show_items = [];
       var depth = 0;
@@ -440,6 +442,7 @@ export default {
       
       return show_items;
     },
+    */
   }
 };
 </script>
