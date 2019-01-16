@@ -1,56 +1,9 @@
-
-export function print_json(d, msg) {
-  console.log("#### %s: %s", msg, JSON.stringify(d, null, 2));
-}
-
-export function deep_copy(arr) {
-  let out = [];
-
-  for (let i = 0, len = arr.length; i < len; i++) {
-    let item = arr[i];
-    let obj = {};
-
-    for (let k in item) {
-      obj[k] = item[k];
-    }
-
-    out.push(obj);
-  }
-  return out;
-}
-
-export function empty_array(arr) {
-  arr.splice(0, arr.length);
-}
-
 function get_item_index(items, nid) {
   let i = items.findIndex((item, idx) => {
     return item.netobj_id == nid;
   });
 
   return i;
-}
-
-export function normalize_items(items) {
-  let depth = 0;
-
-  function _normalize_items(cur_items, cur_depth) {
-    let fix_idx = 0;
-
-    cur_items.forEach((item, idx) => {
-      item._depth = cur_depth;
-      item._visible_child = 'none';
-      item._fix_idx = fix_idx;
-      fix_idx ++;
-
-      if (item.children && item.children.length > 0) {
-        item._visible_child = 'hide';
-        _normalize_items(item.children, cur_depth + 1);
-      }
-    });
-  }
-
-  _normalize_items(items, depth);
 }
 
 function expand_children(items, item_index, item) {
@@ -107,39 +60,12 @@ function collapse_children(items, start_index, parent) {
   //print_json(items, "after");
 }
 
-export function toggle_child(items, nid) {
-  let item_index = get_item_index(items, nid);
-  // console.log("toggle item index: %d", item_index);
-
-  if (item_index === -1) {
-    console.log("no item with nid: " + nid);
-    return
-  }
-
-  let item = items[item_index];
-
-  // console.log("%d: %s", item_index, JSON.stringify(item, null, 2));
-  // console.log("index: %s, nid: %s", item_index, item.netobj_id);
-
-  let visible_child = item._visible_child;
-
-  if (visible_child === 'hide' && item.children != undefined && item.children.length > 0) {
-    console.log("--> expanding child: %s", item.netobj_id);
-    expand_children(items, item_index, item);
-  }
-  else if (visible_child == 'show') {
-    console.log("--> collaping child: idx=%s, id=%s", item_index, item.netobj_id);
-    collapse_children(items, item_index, item);
-  }
-}
-
 function save_expanded_items(items, expanded_items) {
-  console.log("--> save expanded items");
+  // console.log("--> save expanded items");
 
   empty_array(expanded_items);
 
   items.forEach((item, idx) => {
-
     if (item._visible_child === 'show') {
       let showed_item = {
         'idx': idx,
@@ -156,10 +82,9 @@ function save_expanded_items(items, expanded_items) {
 }
 
 function collapsed_items(items, expanded_items) {
-  console.log("--> collapse all items: %d", expanded_items.length);
+  // console.log("--> collapse all items: %d", expanded_items.length);
 
   expanded_items.forEach((item, idx) => {
-
     if (item._parent_id == null) {
       let child_idx = get_item_index(items, item.netobj_id);
       if (child_idx != -1) {
@@ -227,7 +152,7 @@ function dynamic_sort(property) {
 }
 
 function sort_items(items, sort_by, sort_desc) {
-  console.log("--> sorting items: %d", items.length);
+  // console.log("--> sorting items: %d", items.length);
 
   let field = sort_by;
 
@@ -245,7 +170,7 @@ function sort_items(items, sort_by, sort_desc) {
 }
 
 function apply_expanded_items(items, expanded_items) {
-  console.log("--> expanding items: %d", expanded_items.length);
+  // console.log("--> expanding items: %d", expanded_items.length);
 
   expanded_items.forEach((item, idx) => {
     //console.log("expanding id: %s", item.netobj_id);
@@ -256,25 +181,100 @@ function apply_expanded_items(items, expanded_items) {
   //print_json(items, "collapse all");
 }
 
-export function sort_data(items, org_items, sort_by, sort_desc) {
-  console.log("#### sort_by: %s, sort_desc: %s", sort_by, sort_desc);
+///////////////////////////////////////////
+
+export function print_json(d, msg) {
+  console.log("#### %s: %s", msg, JSON.stringify(d, null, 2));
+}
+
+export function deep_copy(arr) {
+  let out = [];
+
+  for (let i = 0, len = arr.length; i < len; i++) {
+    let item = arr[i];
+    let obj = {};
+
+    for (let k in item) {
+      obj[k] = item[k];
+    }
+
+    out.push(obj);
+  }
+  return out;
+}
+
+export function empty_array(arr) {
+  arr.splice(0, arr.length);
+}
+
+export function normalize_items(items) {
+  let depth = 0;
+
+  function _normalize_items(cur_items, cur_depth) {
+    let fix_idx = 0;
+
+    cur_items.forEach((item, idx) => {
+      item._depth = cur_depth;
+      item._visible_child = 'none';
+      item._fix_idx = fix_idx.toString();
+      fix_idx++;
+
+      if (item.children && item.children.length > 0) {
+        item._visible_child = 'hide';
+        _normalize_items(item.children, cur_depth + 1);
+      }
+    });
+  }
+
+  _normalize_items(items, depth);
+}
+
+export function toggle_child(items, nid) {
+  let item_index = get_item_index(items, nid);
+  // console.log("toggle item index: %d", item_index);
+
+  if (item_index === -1) {
+    // console.log("no item with nid: " + nid);
+    return
+  }
+
+  let item = items[item_index];
+
+  // console.log("%d: %s", item_index, JSON.stringify(item, null, 2));
+  // console.log("index: %s, nid: %s", item_index, item.netobj_id);
+
+  let visible_child = item._visible_child;
+
+  if (visible_child === 'hide' && item.children != undefined && item.children.length > 0) {
+    // console.log("--> expanding child: %s", item.netobj_id);
+    expand_children(items, item_index, item);
+  }
+  else if (visible_child == 'show') {
+    // console.log("--> collaping child: idx=%s, id=%s", item_index, item.netobj_id);
+    collapse_children(items, item_index, item);
+  }
+}
+
+export function sort_data(items, sort_by, sort_desc) {
+  // console.log("#### sort_by: %s, sort_desc: %s", sort_by, sort_desc);
 
   let expanded_items = [];
 
-  org_items = deep_copy(items);
-  //print_json(org_items, "############## Copyed org");
-
   save_expanded_items(items, expanded_items);
-  //print_json(g_expanded_items, "current Last Status");
+  //print_json(expanded_items, "current Last Status");
 
-  //console.log("#########################");
   collapsed_items(items, expanded_items);
-  //print_json(g_items, "collapsed items");
+  //print_json(items, "collapsed items");
 
-  //console.log("#########################");
-  sort_items(items, sort_by, sort_desc);
-  //print_json(g_items, "sorted items");
+  if (sort_by) {
+    sort_items(items, sort_by, sort_desc);
+  }
+  else {
+    sort_items(items, '_fix_idx', sort_desc);
+  }
+  //print_json(items, "sorted items");
 
   apply_expanded_items(items, expanded_items);
-  //print_json(g_items, "expanded items");
+  // print_json(items, "expanded items");
 }
+

@@ -184,7 +184,7 @@
 // import Vue from "vue";
 // import BInputGroup from "bootstrap-vue/es/components/input-group/input-group";
 
-import { normalize_items, toggle_child, sort_data, empty_array, print_json, deep_copy } from "./nodeHelper.js";
+import { normalize_items, toggle_child, sort_data, empty_array, print_json } from "./nodeHelper.js";
 import { netobj_fields, netobj_data, } from "./netobj_data_bstreetable.js";
 
 import "../../fa-config.js";
@@ -210,7 +210,6 @@ export default {
 
       fields: netobj_fields,
       items: netobj_data,
-      org_items: [],
       currentPage: 2,
       perPage: 3,
       totalRows: 0,      
@@ -225,7 +224,7 @@ export default {
     // console.log(d);
     this.totalRows = this.items.length;
     normalize_items(this.items);
-    print_json(this.items);
+    // print_json(this.items, "initial state:");
   },
   computed: {
 
@@ -382,8 +381,7 @@ export default {
         this.sort_desc = false;
         this.sort_by = null;
 
-        this.items = this.org_items;
-        empty_array(this.org_items);
+        sort_data(this.items, null, false);
 
         return
       }
@@ -414,18 +412,7 @@ export default {
       else
         this.sort_icon = "sort-amount-up";        
 
-      if (this.sort_by) {
-        if (this.org_items.length == 0) {
-          this.org_items = deep_copy(this.items);
-        }
-
-        sort_data(this.items, this.org_items, this.sort_by, this.sort_desc);
-      }
-      else {
-        empty_array(this.items);
-        this.items = deep_copy(this.org_items);
-        empty_array(this.org_items);
-      }
+      sort_data(this.items, this.sort_by, this.sort_desc);
     },
 
     getItems(ctx, callback) {
