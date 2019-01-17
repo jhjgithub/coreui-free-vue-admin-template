@@ -34,6 +34,11 @@
       </b-row>
     </b-container>
 
+    <div>
+      <net-obj1 id="netobj_add"/>
+    </div>
+
+
     <b-table striped hover small fixed show-empty 
       ref="netobj_table"
       :items="getItems" 
@@ -132,6 +137,7 @@
       <template slot="netobj_id" slot-scope="row">
         <div :style="get_left_padding(row.item)">
           <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
+          <!-- <span style="width: 20px"> -->
           <span>
             <font-awesome-icon 
             :class="get_expand_icon_class(row.item)"
@@ -188,9 +194,13 @@ import { normalize_items, toggle_child, sort_data, empty_array, print_json } fro
 import { netobj_fields, netobj_data, } from "./netobj_data_bstreetable.js";
 
 import "../../fa-config.js";
+import NetObj from "./Netobj";
+// import NetObj1 from "./Netobj1";
 
 export default {
   components: {
+    NetObj,
+    // NetObj1,
     // BInputGroup
   },
 
@@ -225,9 +235,9 @@ export default {
     this.totalRows = this.items.length;
     normalize_items(this.items);
     // print_json(this.items, "initial state:");
+
   },
   computed: {
-
   },
   methods: {
     ready: function() {
@@ -262,6 +272,9 @@ export default {
 
     onNew() {
       console.log("click edit");
+      //console.log(this.$refs.netobj_add.form.name);
+      console.log(this.netobj_add.form.name);
+      // this.$refs.netobj_add.show = !this.$refs.netobj_add.show;
     },
     onEdit() {
       console.log("click edit");
@@ -326,6 +339,7 @@ export default {
       }
     },
 
+    /*
     rowClass( item, type ) {
       console.log("item:" + item);
       // https://github.com/bootstrap-vue/bootstrap-vue/issues/1795
@@ -335,6 +349,7 @@ export default {
       // if ( item.status === 'awesome' )
       //   return 'table-success';
     },
+    */
     
     get_left_padding(item) {
       // 'padding-left': (1 + this.column.collapseIcon * this.row.countParents() * 1.5) + 'rem'
