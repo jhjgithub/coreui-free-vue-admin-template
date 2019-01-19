@@ -34,8 +34,9 @@
       </b-row>
     </b-container>
 
-    <div>
-      <net-obj1 id="netobj_add"/>
+    <div class="row justify-content-center align-items-center">
+      <!-- <net-obj style="width: 600px" ref="netobj_add"/> -->
+      <net-obj  title="객체 추가" style="width: 90%" ref="netobj_add"/>
     </div>
 
 
@@ -271,10 +272,10 @@ export default {
     },
 
     onNew() {
-      console.log("click edit");
-      //console.log(this.$refs.netobj_add.form.name);
-      console.log(this.netobj_add.form.name);
-      // this.$refs.netobj_add.show = !this.$refs.netobj_add.show;
+      // console.log("click edit");
+      // console.log(this.$refs.netobj_add.form.name);
+      // console.log(this.netobj_add.form.name);
+      this.$refs.netobj_add.show = !this.$refs.netobj_add.show;
     },
     onEdit() {
       console.log("click edit");
