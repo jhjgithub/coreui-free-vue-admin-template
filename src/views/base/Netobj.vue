@@ -10,7 +10,7 @@
             <b-col class="text-right mx-0">
               <b-button class="mr-1" size="sm" type="submit" variant="primary">추가</b-button>
               <b-button class="mr-1" size="sm" type="reset" variant="danger">Reset</b-button>
-              <b-button class="mr-3" size="sm" type="reset" variant="secondary">Close</b-button>
+              <b-button class="mr-3" size="sm" variant="secondary" @click="onClose">Close</b-button>
             </b-col>
           </b-row>
         </template>
@@ -23,25 +23,25 @@
                 <!-- <strong>Date</strong> -->
                 Date
               </b-input-group-text>
-              <b-form-input disabled size="sm" type="text" v-model="form.create_date" required placeholder="Date and time" />
+              <b-form-input disabled size="sm" type="text" v-model="netobj.create_date" :formatter="date_format"/>
             </b-input-group>
             <b-input-group size="sm" class="mb-2 ">
               <b-input-group-text class="left-side-label" slot="prepend">
                 ID
               </b-input-group-text>
-              <b-form-input disabled size="sm" type="text" v-model="form.netobj_id" required placeholder="Enter Network object ID" />
+              <b-form-input disabled size="sm" type="text" v-model="netobj.netobj_id" />
             </b-input-group>
             <b-input-group size="sm" class="mb-2" >
               <b-input-group-text class="left-side-label" slot="prepend">
                 Name
               </b-input-group-text>
-              <b-form-input size="sm" type="text" v-model="form.netobj_name" required placeholder="Enter Network object Name" />
+              <b-form-input size="sm" type="text" v-model="netobj.netobj_name" required placeholder="Enter Network object Name" />
             </b-input-group>
             <b-input-group size="sm" >
               <b-input-group-text class="left-side-label" slot="prepend">
                 Description
               </b-input-group-text>
-              <b-form-textarea no-resize v-model="form.desc" placeholder="Enter descirption" :rows="3" :max-rows="3"/>
+              <b-form-textarea no-resize v-model="netobj.desc" placeholder="Enter descirption" :rows="3" :max-rows="3"/>
             </b-input-group>
 
                 <!-- <b-form-group horizontal label-size="sm"  :label-cols="2" label-text-align="right" id="netobj_id" label="ID:" label-for="netobj_id" >
@@ -60,7 +60,7 @@
               <b-input-group-text class="right-side-label" slot="prepend">
                 Address Type
               </b-input-group-text>
-              <b-form-radio-group buttons button-variant="outline-primary"  size="sm" v-model="form.network_type" :options="form.network_type_list"/>
+              <b-form-radio-group buttons button-variant="outline-primary"  size="sm" v-model="netobj.network_type" :options="network_type_list"/>
             </b-input-group>
 
               <!-- <b-col sm="2" class="align-self-center text-right col-form-label col-form-label-sm">
@@ -71,14 +71,14 @@
               </b-col> -->
             </b-row>
 
-            <b-row v-if="form.network_type === 'netmask'">
+            <b-row v-if="netobj.network_type === 'netmask'">
               <b-input-group size="sm" class="mb-2" >
                 <b-input-group-text class="right-side-label" slot="prepend">
                   IP Address
                 </b-input-group-text>
-                <b-form-input size="sm" type="text" v-model="form.network_start" required placeholder="Enter Network object ID" />
+                <b-form-input size="sm" type="text" v-model="netobj.network_start" required placeholder="Enter Network object ID" />
                 <b-col sm="2">
-                  <b-form-input size="sm" type="text" v-model="form.netmask" required placeholder="Mask" />
+                  <b-form-input size="sm" type="text" v-model="netobj.netmask" required placeholder="Mask" />
                 </b-col>
               </b-input-group>
 
@@ -95,18 +95,18 @@
               </b-col> -->
             </b-row>
 
-            <b-row v-if="form.network_type === 'iprange'">
+            <b-row v-if="netobj.network_type === 'iprange'">
               <b-input-group size="sm" class="mb-2">
                 <b-input-group-text class="right-side-label" slot="prepend">
                   Start IP Address
                 </b-input-group-text>
-                <b-form-input size="sm" type="text" v-model="form.network_start" required placeholder="Enter Start IP Address" />
+                <b-form-input size="sm" type="text" v-model="netobj.network_start" required placeholder="Enter Start IP Address" />
               </b-input-group>
               <b-input-group size="sm" class="mb-2">
                 <b-input-group-text class="right-side-label" slot="prepend">
                   End IP Address
                 </b-input-group-text>
-                <b-form-input size="sm" type="text" v-model="form.network_end" required placeholder="Enter End IP Address" />
+                <b-form-input size="sm" type="text" v-model="netobj.network_end" required placeholder="Enter End IP Address" />
               </b-input-group>
 
               <!-- <b-col cols="2" class="align-self-center text-right">
@@ -133,7 +133,7 @@
               <b-input-group-text class="right-side-label" slot="prepend">
                 Subobject
               </b-input-group-text>
-              <b-form-select multiple :select-size="5" v-model="form.selected_child" :options="form.children">
+              <b-form-select multiple :select-size="5" v-model="selected_child" :options="netobj.children">
               </b-form-select>
               <b-col sm="2" class="align-self-center">
                 <div>
@@ -159,56 +159,114 @@
 <script>
 export default {
   props: {
-    title: String,
-    cellData: {
+    props_netobj: {
       type: Object,
       default: () => {}
     }
   },
   data() {
     return {
-      form: {
-        netobj_id: 'netobj-6',
-        netobj_name: 'WebServer6',
-        create_date: '2018-12-31T14:10:10',
-        network_type: 'netmask', // range, netmask
+      netobj: {
+        netobj_id: '',
+        netobj_name: '',
+        create_date: '',
+        network_type: '',
         network_start: '', 
         network_end: '', 
         netmask: '', 
-        network_type_list: [
-          { text: 'Net Mask', value: 'netmask' },
-          { text: 'IP Range', value: 'iprange' },
-        ],
-        selected_child:[],
-        children: [
-          { value: 'netobj-1', text: 'netobj-1'},
-          { value: 'netobj-2', text: 'netobj-2'},
-          { value: 'netobj-3', text: 'netobj-3'},
-        ]
+        desc: '',
+        children: [],
       },
-      show: true,
+      show: false,
+      title: "New Network Object",
+      selected_child:[],
+      network_type_list: [
+        { text: 'Net Mask', value: 'netmask' },
+        { text: 'IP Range', value: 'iprange' },
+      ],
     };
+  },
+  mounted: function() {
+  },
+  watch: {
+    show: function () {
+      if (this.show) {
+        this.$nextTick(function() {
+          // show myself
+          if (this.props_netobj) {
+            this.title = "Edit Network Object";
+            this.initNetobj(this.props_netobj);
+          }
+          else {
+            this.initNetobj(null);
+          }
+        });
+      } else {
+        // hide myself
+        this.initNetobj(null);
+      }
+    }
   },
   computed: {
   },
   methods: {
+    initNetobj(obj) {
+      if (obj) {
+        // edit
+        this.netobj.netobj_id = obj.netobj_id;
+        this.netobj.netobj_name = obj.netobj_name;
+        this.netobj.create_date = obj.create_date;
+        this.netobj.network_type = obj.network_type;
+        this.netobj.network_start = obj.network_start;
+        this.netobj.network_end = obj.network_end;
+        this.netobj.netmask = obj.netmask;
+        this.netobj.desc = obj.desc;
+        this.netobj.children = obj.children;
+      }
+      else {
+        // new
+        let id = Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
+        this.netobj.netobj_id = "netobj-" + id.toString();
+        this.netobj.netobj_name = '';
+        // this.netobj.create_date = d.toLocaleString();
+        this.netobj.create_date = new Date();
+        this.netobj.network_type = 'netmask'; // range, netmask
+        this.netobj.network_start = ''; 
+        this.netobj.network_end = ''; 
+        this.netobj.netmask = ''; 
+        this.netobj.desc = ''; 
+        this.netobj.children = [];
+          // { value: 'netobj-1', text: 'netobj-1'},
+          // { value: 'netobj-2', text: 'netobj-2'},
+          // { value: 'netobj-3', text: 'netobj-3'},
+      }
+    },
     onSubmit(evt) {
       evt.preventDefault();
-      alert(JSON.stringify(this.form));
+      // alert(JSON.stringify(this.netobj));
+
+      this.$emit('submitNetobj', this.netobj);
     },
+
     onReset(evt) {
       evt.preventDefault();
-      /* Reset our form values */
-      this.form.email = "";
-      this.form.name = "";
-      this.form.food = null;
-      this.form.checked = [];
+      this.initNetobj(null);
+
       /* Trick to reset/clear native browser form validation state */
       this.show = false;
       this.$nextTick(() => {
         this.show = true;
       });
-    }
+    },
+    onClose(evt) {
+      this.$emit('closeNetobj');
+    },
+    date_format(value, event) {
+      if (value) {
+        return value.toLocaleString();
+      }
+      return '';
+    },
   }
 };
 </script>

@@ -36,9 +36,8 @@
 
     <div class="row justify-content-center align-items-center">
       <!-- <net-obj style="width: 600px" ref="netobj_add"/> -->
-      <net-obj  title="객체 추가" style="width: 90%" ref="netobj_add"/>
+      <net-obj :props_netobj="lastSelectedItem" style="width: 90%" ref="netobj_add" @submitNetobj="onSubmitNetobj" @closeNetobj="onCloseNetobj"/>
     </div>
-
 
     <b-table striped hover small fixed show-empty 
       ref="netobj_table"
@@ -214,7 +213,8 @@ export default {
       sort_dir: 'last',
       sort_changed: 0,
 
-      selectedItems: [],
+      // selectedItems: [],
+      lastSelectedItem:null,
       selectAll: false,
       indeterminate: false,
       sort_icon: "sort-up",
@@ -275,7 +275,11 @@ export default {
       // console.log("click edit");
       // console.log(this.$refs.netobj_add.form.name);
       // console.log(this.netobj_add.form.name);
-      this.$refs.netobj_add.show = !this.$refs.netobj_add.show;
+
+      if (!this.$refs.netobj_add.show) {
+        // XXX: init netobj
+        this.$refs.netobj_add.show = true;
+      }
     },
     onEdit() {
       console.log("click edit");
@@ -286,10 +290,30 @@ export default {
     onDelete() {
       console.log("click edit");
     },
+    onSubmitNetobj(obj) {
+      console.log("submit netobj: %s", JSON.stringify(obj));
+    },
+    onCloseNetobj() {
+      //console.log("close netobj");
+      // todo reset contexts in child
+      this.$refs.netobj_add.show = false;
+    },
+
+    getSelectedItem() {
+      for (var i = 0; i < this.items.length; i++) {
+        item = items[i];
+        if (item._selected) {
+          return item;
+        }
+      }
+
+      return null;
+    },
 
     selectRow(item) {
       item._selected = !item._selected;
       if (item._selected) {
+        this.lastSelectedItem = item;
         var all = true;
         for (var i = 0; i < this.items.length; i++) {
           if (!this.items[i]._selected)
@@ -305,6 +329,8 @@ export default {
           this.indeterminate = true;
         }
       } else {
+        this.lastSelectedItem = null;
+
         // change color to show status
         // item._rowVariant = "default";
         var all = false;
