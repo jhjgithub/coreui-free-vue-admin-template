@@ -181,6 +181,18 @@ function apply_expanded_items(items, expanded_items) {
   //print_json(items, "collapse all");
 }
 
+function removeChar(data) {
+  let b = ''
+  for (let j = 0; j < data.length; j++) {
+    let c = data[j];
+    if (c >= '0' && c <= '9') {
+      b = b.concat(c);
+    }
+  }
+
+  return b;
+}
+
 ///////////////////////////////////////////
 
 export function print_json(d, msg) {
@@ -278,3 +290,45 @@ export function sort_data(items, sort_by, sort_desc) {
   // print_json(items, "expanded items");
 }
 
+export function format_ipv4_address(entry) {
+  let blocks = entry.split(".");
+  let len = blocks.length;
+
+  if (len > 4) {
+    blocks = blocks.splice(0, 4);
+    len = 4;
+  }
+
+  for (let idx = 0; idx < len; idx++) {
+    let block = blocks[idx];
+
+    block = removeChar(block);
+    let len = block.length;
+    let b = ''
+
+    for (let j = 0; j < len; j++) {
+      let c = block[j];
+      b = b.concat(c);
+      let val = parseInt(b);
+
+      if (val > 255) {
+        b = b.substr(0, b.length - 1);
+        break;
+      }
+    }
+
+    blocks[idx] = b;
+  }
+
+  let ip = blocks.join(".");
+
+  if (blocks.length < 4) {
+    let val = blocks[blocks.length - 1];
+    if (val.length == 3) {
+      ip += ".";
+      ip += ".";
+    }
+  }
+
+  return ip;
+}

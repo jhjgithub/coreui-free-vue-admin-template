@@ -76,7 +76,7 @@
                 <b-input-group-text class="right-side-label" slot="prepend">
                   IP Address
                 </b-input-group-text>
-                <b-form-input size="sm" type="text" v-model="netobj.network_start" required placeholder="Enter Network object ID" />
+                <b-form-input size="sm" type="text" v-model="netobj.network_start" required placeholder="Enter Network object ID"  :formatter="ip_formatter" />
                 <b-col sm="2">
                   <b-form-input size="sm" type="text" v-model="netobj.netmask" required placeholder="Mask" />
                 </b-col>
@@ -157,6 +157,8 @@
 </template>
 
 <script>
+import { format_ipv4_address, } from "./nodeHelper.js";
+
 export default {
   props: {
     props_netobj: {
@@ -266,6 +268,9 @@ export default {
         return value.toLocaleString();
       }
       return '';
+    },
+    ip_formatter(vlaue, event) {
+      return format_ipv4_address(vlaue);
     },
   }
 };
