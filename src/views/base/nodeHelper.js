@@ -290,8 +290,10 @@ export function sort_data(items, sort_by, sort_desc) {
   // print_json(items, "expanded items");
 }
 
-export function format_ipv4_address(entry) {
-  let blocks = entry.split(".");
+export function format_ipv4_address(value) {
+  console.log("in value=%s", value);
+
+  let blocks = value.split(".");
   let len = blocks.length;
 
   if (len > 4) {
@@ -326,9 +328,9 @@ export function format_ipv4_address(entry) {
     let val = blocks[blocks.length - 1];
     if (val.length == 3) {
       ip += ".";
-      ip += ".";
     }
   }
 
+  console.log("out value=%s", ip);
   return ip;
 }

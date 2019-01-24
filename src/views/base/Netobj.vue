@@ -71,15 +71,19 @@
               </b-col> -->
             </b-row>
 
-            <b-row v-if="netobj.network_type === 'netmask'">
+            <!-- <b-row v-if="netobj.network_type === 'netmask'"> -->
+            <b-row >
               <b-input-group size="sm" class="mb-2" >
                 <b-input-group-text class="right-side-label" slot="prepend">
                   IP Address
                 </b-input-group-text>
-                <b-form-input size="sm" type="text" v-model="netobj.network_start" required placeholder="Enter Network object ID"  :formatter="ip_formatter" />
-                <b-col sm="2">
-                  <b-form-input size="sm" type="text" v-model="netobj.netmask" required placeholder="Mask" />
-                </b-col>
+                <b-form-input class="ip_addr" size="sm" type="text" v-model="netobj.network_start" required placeholder="Enter Network IP"  
+                :formatter="ip_formatter" />
+                <!-- <b-col sm="2"> -->
+                  <b-form-input v-if="netobj.network_type === 'netmask'" class="ip_mask ml-1" size="sm" type="text" v-model="netobj.netmask" required placeholder="Mask" />
+
+                  <b-form-input v-if="netobj.network_type === 'iprange'" class="ip_addr ml-1" size="sm" type="text" v-model="netobj.network_end" required placeholder="End IP" />
+                <!-- </b-col> -->
               </b-input-group>
 
               <!-- <b-col sm="2" class="align-self-center text-right">
@@ -95,7 +99,7 @@
               </b-col> -->
             </b-row>
 
-            <b-row v-if="netobj.network_type === 'iprange'">
+            <b-row v-if="netobj.network_type === 'iprange1'">
               <b-input-group size="sm" class="mb-2">
                 <b-input-group-text class="right-side-label" slot="prepend">
                   Start IP Address
@@ -269,8 +273,8 @@ export default {
       }
       return '';
     },
-    ip_formatter(vlaue, event) {
-      return format_ipv4_address(vlaue);
+    ip_formatter(value, event) {
+      return value;
     },
   }
 };
@@ -329,5 +333,19 @@ export default {
 .subobj-btn {
   padding: 2px;
   /* height: 30px; */
+}
+
+.ip_addr {
+  max-width: 200px;
+  /* width: 50px; */
+  /* minlength: 4; */
+  /* maxlength: 8; */
+}
+
+.ip_mask {
+  max-width: 70px;
+  /* width: 50px; */
+  /* minlength: 4; */
+  /* maxlength: 8; */
 }
 </style>
