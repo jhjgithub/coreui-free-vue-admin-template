@@ -16,16 +16,16 @@
         <b-col cols="10"  class="d-flex justify-content-end toolbtn-box">
           <span>
               <b-button-group size="sm">
-                <b-btn @click.stop="onNew" v-b-tooltip.hover title="New item">
+                <b-btn class="toolbar" ref="btn_add"  @click.stop="onNew" v-b-tooltip.hover title="New item" >
                   <font-awesome-icon  icon="plus"  size="lg" />
                 </b-btn>
-                <b-btn @click.stop="onEdit" v-b-tooltip.hover title="Edit item">
+                <b-btn class="toolbar" ref="btn_edit" @click.stop="onEdit" v-b-tooltip.hover title="Edit item">
                   <font-awesome-icon  icon="edit"  size="lg" />
                   </b-btn>
-                <b-btn @click.stop="onClone" v-b-tooltip.hover title="Clone item">
+                <b-btn class="toolbar" ref="btn_clone"  @click.stop="onClone" v-b-tooltip.hover title="Clone item">
                   <font-awesome-icon :icon="['far', 'clone']"  size="lg" />
                   </b-btn>              
-                <b-btn @click.stop="onDelete" v-b-tooltip.hover title="Delete item">
+                <b-btn class="toolbar" ref="btn_del"  @click.stop="onDelete" v-b-tooltip.hover title="Delete item">
                   <font-awesome-icon :icon="['far', 'trash-alt']"  size="lg" />
                   </b-btn>              
               </b-button-group>
@@ -34,9 +34,18 @@
       </b-row>
     </b-container>
 
+    <!-- Subobject List -->
     <div class="row justify-content-center align-items-center">
       <!-- <net-obj style="width: 600px" ref="netobj_add"/> -->
-      <net-obj :props_netobj="lastSelectedItem" style="width: 90%" ref="netobj_add" @submitNetobj="onSubmitNetobj" @closeNetobj="onCloseNetobj"/>
+      <net-obj 
+      ref="netobj_add" 
+      style="width: 90%" 
+      :show="show_netobj" 
+      :selectedItems="selectedItems"
+      :objItem="lastSelectedItem" 
+      @submitNetobj="onSubmitNetobj" 
+      @closeNetobj="onCloseNetobj" 
+      @resetSelect="onResetSelect"/>
     </div>
 
     <b-table striped hover small fixed show-empty 
@@ -213,7 +222,9 @@ export default {
       sort_dir: 'last',
       sort_changed: 0,
 
-      // selectedItems: [],
+      show_netobj: false,
+
+      selectedItems: { selItems:[]},
       lastSelectedItem:null,
       selectAll: false,
       indeterminate: false,
@@ -235,6 +246,7 @@ export default {
     // console.log(d);
     this.totalRows = this.items.length;
     normalize_items(this.items);
+    this.update_btn_state();
     // print_json(this.items, "initial state:");
 
   },
@@ -245,50 +257,70 @@ export default {
       // this.$refs.NetobjGrid.expandRow(2);
     },
 
-    /*
-    calc_depth() {
-      var depth = 0;
-      function recursive_get_items(cur_items, depth) {
-
-        for (var i = 0, item; (item = cur_items[i]); i++) {
-          // console.log(item);
-          item.depth = depth;
-          item._visible_child = 'none';
-
-          if (item.children && item.children.length > 0) {
-            item._visible_child = 'hide';
-            recursive_get_items(item.children, depth + 1);
-          }
-        }
-      }
-
-      recursive_get_items(this.items, depth);
-    },
-    */
-    
     get_sort_by() {
       // console.log("get sort by: " + this.sort_by);
       return this.sort_by;
     },
 
-    onNew() {
-      // console.log("click edit");
-      // console.log(this.$refs.netobj_add.form.name);
-      // console.log(this.netobj_add.form.name);
+    getNetobjStatus() {
+      return false;
+      // return this.$refs.netobj_add.show;
+    },
 
-      if (!this.$refs.netobj_add.show) {
-        // XXX: init netobj
-        this.$refs.netobj_add.show = true;
+    update_btn_state() {
+      // let len = Object.keys(this.selectedItems.selItems).length;
+      let len = this.selectedItems.selItems.length;
+      // let len = this.selectedItems.size;
+      // console.log("selectedItems len: %d", len);
+
+      // console.log("sel len: %d", len);
+      if (this.show_netobj) {
+        this.$refs.btn_add.disabled = true;
+        this.$refs.btn_edit.disabled = true;
+        this.$refs.btn_clone.disabled = true;
+        this.$refs.btn_del.disabled = true;
+      }
+      else if (this.lastSelectedItem) {
+        this.$refs.btn_add.disabled = false;
+        this.$refs.btn_edit.disabled = false;
+        this.$refs.btn_clone.disabled = false;
+        this.$refs.btn_del.disabled = false;
+      }
+      else {
+        this.$refs.btn_add.disabled = false;
+        this.$refs.btn_edit.disabled = true;
+        this.$refs.btn_clone.disabled = true;
+        this.$refs.btn_del.disabled = true;
       }
     },
+
+    change_netobj_box(is_show) {
+      this.show_netobj = is_show;
+      this.update_btn_state();
+    },
+
+    onNew() {
+      console.log("click new");
+
+      this.indeterminate = false;
+      this.toggleSelectAll(false);
+
+      this.$root.$emit('bv::hide::tooltip');
+      this.change_netobj_box(true);
+    },
+
     onEdit() {
       console.log("click edit");
+
+      this.$root.$emit('bv::hide::tooltip');
+      this.change_netobj_box(true);
     },
+
     onClone() {
-      console.log("click edit");
+      console.log("click clone");
     },
     onDelete() {
-      console.log("click edit");
+      console.log("click delete");
     },
     onSubmitNetobj(obj) {
       console.log("submit netobj: %s", JSON.stringify(obj));
@@ -296,7 +328,14 @@ export default {
     onCloseNetobj() {
       //console.log("close netobj");
       // todo reset contexts in child
-      this.$refs.netobj_add.show = false;
+
+      this.indeterminate = false;
+      this.toggleSelectAll(false);
+      this.change_netobj_box(false);
+    },
+    onResetSelect() {
+      this.indeterminate = false;
+      this.toggleSelectAll(false);
     },
 
     getSelectedItem() {
@@ -312,6 +351,7 @@ export default {
 
     selectRow(item) {
       item._selected = !item._selected;
+
       if (item._selected) {
         this.lastSelectedItem = item;
         var all = true;
@@ -328,7 +368,12 @@ export default {
           this.selectAll = false;
           this.indeterminate = true;
         }
-      } else {
+
+        if (this.selectedItems.selItems.indexOf(item) == -1) {
+          this.selectedItems.selItems.push(item);
+        }
+      } 
+      else {
         this.lastSelectedItem = null;
 
         // change color to show status
@@ -347,23 +392,48 @@ export default {
           this.selectAll = false;
           this.indeterminate = true;
         }
+
+        let idx = this.selectedItems.selItems.indexOf(item);
+        if (idx >= 0) {
+          this.selectedItems.selItems.splice(idx, 1);
+        }
       }
+
+      this.update_btn_state();
+      // console.log(this.selectedItems);
     },
 
     toggleSelectAll(checked) {
       this.selectAll = checked;
       if (this.selectAll) {
         for (var i = 0; i < this.items.length; i++) {
-          this.items[i]._selected = true;
-          // this.items[i]._rowVariant = "info";
+          let item = this.items[i];
+          item._selected = true;
+
+          if (this.lastSelectedItem == null) {
+            this.lastSelectedItem = item;
+          }
+
+          if (this.selectedItems.selItems.indexOf(item) == -1) {
+            this.selectedItems.selItems.push(item);
+          }
         }
       } 
       else {
+        this.lastSelectedItem = null;
         for (var i = 0; i < this.items.length; i++) {
-          this.items[i]._selected = false;
-          // this.items[i]._rowVariant = "default";
+          let item = this.items[i];
+          item._selected = false;
+
+          let idx = this.selectedItems.selItems.indexOf(item);
+          if (idx >= 0) {
+            this.selectedItems.selItems.splice(idx, 1);
+          }
         }
       }
+
+      this.update_btn_state();
+      // console.log(this.selectedItems);
     },
 
     /*
@@ -602,6 +672,12 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
   padding: 0;
   margin: 0;
 }
+
+/* 
+.toolbar {
+  background-color: rgb(190, 190, 190);
+} 
+*/
 
 </style>
 

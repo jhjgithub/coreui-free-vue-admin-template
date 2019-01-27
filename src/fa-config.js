@@ -13,6 +13,12 @@ import {
   faSortAmountDown, faSortAmountUp,
   faSearch,  
   faIdBadge,
+  faTimesCircle,
+  faCheckCircle,
+  faEraser,
+  faCheck,
+  faTimes,
+  faMinus,
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -25,18 +31,28 @@ library.add(
   faSortAmountDown, faSortAmountUp,
   faSearch,
   faIdBadge,
+  faTimesCircle,
+  faCheckCircle,
+  faEraser,
+  faCheck,
+  faTimes,
+  faMinus,
 );
 
 import { 
   faClone as faCloneR,
   faTrashAlt as faTrashAltR,
   faArrowAltCircleRight as faArrowAltCircleRightR,
+  faTimesCircle as faTimesCircleR,
+  faCheckCircle as faCheckCircleR,
 } from '@fortawesome/free-regular-svg-icons'
 
 library.add(
   faCloneR,
   faTrashAltR,
   faArrowAltCircleRightR,
+  faTimesCircleR,
+  faCheckCircleR,
 );
 
 

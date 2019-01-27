@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+    <b-form @submit="onSubmit" @reset="onReset" v-if="showMe">
       <b-card header-tag="header" border-variant="light">
         <template slot="header">
           <b-row>
@@ -8,9 +8,19 @@
               <h5 slot="header" class="my-0">{{title}}</h5>
             </b-col>
             <b-col class="text-right mx-0">
-              <b-button class="mr-1" size="sm" type="submit" variant="primary">추가</b-button>
-              <b-button class="mr-1" size="sm" type="reset" variant="danger">Reset</b-button>
-              <b-button class="mr-3" size="sm" variant="secondary" @click="onClose">Close</b-button>
+              <b-button class="mr-1" size="sm" type="submit">
+                적용
+                <font-awesome-icon class="top_btn" icon="check"  size="lg" />
+              </b-button>
+              <b-button class="mr-1" size="sm" type="reset" >
+                리셋
+                <font-awesome-icon  class="top_btn" icon="eraser"  size="lg" />
+                </b-button>
+              <b-button class="mr-1" size="sm" @click="onClose">
+                닫기
+                <font-awesome-icon class="top_btn" icon="times" size="lg"/>
+              </b-button>               
+
             </b-col>
           </b-row>
         </template>
@@ -43,93 +53,30 @@
               </b-input-group-text>
               <b-form-textarea no-resize v-model="netobj.desc" placeholder="Enter descirption" :rows="3" :max-rows="3"/>
             </b-input-group>
-
-                <!-- <b-form-group horizontal label-size="sm"  :label-cols="2" label-text-align="right" id="netobj_id" label="ID:" label-for="netobj_id" >
-                  <b-form-input id="netobj_id" size="sm" type="text" v-model="form.id" required placeholder="Enter Network object ID" />
-                </b-form-group>
-
-            <b-form-group
-              horizontal label-size="sm" class="mr-0" :label-cols="2" label-text-align="right" id="netobj_name" label="Name:" label-for="netobj_name" >
-              <b-form-input id="netobj_name" size="sm" type="text" v-model="form.name" required placeholder="Enter Network object name" />
-            </b-form-group> -->
           </b-col>
 
           <b-col sm="7" class="align-self-top">
             <b-row>
-            <b-input-group size="sm" class="mb-2">
-              <b-input-group-text class="right-side-label" slot="prepend">
-                Address Type
-              </b-input-group-text>
-              <b-form-radio-group buttons button-variant="outline-primary"  size="sm" v-model="netobj.network_type" :options="network_type_list"/>
-            </b-input-group>
-
-              <!-- <b-col sm="2" class="align-self-center text-right col-form-label col-form-label-sm">
-                  <label class="col-form-label-sm ">Type:</label>
-              </b-col>
-              <b-col sm="8">
-              <b-form-radio-group id="radios1" buttons button-variant="outline-primary"  size="sm" v-model="form.network_type" :network_type_list="form.network_type_list" name="radioOpenions"/>
-              </b-col> -->
+              <b-input-group size="sm" class="mb-2">
+                <b-input-group-text class="right-side-label" slot="prepend">
+                  Address Type
+                </b-input-group-text>
+                <b-form-radio-group buttons button-variant="outline-secondary" class="ml-1" size="sm" v-model="netobj.ipaddr_type" :options="ipaddr_type_list"/>
+                <b-form-radio-group v-if="netobj.ipaddr_type != 'group'" class="ml-1" buttons button-variant="outline-secondary"  size="sm" v-model="netobj.ipaddr_ver" :options="ipaddr_ver_list"/>
+              </b-input-group>
             </b-row>
 
-            <!-- <b-row v-if="netobj.network_type === 'netmask'"> -->
             <b-row >
               <b-input-group size="sm" class="mb-2" >
                 <b-input-group-text class="right-side-label" slot="prepend">
                   IP Address
                 </b-input-group-text>
-                <b-form-input class="ip_addr" size="sm" type="text" v-model="netobj.network_start" required placeholder="Enter Network IP"  
+                <b-form-input :disabled="netobj.ipaddr_type == 'group'" class="ip_addr" size="sm" type="text" v-model="netobj.ipaddr_start" required placeholder="Enter IP address"  
                 :formatter="ip_formatter" />
-                <!-- <b-col sm="2"> -->
-                  <b-form-input v-if="netobj.network_type === 'netmask'" class="ip_mask ml-1" size="sm" type="text" v-model="netobj.netmask" required placeholder="Mask" />
+                <b-form-input v-if="netobj.ipaddr_type === 'netmask'" class="ip_mask ml-1" size="sm" type="text" v-model="netobj.netmask" required placeholder="Netmask" />
 
-                  <b-form-input v-if="netobj.network_type === 'iprange'" class="ip_addr ml-1" size="sm" type="text" v-model="netobj.network_end" required placeholder="End IP" />
-                <!-- </b-col> -->
+                <b-form-input v-if="netobj.ipaddr_type === 'iprange'" class="ip_addr ml-1" size="sm" type="text" v-model="netobj.netmask" required placeholder="End IP address" />
               </b-input-group>
-
-              <!-- <b-col sm="2" class="align-self-center text-right">
-                  <label class="col-form-label-sm">IP Address:</label>
-              </b-col>
-
-              <b-col sm="5">
-              <b-form-input id="netobj_name" size="sm" type="text" v-model="form.name" required placeholder="IP Address" />
-              </b-col>
-
-              <b-col sm="2">
-              <b-form-input id="netobj_name" size="sm" type="text" v-model="form.name" required placeholder="Mask" />
-              </b-col> -->
-            </b-row>
-
-            <b-row v-if="netobj.network_type === 'iprange1'">
-              <b-input-group size="sm" class="mb-2">
-                <b-input-group-text class="right-side-label" slot="prepend">
-                  Start IP Address
-                </b-input-group-text>
-                <b-form-input size="sm" type="text" v-model="netobj.network_start" required placeholder="Enter Start IP Address" />
-              </b-input-group>
-              <b-input-group size="sm" class="mb-2">
-                <b-input-group-text class="right-side-label" slot="prepend">
-                  End IP Address
-                </b-input-group-text>
-                <b-form-input size="sm" type="text" v-model="netobj.network_end" required placeholder="Enter End IP Address" />
-              </b-input-group>
-
-              <!-- <b-col cols="2" class="align-self-center text-right">
-                <label class="col-form-label-sm">IP Address:</label>
-              </b-col>
-
-              <b-col cols="8">
-              <b-form-input id="netobj_name" size="sm" type="text" v-model="form.name" required placeholder="Mask" />
-              </b-col>
-            </b-row>
-
-            <b-row v-if="form.network_type === 'range'">
-              <b-col cols="2" class="align-self-center text-right">
-                <label class="col-form-label-sm">IP Address:</label>
-              </b-col>
-
-              <b-col cols="8">
-              <b-form-input id="netobj_name" size="sm" type="text" v-model="form.name" required placeholder="Mask" />
-              </b-col> -->
             </b-row>
 
             <b-row>
@@ -137,14 +84,19 @@
               <b-input-group-text class="right-side-label" slot="prepend">
                 Subobject
               </b-input-group-text>
-              <b-form-select multiple :select-size="5" v-model="selected_child" :options="netobj.children">
-              </b-form-select>
+              <b-form-select ref="subobj" multiple :select-size="5" v-model="selected_child" :options="netobj.children"/>
               <b-col sm="2" class="align-self-center">
                 <div>
-                <b-button class="my-1 subobj-btn" size="sm" variant="secondary">추가</b-button>
+                <b-button ref="add_subobj" @click="onAddSubobj" class="mb-1 subobj-btn" size="sm" variant="secondary">
+                  <!-- 추가 -->
+                  <font-awesome-icon  icon="plus"  size="sm" />
+                  </b-button>
                 </div>
                 <div>
-                <b-button class="my-1 subobj-btn" size="sm" variant="secondary">삭제</b-button>
+                <b-button ref="del_subobj" @click="onDelSubobj" class="my-0 subobj-btn" size="sm" variant="secondary">
+                  <!-- 삭제 -->
+                  <font-awesome-icon  icon="minus"  size="sm" />
+                  </b-button>
                 </div>
               </b-col>
             </b-input-group>
@@ -165,10 +117,20 @@ import { format_ipv4_address, } from "./nodeHelper.js";
 
 export default {
   props: {
-    props_netobj: {
+    netAddrObj: {
       type: Object,
       default: () => {}
-    }
+    },
+    show: {
+      type: Boolean,
+      default: false,
+    },
+    selectedItems: {
+      type: Object,
+      default: () => {}
+    },
+    subobj: [],
+
   },
   data() {
     return {
@@ -176,42 +138,71 @@ export default {
         netobj_id: '',
         netobj_name: '',
         create_date: '',
-        network_type: '',
-        network_start: '', 
-        network_end: '', 
+        ipaddr_type: '',
+        ipaddr_ver: '',
+        ipaddr_start: '', 
         netmask: '', 
         desc: '',
         children: [],
       },
-      show: false,
+      selItems: this.selectedItems.selItems,
+      showMe: false,
       title: "New Network Object",
       selected_child:[],
-      network_type_list: [
-        { text: 'Net Mask', value: 'netmask' },
+      ipaddr_type_list: [
+        { text: 'Group', value: 'group' },
+        { text: 'Netmask', value: 'netmask' },
         { text: 'IP Range', value: 'iprange' },
+      ],
+      ipaddr_ver_list: [
+        { text: 'IPv4', value: '4' },
+        { text: 'IPv6', value: '6' },
       ],
     };
   },
   mounted: function() {
+    this.$nextTick(function () {
+      // console.log("run updated!!!!!");
+      // this.resetSelect();
+    })
   },
   watch: {
-    show: function () {
-      if (this.show) {
+    showMe() {
+      if (this.showMe) {
         this.$nextTick(function() {
-          // show myself
-          if (this.props_netobj) {
+          // showMe myself
+          if (this.netAddrObj) {
             this.title = "Edit Network Object";
-            this.initNetobj(this.props_netobj);
+            this.initNetobj(this.netAddrObj);
+            this.resetSelect();
           }
           else {
             this.initNetobj(null);
           }
+
+          this.update_subobj_btn_state();
         });
       } else {
         // hide myself
         this.initNetobj(null);
       }
-    }
+    },
+    show(newVal, oldVal) {
+      this.showMe = this.show;
+    },
+    selectedItems: {
+      // immediate: true, 
+      deep: true,
+      handler(newVal, oldVal) {
+        this.update_subobj_btn_state();
+      }
+    },
+    selected_child(newVal, oldVal) {
+      this.update_subobj_btn_state();
+    },
+    // subobj: function() {
+    //   console.log(this.subobj);
+    // },
   },
   computed: {
   },
@@ -222,9 +213,9 @@ export default {
         this.netobj.netobj_id = obj.netobj_id;
         this.netobj.netobj_name = obj.netobj_name;
         this.netobj.create_date = obj.create_date;
-        this.netobj.network_type = obj.network_type;
-        this.netobj.network_start = obj.network_start;
-        this.netobj.network_end = obj.network_end;
+        this.netobj.ipaddr_type = obj.ipaddr_type;
+        this.netobj.ipaddr_ver = obj.ipaddr_ver;
+        this.netobj.ipaddr_start = obj.ipaddr_start;
         this.netobj.netmask = obj.netmask;
         this.netobj.desc = obj.desc;
         this.netobj.children = obj.children;
@@ -236,9 +227,9 @@ export default {
         this.netobj.netobj_name = '';
         // this.netobj.create_date = d.toLocaleString();
         this.netobj.create_date = new Date();
-        this.netobj.network_type = 'netmask'; // range, netmask
-        this.netobj.network_start = ''; 
-        this.netobj.network_end = ''; 
+        this.netobj.ipaddr_type = 'netmask'; // goup, iprange, netmask
+        this.netobj.ipaddr_ver = '4'; // 4 or 6
+        this.netobj.ipaddr_start = ''; 
         this.netobj.netmask = ''; 
         this.netobj.desc = ''; 
         this.netobj.children = [];
@@ -254,15 +245,44 @@ export default {
       this.$emit('submitNetobj', this.netobj);
     },
 
+    resetSelect() {
+      this.$emit('resetSelect');
+    },
+
     onReset(evt) {
       evt.preventDefault();
       this.initNetobj(null);
 
       /* Trick to reset/clear native browser form validation state */
-      this.show = false;
+      this.showMe = false;
       this.$nextTick(() => {
-        this.show = true;
+        this.showMe = true;
       });
+    },
+    onAddSubobj() {
+      let len = Object.keys(this.selItems).length;
+      for (let i = 0; i < len; i++) {
+        let name = this.selItems[i].netobj_name;
+
+        if (this.netobj.children.indexOf(name) == -1) {
+          this.netobj.children.push(name);
+        }
+      }
+
+      this.resetSelect();
+    },
+    onDelSubobj() {
+      let len = this.selected_child.length;
+      for (let i = 0; i < len; i++) {
+        let name = this.selected_child[i];
+        let idx = this.netobj.children.indexOf(name);
+        if (idx != -1) {
+          this.netobj.children.splice(idx, 1);
+        }
+      }
+
+      this.selected_child = [];
+      this.update_subobj_btn_state();
     },
     onClose(evt) {
       this.$emit('closeNetobj');
@@ -276,6 +296,16 @@ export default {
     ip_formatter(value, event) {
       return value;
     },
+    update_subobj_btn_state() {
+      if (!this.showMe) {
+        return
+      }
+      let len = Object.keys(this.selItems).length;
+
+      this.$refs.add_subobj.disabled = len <= 0;
+      this.$refs.del_subobj.disabled = this.selected_child.length <= 0;
+    },
+
   }
 };
 </script>
@@ -330,22 +360,30 @@ export default {
   width: 100px;
 }
 
-.subobj-btn {
-  padding: 2px;
-  /* height: 30px; */
-}
-
 .ip_addr {
   max-width: 200px;
-  /* width: 50px; */
-  /* minlength: 4; */
-  /* maxlength: 8; */
 }
 
 .ip_mask {
   max-width: 70px;
-  /* width: 50px; */
-  /* minlength: 4; */
-  /* maxlength: 8; */
 }
+
+.btn-sm, .btn-group-sm > .btn {
+    border-radius: 0.5rem;
+}
+
+/*
+.ipadd_type.btn-group-toggle.btn-group.btn-group-sm {
+  background-color: red;
+} 
+*/
+
+.subobj-btn {
+  padding: 5px;
+}
+
+.top_btn {
+  /* background-color: rgb(190, 190, 190); */
+  color: rgb(80, 80, 80);
+} 
 </style>
