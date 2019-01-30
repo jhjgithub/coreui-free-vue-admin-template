@@ -1,0 +1,51 @@
+{
+    "workbench.colorTheme": "Visual Studio Dark",
+    "git.ignoreMissingGitWarning": true,
+    "editor.minimap.enabled": false,
+    "git.autofetch": true,
+    "vim.hlsearch": true,
+    "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
+    "editor.parameterHints.enabled": false,
+    "typescript.suggest.enabled": false,
+    "javascript.suggest.enabled": false,
+    "editor.autoClosingBrackets": "never",
+    "editor.autoClosingQuotes": "never",
+    "vim.handleKeys" : {
+        "<C-c>" : false,
+        "<C-v>" : false,
+    },
+    "vim.leader": ",",
+    "vim.normalModeKeyBindings": [
+        {
+            "before": ["C-j"],
+            "after": ["C-e"]
+        },
+        {
+            "before": ["C-k"],
+            "after": ["C-y"]
+        },
+        // {
+        //     "before": ["leader", "r"],
+        //     "commands": [
+        //         "editor.action.startFindReplaceAction"
+        //     ]
+        // },
+        {
+            "before": ["leader", "r"],
+            "commands": [ 
+                "editor.action.smartSelect.grow",
+                "editor.action.startFindReplaceAction"
+            ],
+            "when": "editorTextFocus"
+        },
+    ],
+    "vim.visualModeKeyBindings": [
+        {
+            "before": ["leader", "f"],
+            "commands": [
+                "editor.action.formatSelection"
+            ]
+        },
+    ],
+    "editor.fontFamily": "D2Coding, Consolas, 'Courier New', monospace",
+}
