@@ -38,6 +38,18 @@
             ],
             "when": "editorTextFocus"
         },
+        {
+            "before": ["leader", "e"],
+            "after": [ 
+                ":",
+                "%s",
+                "/aaaa",
+                "/",
+                "bbb",
+                "/g",
+            ],
+            "when": "editorTextFocus"
+        },
     ],
     "vim.visualModeKeyBindings": [
         {
