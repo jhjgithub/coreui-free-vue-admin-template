@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-form @submit="onSubmit" @reset="onReset" v-if="showMe">
+    <b-form @submit="on_submit" @reset="on_reset" v-if="show_me">
       <b-card header-tag="header" border-variant="light">
         <template slot="header">
           <b-row>
@@ -10,15 +10,15 @@
             <b-col class="text-right mx-0">
               <b-button class="mr-1" size="sm" type="submit">
                 적용
-                <font-awesome-icon class="top_btn" icon="check"  size="lg" />
+                <font-awesome-icon class="top-btn" icon="check"  size="lg" />
               </b-button>
               <b-button class="mr-1" size="sm" type="reset" >
                 리셋
-                <font-awesome-icon  class="top_btn" icon="eraser"  size="lg" />
+                <font-awesome-icon  class="top-btn" icon="eraser"  size="lg" />
                 </b-button>
-              <b-button class="mr-1" size="sm" @click="onClose">
+              <b-button class="mr-1" size="sm" @click="on_close">
                 닫기
-                <font-awesome-icon class="top_btn" icon="times" size="lg"/>
+                <font-awesome-icon class="top-btn" icon="times" size="lg"/>
               </b-button>               
 
             </b-col>
@@ -84,19 +84,51 @@
               <b-input-group-text class="right-side-label" slot="prepend">
                 Subobject
               </b-input-group-text>
-              <b-form-select ref="subobj" multiple :select-size="5" v-model="selected_child" :options="netobj.children"/>
+              <b-form-select ref="subobj" multiple :select-size="5" 
+              @focusout.native="on_focus_out"
+              v-model="selected_child" 
+              :options="netobj.children"/>
+
               <b-col sm="2" class="align-self-center">
+                <!-- <div> 
+                  <span>
+                    <b-button ref="add_subobj" @click="on_add_subobj" class="mb-1 subobj-btn" size="sm" variant="secondary">
+                    <font-awesome-icon  icon="plus"  size="sm" />
+                    </b-button>
+                  </span>
+                  <span>
+                    <b-button ref="add_subobj" @click="on_add_subobj" class="ml-1 mb-1 subobj-btn" size="sm" variant="secondary">
+                    <font-awesome-icon  icon="plus"  size="sm" />
+                    </b-button>
+                  </span>
+                </div> -->
                 <div>
-                <b-button ref="add_subobj" @click="onAddSubobj" class="mb-1 subobj-btn" size="sm" variant="secondary">
-                  <!-- 추가 -->
-                  <font-awesome-icon  icon="plus"  size="sm" />
-                  </b-button>
-                </div>
-                <div>
-                <b-button ref="del_subobj" @click="onDelSubobj" class="my-0 subobj-btn" size="sm" variant="secondary">
+                  <span>
+                  <b-button-group vertical>
+                    <b-button ref="up_subobj" @click="on_moveup_subobj" class="mr-1 subobj-btn" size="sm" variant="secondary">
+                    <!-- 추가 -->
+                    <font-awesome-icon  icon="caret-up"  size="lg" />
+                    </b-button>
+                    <b-button ref="down_subobj" @click="on_movedown_subobj" class="mr-1 subobj-btn" size="sm" variant="secondary">
                   <!-- 삭제 -->
+                  <font-awesome-icon  icon="caret-down"  size="lg" />
+                  </b-button>
+                  </b-button-group>
+                  </span>
+                  <span>
+                  <b-button-group vertical>
+                    <b-button ref="add_subobj" @click="on_add_subobj" class="ml-1 subobj-btn" size="sm" variant="secondary">
+                    <font-awesome-icon  icon="plus"  size="sm" />
+                    </b-button>
+                    <b-button ref="del_subobj" @click="on_del_subobj" class="ml-1 subobj-btn" size="sm" variant="secondary">
                   <font-awesome-icon  icon="minus"  size="sm" />
                   </b-button>
+                  </b-button-group>
+                  <!-- <b-button ref="del_subobj" @click="on_del_subobj" class="my-0 subobj-btn" size="sm" variant="secondary"> -->
+                  <!-- 삭제 -->
+                  <!-- <font-awesome-icon  icon="minus"  size="sm" /> -->
+                  <!-- </b-button> -->
+                  </span>
                 </div>
               </b-col>
             </b-input-group>
@@ -113,11 +145,11 @@
 </template>
 
 <script>
-import { format_ipv4_address, } from "./nodeHelper.js";
+import { format_ipv4_address, array_move } from "./nodeHelper.js";
 
 export default {
   props: {
-    netAddrObj: {
+    net_addr_obj: {
       type: Object,
       default: () => {}
     },
@@ -125,7 +157,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    selectedItems: {
+    selected_items: {
       type: Object,
       default: () => {}
     },
@@ -145,8 +177,8 @@ export default {
         desc: '',
         children: [],
       },
-      selItems: this.selectedItems.selItems,
-      showMe: false,
+      sel_items: this.selected_items.sel_items,
+      show_me: false,
       title: "New Network Object",
       selected_child:[],
       ipaddr_type_list: [
@@ -163,41 +195,41 @@ export default {
   mounted: function() {
     this.$nextTick(function () {
       // console.log("run updated!!!!!");
-      // this.resetSelect();
+      // this.reset_select();
     })
   },
   watch: {
-    showMe() {
-      if (this.showMe) {
+    show_me() {
+      if (this.show_me) {
         this.$nextTick(function() {
-          // showMe myself
-          if (this.netAddrObj) {
+          // show_me myself
+          if (this.net_addr_obj) {
             this.title = "Edit Network Object";
-            this.initNetobj(this.netAddrObj);
-            this.resetSelect();
+            this.init_netobj(this.net_addr_obj);
+            this.reset_select();
           }
           else {
-            this.initNetobj(null);
+            this.init_netobj(null);
           }
 
           this.update_subobj_btn_state();
         });
       } else {
         // hide myself
-        this.initNetobj(null);
+        this.init_netobj(null);
       }
     },
-    show(newVal, oldVal) {
-      this.showMe = this.show;
+    show(new_val, old_val) {
+      this.show_me = this.show;
     },
-    selectedItems: {
+    selected_items: {
       // immediate: true, 
       deep: true,
-      handler(newVal, oldVal) {
+      handler(new_val, old_val) {
         this.update_subobj_btn_state();
       }
     },
-    selected_child(newVal, oldVal) {
+    selected_child(new_val, old_val) {
       this.update_subobj_btn_state();
     },
     // subobj: function() {
@@ -207,7 +239,7 @@ export default {
   computed: {
   },
   methods: {
-    initNetobj(obj) {
+    init_netobj(obj) {
       if (obj) {
         // edit
         this.netobj.netobj_id = obj.netobj_id;
@@ -238,40 +270,42 @@ export default {
           // { value: 'netobj-3', text: 'netobj-3'},
       }
     },
-    onSubmit(evt) {
+
+    on_submit(evt) {
       evt.preventDefault();
       // alert(JSON.stringify(this.netobj));
 
       this.$emit('submitNetobj', this.netobj);
     },
 
-    resetSelect() {
-      this.$emit('resetSelect');
+    reset_select() {
+      this.$emit('reset_select');
     },
 
-    onReset(evt) {
+    on_reset(evt) {
       evt.preventDefault();
-      this.initNetobj(null);
+      this.init_netobj(null);
 
       /* Trick to reset/clear native browser form validation state */
-      this.showMe = false;
+      this.show_me = false;
       this.$nextTick(() => {
-        this.showMe = true;
+        this.show_me = true;
       });
     },
-    onAddSubobj() {
-      let len = Object.keys(this.selItems).length;
+
+    on_add_subobj() {
+      let len = Object.keys(this.sel_items).length;
       for (let i = 0; i < len; i++) {
-        let name = this.selItems[i].netobj_name;
+        let name = this.sel_items[i].netobj_name;
 
         if (this.netobj.children.indexOf(name) == -1) {
           this.netobj.children.push(name);
         }
       }
 
-      this.resetSelect();
+      this.reset_select();
     },
-    onDelSubobj() {
+    on_del_subobj() {
       let len = this.selected_child.length;
       for (let i = 0; i < len; i++) {
         let name = this.selected_child[i];
@@ -283,8 +317,45 @@ export default {
 
       this.selected_child = [];
       this.update_subobj_btn_state();
+    }, 
+
+    on_moveup_subobj(event) {
+      let len = this.selected_child.length;
+      for (let i = 0; i < len; i++) {
+        let name = this.selected_child[i];
+        let idx = this.netobj.children.indexOf(name);
+        if (idx > 0) {
+          array_move(this.netobj.children, idx, idx-1);
+        }
+        else if (i == 0 && idx == 0) {
+          return
+        }
+      }
     },
-    onClose(evt) {
+
+    on_movedown_subobj(event) {
+      let len = this.selected_child.length;
+      let max_idx = this.netobj.children.length - 1;
+
+      for (let i = len-1; i >= 0; i-- ) {
+        let name = this.selected_child[i];
+        let idx = this.netobj.children.indexOf(name);
+        if (idx < max_idx) {
+          array_move(this.netobj.children, idx, idx+1);
+        }
+        else if (i == len-1) {
+          return
+        }
+      }
+    },
+
+    on_focus_out() {
+      var vm = this;
+      setTimeout(function() {
+        vm.selected_child = [];
+      }, 300);
+    },
+    on_close(evt) {
       this.$emit('closeNetobj');
     },
     date_format(value, event) {
@@ -297,13 +368,20 @@ export default {
       return value;
     },
     update_subobj_btn_state() {
-      if (!this.showMe) {
+      if (!this.show_me) {
         return
       }
-      let len = Object.keys(this.selItems).length;
 
-      this.$refs.add_subobj.disabled = len <= 0;
-      this.$refs.del_subobj.disabled = this.selected_child.length <= 0;
+      let len = Object.keys(this.sel_items).length;
+
+      if (this.$refs.add_subobj)
+        this.$refs.add_subobj.disabled = len <= 0;
+      if (this.$refs.del_subobj)
+        this.$refs.del_subobj.disabled = this.selected_child.length <= 0;
+      if (this.$refs.up_subobj)
+        this.$refs.up_subobj.disabled = this.selected_child.length <= 0;
+      if (this.$refs.down_subobj)
+        this.$refs.down_subobj.disabled = this.selected_child.length <= 0;
     },
 
   }
@@ -379,11 +457,20 @@ export default {
 */
 
 .subobj-btn {
-  padding: 5px;
+  padding: 3px;
 }
 
-.top_btn {
-  /* background-color: rgb(190, 190, 190); */
+.btn-group-vertical > .btn, .btn-group-vertical > .btn-group {
+  width: 25px;
+}
+
+.top-btn {
   color: rgb(80, 80, 80);
 } 
+
+.btn-secondary.disabled, .btn-secondary:disabled {
+    color: #8f8e8e;
+}
+
+
 </style>

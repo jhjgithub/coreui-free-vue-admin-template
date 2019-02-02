@@ -300,8 +300,6 @@ export default {
     },
 
     onNew() {
-      console.log("click new");
-
       this.indeterminate = false;
       this.toggleSelectAll(false);
 

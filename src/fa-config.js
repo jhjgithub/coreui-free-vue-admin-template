@@ -8,6 +8,7 @@ import {
   faInfoCircle,
   faAngleRight, 
   faAngleDown,
+  faAngleUp,
   faPlus, faEdit, faClone, faTrashAlt,
   faSortUp, faSortDown,
   faSortAmountDown, faSortAmountUp,
@@ -19,6 +20,8 @@ import {
   faCheck,
   faTimes,
   faMinus,
+  faCaretDown,
+  faCaretUp,
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -26,6 +29,7 @@ library.add(
   faInfoCircle,
   faAngleRight, 
   faAngleDown,
+  faAngleUp,
   faPlus, faEdit, faClone, faTrashAlt,
   faSortUp, faSortDown,
   faSortAmountDown, faSortAmountUp,
@@ -37,6 +41,8 @@ library.add(
   faCheck,
   faTimes,
   faMinus,
+  faCaretDown,
+  faCaretUp,
 );
 
 import { 

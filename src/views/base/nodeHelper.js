@@ -334,3 +334,9 @@ export function format_ipv4_address(value) {
   console.log("out value=%s", ip);
   return ip;
 }
+
+export function array_move(arr, fromIndex, toIndex) {
+    var element = arr[fromIndex];
+    arr.splice(fromIndex, 1);
+    arr.splice(toIndex, 0, element);
+}
