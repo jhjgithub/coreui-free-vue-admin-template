@@ -16,16 +16,16 @@
         <b-col cols="10"  class="d-flex justify-content-end toolbtn-box">
           <span>
               <b-button-group size="sm">
-                <b-btn class="toolbar" ref="btn_add"  @click.stop="onNew" v-b-tooltip.hover title="New item" >
+                <b-btn class="toolbar" ref="btn_add"  @click.stop="on_new" v-b-tooltip.hover title="New item" >
                   <font-awesome-icon  icon="plus"  size="lg" />
                 </b-btn>
-                <b-btn class="toolbar" ref="btn_edit" @click.stop="onEdit" v-b-tooltip.hover title="Edit item">
+                <b-btn class="toolbar" ref="btn_edit" @click.stop="on_edit" v-b-tooltip.hover title="Edit item">
                   <font-awesome-icon  icon="edit"  size="lg" />
                   </b-btn>
-                <b-btn class="toolbar" ref="btn_clone"  @click.stop="onClone" v-b-tooltip.hover title="Clone item">
+                <b-btn class="toolbar" ref="btn_clone"  @click.stop="on_clone" v-b-tooltip.hover title="Clone item">
                   <font-awesome-icon :icon="['far', 'clone']"  size="lg" />
                   </b-btn>              
-                <b-btn class="toolbar" ref="btn_del"  @click.stop="onDelete" v-b-tooltip.hover title="Delete item">
+                <b-btn class="toolbar" ref="btn_del"  @click.stop="on_delete" v-b-tooltip.hover title="Delete item">
                   <font-awesome-icon :icon="['far', 'trash-alt']"  size="lg" />
                   </b-btn>              
               </b-button-group>
@@ -36,48 +36,48 @@
 
     <!-- Subobject List -->
     <div class="row justify-content-center align-items-center">
-      <!-- <net-obj style="width: 600px" ref="netobj_add"/> -->
-      <net-obj 
-      ref="netobj_add" 
+      <!-- <net-ip-obj-input style="width: 600px" ref="net_ip_obj"/> -->
+      <net-ip-obj-input 
+      ref="ref_netipobj_input" 
       style="width: 90%" 
-      :show="show_netobj" 
-      :selectedItems="selectedItems"
-      :objItem="lastSelectedItem" 
-      @submitNetobj="onSubmitNetobj" 
-      @closeNetobj="onCloseNetobj" 
-      @resetSelect="onResetSelect"/>
+      :show="show_netipobj_input" 
+      :selected_items="selected_items"
+      :netipobj="last_selected_item" 
+      @eventSubmitNetIpObjInput="on_submit_netipobj_input" 
+      @eventCloseNetIpObjInput="on_close_netipobj_input" 
+      @eventResetSelect="on_reset_select"/>
     </div>
 
     <b-table striped hover small fixed show-empty 
-      ref="netobj_table"
-      :items="getItems" 
+      ref="net_ip_obj_table"
+      :items="get_items" 
       :fields="fields" 
       :sort-by.sync="sort_by"
       :sort-desc.sync="sort_desc"      
       :sort-direction="sort_dir"
-      @sort-changed="sortingChanged"
-      :current-page="currentPage"
-      :per-page="perPage"
+      @sort-changed="sorting_changed"
+      :current-page="current_page"
+      :per-page="per_page"
       thead-class="table-text"
       class="table-area" 
       :filter="search_keyword"
-      @filtered="onFiltered"
+      @filtered="on_filtered"
       :no-provider-paging=true
       :no-provider-filtering=true
       >
       <!-- :no-local-sorting=true -->
-      <!-- :tbody-tr-class="rowClass" -->
+      <!-- :tbody-tr-class="row_class" -->
       
       <!-- Checkbox column of the Table Header -->
       <template slot="HEAD__selected" slot-scope="row">
         <b-form-checkbox 
           @click.native.stop
-          v-model="selectAll"
+          v-model="select_all"
           :indeterminate="indeterminate"
-          @change="toggleSelectAll"                  
+          @change="toggle_select_all"                  
         />
       </template>
-      <template slot="HEAD_netobj_id" slot-scope="row">
+      <template slot="HEAD_obj_id" slot-scope="row">
         <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon"  size="sm"  />
           {{row.label}} 
         <span v-if="get_sort_by() == row.column">
@@ -85,7 +85,7 @@
         </span>
       </template>
 
-      <template slot="HEAD_netobj_name" slot-scope="row">
+      <template slot="HEAD_obj_name" slot-scope="row">
         <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon"  size="sm"  />
           {{row.label}} 
         <span v-if="get_sort_by() == row.column">
@@ -139,23 +139,23 @@
 
       <!-- Checkbox column of the rows -->
       <template slot="_selected" slot-scope="row">
-        <b-form-checkbox @click.native.stop v-model="row.item._selected" @change="selectRow(row.item)" />
+        <b-form-checkbox @click.native.stop v-model="row.item._selected" @change="select_row(row.item)" />
       </template>
 
-      <!-- <template slot="netobj_id" slot-scope="row" :tbody-tr-class="hide-col"> -->
-      <template slot="netobj_id" slot-scope="row">
+      <!-- <template slot="obj_id" slot-scope="row" :tbody-tr-class="hide-col"> -->
+      <template slot="obj_id" slot-scope="row">
         <div :style="get_left_padding(row.item)">
           <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
           <!-- <span style="width: 20px"> -->
           <span>
             <font-awesome-icon 
             :class="get_expand_icon_class(row.item)"
-            @click.stop="toggleShowChild(row.item)" 
+            @click.stop="toggle_show_child(row.item)" 
             :icon="get_expand_icon(row.item)"
             size="lg" />
           </span>
           <span>
-            {{row.item.netobj_id}}        
+            {{row.item.obj_id}}        
           </span>
         </div>
       </template>
@@ -184,9 +184,9 @@
     <b-pagination 
     align="center" 
     size="sm" 
-    :total-rows="totalRows" 
-    :per-page="perPage" 
-    v-model="currentPage" 
+    :total-rows="total_rows" 
+    :per-page="per_page" 
+    v-model="current_page" 
     class="page-nav" 
     />
   
@@ -203,12 +203,11 @@ import { normalize_items, toggle_child, sort_data, empty_array, print_json } fro
 import { netobj_fields, netobj_data, } from "./netobj_data_bstreetable.js";
 
 import "../../fa-config.js";
-import NetObj from "./Netobj";
-// import NetObj1 from "./Netobj1";
+import NetIpObjInput from "./NetIpObjInput";
 
 export default {
   components: {
-    NetObj,
+    NetIpObjInput,
     // NetObj1,
     // BInputGroup
   },
@@ -222,20 +221,20 @@ export default {
       sort_dir: 'last',
       sort_changed: 0,
 
-      show_netobj: false,
+      show_netipobj_input: false,
 
-      selectedItems: { selItems:[]},
-      lastSelectedItem:null,
-      selectAll: false,
+      selected_items: { sel_items:[]},
+      last_selected_item:null,
+      select_all: false,
       indeterminate: false,
       sort_icon: "sort-up",
 
       fields: netobj_fields,
       items: netobj_data,
-      currentPage: 2,
-      perPage: 3,
-      totalRows: 0,      
-      pageOptions: [ 5, 10, 15 ],
+      current_page: 2,
+      per_page: 3,
+      total_rows: 0,      
+      page_options: [ 5, 10, 15 ],
     };
   },
 
@@ -244,43 +243,27 @@ export default {
 
   mounted: function() {
     // console.log(d);
-    this.totalRows = this.items.length;
+    this.total_rows = this.items.length;
     normalize_items(this.items);
     this.update_btn_state();
-    // print_json(this.items, "initial state:");
-
   },
   computed: {
   },
   methods: {
-    ready: function() {
-      // this.$refs.NetobjGrid.expandRow(2);
-    },
-
     get_sort_by() {
-      // console.log("get sort by: " + this.sort_by);
       return this.sort_by;
     },
 
-    getNetobjStatus() {
-      return false;
-      // return this.$refs.netobj_add.show;
-    },
-
     update_btn_state() {
-      // let len = Object.keys(this.selectedItems.selItems).length;
-      let len = this.selectedItems.selItems.length;
-      // let len = this.selectedItems.size;
-      // console.log("selectedItems len: %d", len);
+      let len = this.selected_items.sel_items.length;
 
-      // console.log("sel len: %d", len);
-      if (this.show_netobj) {
+      if (this.show_netipobj_input) {
         this.$refs.btn_add.disabled = true;
         this.$refs.btn_edit.disabled = true;
         this.$refs.btn_clone.disabled = true;
         this.$refs.btn_del.disabled = true;
       }
-      else if (this.lastSelectedItem) {
+      else if (this.last_selected_item) {
         this.$refs.btn_add.disabled = false;
         this.$refs.btn_edit.disabled = false;
         this.$refs.btn_clone.disabled = false;
@@ -295,48 +278,48 @@ export default {
     },
 
     change_netobj_box(is_show) {
-      this.show_netobj = is_show;
+      this.show_netipobj_input = is_show;
       this.update_btn_state();
     },
 
-    onNew() {
+    on_new() {
       this.indeterminate = false;
-      this.toggleSelectAll(false);
+      this.toggle_select_all(false);
 
       this.$root.$emit('bv::hide::tooltip');
       this.change_netobj_box(true);
     },
 
-    onEdit() {
+    on_edit() {
       console.log("click edit");
 
       this.$root.$emit('bv::hide::tooltip');
       this.change_netobj_box(true);
     },
 
-    onClone() {
+    on_clone() {
       console.log("click clone");
     },
-    onDelete() {
+    on_delete() {
       console.log("click delete");
     },
-    onSubmitNetobj(obj) {
+    on_submit_netipobj_input(obj) {
       console.log("submit netobj: %s", JSON.stringify(obj));
     },
-    onCloseNetobj() {
+    on_close_netipobj_input() {
       //console.log("close netobj");
       // todo reset contexts in child
 
       this.indeterminate = false;
-      this.toggleSelectAll(false);
+      this.toggle_select_all(false);
       this.change_netobj_box(false);
     },
-    onResetSelect() {
+    on_reset_select() {
       this.indeterminate = false;
-      this.toggleSelectAll(false);
+      this.toggle_select_all(false);
     },
 
-    getSelectedItem() {
+    get_selected_items() {
       for (var i = 0; i < this.items.length; i++) {
         item = items[i];
         if (item._selected) {
@@ -347,11 +330,11 @@ export default {
       return null;
     },
 
-    selectRow(item) {
+    select_row(item) {
       item._selected = !item._selected;
 
       if (item._selected) {
-        this.lastSelectedItem = item;
+        this.last_selected_item = item;
         var all = true;
         for (var i = 0; i < this.items.length; i++) {
           if (!this.items[i]._selected)
@@ -359,20 +342,20 @@ export default {
         }
 
         if (all) {
-          this.selectAll = true;
+          this.select_all = true;
           this.indeterminate = false;                    
         }
         else {
-          this.selectAll = false;
+          this.select_all = false;
           this.indeterminate = true;
         }
 
-        if (this.selectedItems.selItems.indexOf(item) == -1) {
-          this.selectedItems.selItems.push(item);
+        if (this.selected_items.sel_items.indexOf(item) == -1) {
+          this.selected_items.sel_items.push(item);
         }
       } 
       else {
-        this.lastSelectedItem = null;
+        this.last_selected_item = null;
 
         // change color to show status
         // item._rowVariant = "default";
@@ -383,68 +366,55 @@ export default {
         }
 
         if (!all) {
-          this.selectAll = false;
+          this.select_all = false;
           this.indeterminate = false;
         }
         else {
-          this.selectAll = false;
+          this.select_all = false;
           this.indeterminate = true;
         }
 
-        let idx = this.selectedItems.selItems.indexOf(item);
+        let idx = this.selected_items.sel_items.indexOf(item);
         if (idx >= 0) {
-          this.selectedItems.selItems.splice(idx, 1);
+          this.selected_items.sel_items.splice(idx, 1);
         }
       }
 
       this.update_btn_state();
-      // console.log(this.selectedItems);
+      // console.log(this.selected_items);
     },
 
-    toggleSelectAll(checked) {
-      this.selectAll = checked;
-      if (this.selectAll) {
+    toggle_select_all(checked) {
+      this.select_all = checked;
+      if (this.select_all) {
         for (var i = 0; i < this.items.length; i++) {
           let item = this.items[i];
           item._selected = true;
 
-          if (this.lastSelectedItem == null) {
-            this.lastSelectedItem = item;
+          if (this.last_selected_item == null) {
+            this.last_selected_item = item;
           }
 
-          if (this.selectedItems.selItems.indexOf(item) == -1) {
-            this.selectedItems.selItems.push(item);
+          if (this.selected_items.sel_items.indexOf(item) == -1) {
+            this.selected_items.sel_items.push(item);
           }
         }
       } 
       else {
-        this.lastSelectedItem = null;
+        this.last_selected_item = null;
         for (var i = 0; i < this.items.length; i++) {
           let item = this.items[i];
           item._selected = false;
 
-          let idx = this.selectedItems.selItems.indexOf(item);
+          let idx = this.selected_items.sel_items.indexOf(item);
           if (idx >= 0) {
-            this.selectedItems.selItems.splice(idx, 1);
+            this.selected_items.sel_items.splice(idx, 1);
           }
         }
       }
 
       this.update_btn_state();
-      // console.log(this.selectedItems);
     },
-
-    /*
-    rowClass( item, type ) {
-      console.log("item:" + item);
-      // https://github.com/bootstrap-vue/bootstrap-vue/issues/1795
-      // https://github.com/bootstrap-vue/bootstrap-vue/pull/1797
-      // if ( !item )
-      //   return;
-      // if ( item.status === 'awesome' )
-      //   return 'table-success';
-    },
-    */
     
     get_left_padding(item) {
       // 'padding-left': (1 + this.column.collapseIcon * this.row.countParents() * 1.5) + 'rem'
@@ -467,19 +437,19 @@ export default {
       return "angle-right"
     },
 
-    toggleShowChild(item) {
-      // console.log("clicked first_name:" + item.netobj_id);
-      toggle_child(this.items, item.netobj_id);
-      this.$refs.netobj_table.refresh();
+    toggle_show_child(item) {
+      // console.log("clicked first_name:" + item.obj_id);
+      toggle_child(this.items, item.obj_id);
+      this.$refs.net_ip_obj_table.refresh();
     },
 
-    onFiltered(filteredItems) {
+    on_filtered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
+      this.total_rows = filteredItems.length;
+      this.current_page = 1;
     },
 
-    sortingChanged(ctx) {
+    sorting_changed(ctx) {
       // console.log("by: " + ctx.sortBy + ", Desc: " + ctx.sortDesc);      
       // ctx.sortBy   ==> Field key for sorting by (or null for no sorting)
       // ctx.sortDesc ==> true if sorting descending, false otherwise
@@ -525,13 +495,8 @@ export default {
       sort_data(this.items, this.sort_by, this.sort_desc);
     },
 
-    getItems(ctx, callback) {
-      //let params = '?page=' + ctx.currentPage + '&size=' + ctx.perPage
-
-      //console.log(ctx);
-      // console.log("Called getItems: page=%d, perPage=%d", ctx.currentPage, ctx.perPage);
-
-      this.totalRows = this.items.length;
+    get_items(ctx, callback) {
+      this.total_rows = this.items.length;
       return this.items;
     },
   }

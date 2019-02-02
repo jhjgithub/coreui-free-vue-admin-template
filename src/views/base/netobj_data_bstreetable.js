@@ -10,7 +10,7 @@ export const netobj_fields = [
   },
 
   {
-    key: 'netobj_id',
+    key: 'obj_id',
     label: 'ID',
     icon: 'id-badge',
     sortable: true,
@@ -18,7 +18,7 @@ export const netobj_fields = [
   },
 
   {
-    key: 'netobj_name',
+    key: 'obj_name',
     label: 'Name',
     icon: 'user',
     sortable: true,
@@ -70,8 +70,8 @@ export const netobj_fields = [
 
 export const netobj_data = [
   {
-    'netobj_id': 'netobj-1',
-    'netobj_name': 'WebServer',
+    'obj_id': 'netobj-1',
+    'obj_name': 'WebServer',
     'network_type': 'range', // range, netmask, group
     'network_start': '1.1.1.1',
     'network_end': '1.1.1.254',
@@ -85,8 +85,8 @@ export const netobj_data = [
     '_depth': 0,
     'children': [
       {   
-        'netobj_id': 'netobj-6',
-        'netobj_name': 'WebServer6',
+        'obj_id': 'netobj-6',
+        'obj_name': 'WebServer6',
         'create_date': '2018-12-31T14:10:10',
         'network_type': 'group', // range, netmask, group
         'network_start': '', 
@@ -98,8 +98,8 @@ export const netobj_data = [
         '_visible_child': 'none',  // hide, show, none
       },  
       {
-        'netobj_id': 'netobj-3',
-        'netobj_name': 'WebServer3',
+        'obj_id': 'netobj-3',
+        'obj_name': 'WebServer3',
         'create_date': '2018-12-31T13:10:10',
         'network_type': 'netmask', // range, netmask, group
         'network_start': '2.2.1.0',
@@ -112,8 +112,8 @@ export const netobj_data = [
         '_depth': 1,
         'children': [
           {
-            'netobj_id': 'netobj-5',
-            'netobj_name': 'WebServer5',
+            'obj_id': 'netobj-5',
+            'obj_name': 'WebServer5',
             'create_date': '2018-12-31T14:10:10',
             'network_type': 'group', // range, netmask, group
             'network_start': '',
@@ -129,8 +129,8 @@ export const netobj_data = [
     ],
   },
   {
-    'netobj_id': 'netobj-4',
-    'netobj_name': 'WebServer4',
+    'obj_id': 'netobj-4',
+    'obj_name': 'WebServer4',
     'create_date': '2018-12-31T14:10:10',
     'network_type': 'group', // range, netmask, group
     'network_start': '',
@@ -142,8 +142,8 @@ export const netobj_data = [
     '_visible_child': 'none',  // hide, show, none
   },
   {
-    'netobj_id': 'netobj-2',
-    'netobj_name': 'WebServer1',
+    'obj_id': 'netobj-2',
+    'obj_name': 'WebServer1',
     'create_date': '2018-12-30T13:10:10',
     'network_type': 'netmask', // range, netmask, group
     'network_start': '1.1.1.0',

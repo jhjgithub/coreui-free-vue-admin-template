@@ -13,7 +13,7 @@ function expand_children(items, item_index, item) {
     items.splice(item_index, 0, child);
   });
 
-  item._visible_child = 'show';
+  item._visible_child = "show";
   empty_array(item.children);
 
   //print_json(items, "after");
@@ -32,10 +32,10 @@ function collapse_children(items, start_index, parent) {
       //console.log("found item: nid=%s, pid=%s", item.netobj_id, item._parent_id);
       //console.log("%d: %s", i, JSON.stringify(item, null, 2));
 
-      if (item._visible_child === 'show') {
+      if (item._visible_child === "show") {
         // console.log("call recursive remove for %d", item.netobj_id);
         collapse_children(items, i, item);
-        item._visible_child = 'hide';
+        item._visible_child = "hide";
       }
 
       begin_matched = true;
@@ -49,14 +49,13 @@ function collapse_children(items, start_index, parent) {
 
       // and push it back to its parent
       parent.children.push(item);
-    }
-    else if (begin_matched) {
+    } else if (begin_matched) {
       break;
       //return begin_matched;
     }
   }
 
-  parent._visible_child = 'hide';
+  parent._visible_child = "hide";
   //print_json(items, "after");
 }
 
@@ -66,13 +65,13 @@ function save_expanded_items(items, expanded_items) {
   empty_array(expanded_items);
 
   items.forEach((item, idx) => {
-    if (item._visible_child === 'show') {
+    if (item._visible_child === "show") {
       let showed_item = {
-        'idx': idx,
-        'netobj_id': item.netobj_id,
-        'parent_id': item._parent_id,
-        'visible_child': item._visible_child,
-      }
+        idx: idx,
+        netobj_id: item.netobj_id,
+        parent_id: item._parent_id,
+        visible_child: item._visible_child
+      };
 
       expanded_items.push(showed_item);
     }
@@ -121,14 +120,13 @@ function dynamic_sort(property) {
   const reN = /[^0-9]/g;
 
   // to properly handle mixed string with alphabet and digit
-  return function (itemA, itemB) {
+  return function(itemA, itemB) {
     let a, b;
 
     if (sortOrder == -1) {
       a = itemB[property];
       b = itemA[property];
-    }
-    else {
+    } else {
       a = itemA[property];
       b = itemB[property];
     }
@@ -144,11 +142,10 @@ function dynamic_sort(property) {
       }
 
       return aN === bN ? 0 : aN > bN ? 1 : -1;
-    }
-    else {
+    } else {
       return aA > bA ? 1 : -1;
     }
-  }
+  };
 }
 
 function sort_items(items, sort_by, sort_desc) {
@@ -182,10 +179,10 @@ function apply_expanded_items(items, expanded_items) {
 }
 
 function removeChar(data) {
-  let b = ''
+  let b = "";
   for (let j = 0; j < data.length; j++) {
     let c = data[j];
-    if (c >= '0' && c <= '9') {
+    if (c >= "0" && c <= "9") {
       b = b.concat(c);
     }
   }
@@ -227,12 +224,12 @@ export function normalize_items(items) {
 
     cur_items.forEach((item, idx) => {
       item._depth = cur_depth;
-      item._visible_child = 'none';
+      item._visible_child = "none";
       item._fix_idx = fix_idx.toString();
       fix_idx++;
 
       if (item.children && item.children.length > 0) {
-        item._visible_child = 'hide';
+        item._visible_child = "hide";
         _normalize_items(item.children, cur_depth + 1);
       }
     });
@@ -247,7 +244,7 @@ export function toggle_child(items, nid) {
 
   if (item_index === -1) {
     // console.log("no item with nid: " + nid);
-    return
+    return;
   }
 
   let item = items[item_index];
@@ -257,11 +254,14 @@ export function toggle_child(items, nid) {
 
   let visible_child = item._visible_child;
 
-  if (visible_child === 'hide' && item.children != undefined && item.children.length > 0) {
+  if (
+    visible_child === "hide" &&
+    item.children != undefined &&
+    item.children.length > 0
+  ) {
     // console.log("--> expanding child: %s", item.netobj_id);
     expand_children(items, item_index, item);
-  }
-  else if (visible_child == 'show') {
+  } else if (visible_child == "show") {
     // console.log("--> collaping child: idx=%s, id=%s", item_index, item.netobj_id);
     collapse_children(items, item_index, item);
   }
@@ -280,9 +280,8 @@ export function sort_data(items, sort_by, sort_desc) {
 
   if (sort_by) {
     sort_items(items, sort_by, sort_desc);
-  }
-  else {
-    sort_items(items, '_fix_idx', sort_desc);
+  } else {
+    sort_items(items, "_fix_idx", sort_desc);
   }
   //print_json(items, "sorted items");
 
@@ -306,7 +305,7 @@ export function format_ipv4_address(value) {
 
     block = removeChar(block);
     let len = block.length;
-    let b = ''
+    let b = "";
 
     for (let j = 0; j < len; j++) {
       let c = block[j];
@@ -336,7 +335,7 @@ export function format_ipv4_address(value) {
 }
 
 export function array_move(arr, fromIndex, toIndex) {
-    var element = arr[fromIndex];
-    arr.splice(fromIndex, 1);
-    arr.splice(toIndex, 0, element);
+  var element = arr[fromIndex];
+  arr.splice(fromIndex, 1);
+  arr.splice(toIndex, 0, element);
 }

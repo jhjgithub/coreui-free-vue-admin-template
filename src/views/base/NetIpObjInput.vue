@@ -1,27 +1,127 @@
-asdfa
-asdfljkasdf
-asdfl
-asdfljk
-
 <template>
-  <b-col cols="10" class="d-flex justify-content-end toolbtn-box">
-    <span>
-      <b-button-group size="sm">
-        <b-btn class="toolbar" ref="btn_add" @click.stop="on_new" v-b-tooltip.hover title="New item">
-          <font-awesome-icon icon="plus" size="lg"/>
-        </b-btn>
-        <b-btn class="toolbar" ref="btn_edit" @click.stop="on_edit" v-b-tooltip.hover title="Edit item">
-          <font-awesome-icon icon="edit" size="lg"/>
-        </b-btn>
-        <b-btn class="toolbar" ref="btn_clone" @click.stop="on_clone" v-b-tooltip.hover title="Clone item">
-          <font-awesome-icon :icon="['far', 'clone']" size="lg"/>
-        </b-btn>
-        <b-btn class="toolbar" ref="btn_del" @click.stop="on_delete" v-b-tooltip.hover title="Delete item">
-          <font-awesome-icon :icon="['far', 'trash-alt']" size="lg"/>
-        </b-btn>
-      </b-button-group>
-    </span>
-  </b-col>
+  <div>
+    <b-form @submit="on_submit" @reset="on_reset" v-if="local_show">
+      <b-card header-tag="header" border-variant="light">
+        <template slot="header">
+          <b-row>
+            <b-col class="card-header-text align-self-center">
+              <h5 slot="header" class="my-0">{{title}}</h5>
+            </b-col>
+            <b-col class="text-right mx-0">
+              <b-button class="mr-1" size="sm" type="submit">적용
+                <font-awesome-icon class="top-btn" icon="check" size="lg"/>
+              </b-button>
+              <b-button class="mr-1" size="sm" type="reset">리셋
+                <font-awesome-icon class="top-btn" icon="eraser" size="lg"/>
+              </b-button>
+              <b-button class="mr-1" size="sm" @click="on_close">닫기
+                <font-awesome-icon class="top-btn" icon="times" size="lg"/>
+              </b-button>
+            </b-col>
+          </b-row>
+        </template>
+
+        <!-- ID & Name  -->
+        <b-row class="my-1 mx-3">
+          <b-col sm="5" class="align-self-top">
+            <b-input-group size="sm" class="mb-2">
+              <b-input-group-text class="left-side-label" slot="prepend">
+                <!-- <strong>Date</strong> -->
+                Date
+              </b-input-group-text>
+              <b-form-input disabled size="sm" type="text" v-model="local_netipobj.create_date" :formatter="date_format"/>
+            </b-input-group>
+            <b-input-group size="sm" class="mb-2">
+              <b-input-group-text class="left-side-label" slot="prepend">ID</b-input-group-text>
+              <b-form-input disabled size="sm" type="text" v-model="local_netipobj.obj_id"/>
+            </b-input-group>
+            <b-input-group size="sm" class="mb-2">
+              <b-input-group-text class="left-side-label" slot="prepend">Name</b-input-group-text>
+              <b-form-input size="sm" type="text" v-model="local_netipobj.obj_name" required placeholder="Enter Network object Name"/>
+            </b-input-group>
+            <b-input-group size="sm">
+              <b-input-group-text class="left-side-label" slot="prepend">Description</b-input-group-text>
+              <b-form-textarea no-resize v-model="local_netipobj.desc" placeholder="Enter descirption" :rows="3" :max-rows="3"/>
+            </b-input-group>
+          </b-col>
+
+          <b-col sm="7" class="align-self-top">
+            <b-row>
+              <b-input-group size="sm" class="mb-2">
+                <b-input-group-text class="right-side-label" slot="prepend">Address Type</b-input-group-text>
+                <b-form-radio-group buttons button-variant="outline-secondary" class="ml-1" size="sm" v-model="local_netipobj.ipaddr_type" :options="ipaddr_type_list"/>
+                <b-form-radio-group
+                  v-if="local_netipobj.ipaddr_type != 'group'"
+                  class="ml-1"
+                  buttons
+                  button-variant="outline-secondary"
+                  size="sm"
+                  v-model="local_netipobj.ipaddr_ver"
+                  :options="ipaddr_ver_list"
+                />
+              </b-input-group>
+            </b-row>
+
+            <b-row>
+              <b-input-group size="sm" class="mb-2">
+                <b-input-group-text class="right-side-label" slot="prepend">IP Address</b-input-group-text>
+                <b-form-input
+                  :disabled="local_netipobj.ipaddr_type == 'group'"
+                  class="ip_addr"
+                  size="sm"
+                  type="text"
+                  v-model="local_netipobj.ipaddr_start"
+                  required
+                  placeholder="Enter IP address"
+                  :formatter="ip_formatter"
+                />
+                <b-form-input v-if="local_netipobj.ipaddr_type === 'netmask'" class="ip_mask ml-1" size="sm" type="text" v-model="local_netipobj.netmask" required placeholder="Netmask"/>
+
+                <b-form-input v-if="local_netipobj.ipaddr_type === 'iprange'" class="ip_addr ml-1" size="sm" type="text" v-model="local_netipobj.netmask" required placeholder="End IP address"/>
+              </b-input-group>
+            </b-row>
+
+            <b-row>
+              <b-input-group size="sm" class="mb-2">
+                <b-input-group-text class="right-side-label" slot="prepend">Subobject</b-input-group-text>
+                <b-form-select ref="ref_subobj" multiple :select-size="5" @focusout.native="on_focus_out" v-model="selected_child" :options="local_netipobj.children"/>
+
+                <b-col sm="2" class="align-self-center">
+                  <div>
+                    <span>
+                      <b-button-group vertical>
+                        <b-button ref="ref_up_subobj" @click="on_moveup_subobj" class="mr-1 subobj-btn" size="sm" variant="secondary">
+                          <!-- 추가 -->
+                          <font-awesome-icon icon="caret-up" size="lg"/>
+                        </b-button>
+                        <b-button ref="ref_down_subobj" @click="on_movedown_subobj" class="mr-1 subobj-btn" size="sm" variant="secondary">
+                          <!-- 삭제 -->
+                          <font-awesome-icon icon="caret-down" size="lg"/>
+                        </b-button>
+                      </b-button-group>
+                    </span>
+                    <span>
+                      <b-button-group vertical>
+                        <b-button ref="ref_add_subobj" @click="on_add_subobj" class="ml-1 subobj-btn" size="sm" variant="secondary">
+                          <font-awesome-icon icon="plus" size="sm"/>
+                        </b-button>
+                        <b-button ref="ref_del_subobj" @click="on_del_subobj" class="ml-1 subobj-btn" size="sm" variant="secondary">
+                          <font-awesome-icon icon="minus" size="sm"/>
+                        </b-button>
+                      </b-button-group>
+                    </span>
+                  </div>
+                </b-col>
+              </b-input-group>
+            </b-row>
+          </b-col>
+        </b-row>
+
+        <!-- <b-button type="submit" variant="primary">Submit</b-button>
+        <b-button type="reset" variant="danger">Reset</b-button>-->
+      </b-card>
+    </b-form>
+  </div>
 </template>
 
 <script>
@@ -62,28 +162,13 @@ export default {
       title: "New Network Object",
       selected_child: [],
       ipaddr_type_list: [
-        {
-          text: "Group",
-          value: "group"
-        },
-        {
-          text: "Netmask",
-          value: "netmask"
-        },
-        {
-          text: "IP Range",
-          value: "iprange"
-        }
+        { text: "Group", value: "group" },
+        { text: "Netmask", value: "netmask" },
+        { text: "IP Range", value: "iprange" }
       ],
       ipaddr_ver_list: [
-        {
-          text: "IPv4",
-          value: "4"
-        },
-        {
-          text: "IPv6",
-          value: "6"
-        }
+        { text: "IPv4", value: "4" },
+        { text: "IPv6", value: "6" }
       ]
     };
   },
