@@ -1,34 +1,32 @@
  <template>
-
   <b-card header-tag="header">
     <h3 slot="header" class="mb-0">{{caption}}</h3>
-
-    <b-container class="toolbar-box" fluid>      
+    <b-container class="toolbar-box" fluid>
       <b-row>
         <b-col cols="2" class="search-box">
           <b-input-group size="sm">
             <b-input-group-text slot="prepend">
-              <font-awesome-icon  icon="search"  size="sm" />
+              <font-awesome-icon icon="search" size="sm" />
             </b-input-group-text>
             <b-form-input type="search" v-model.lazy="search_keyword"></b-form-input>
           </b-input-group>
         </b-col>
-        <b-col cols="10"  class="d-flex justify-content-end toolbtn-box">
+        <b-col cols="10" class="d-flex justify-content-end toolbtn-box">
           <span>
-              <b-button-group size="sm">
-                <b-btn class="toolbar" ref="btn_add"  @click.stop="on_new" v-b-tooltip.hover title="New item" >
-                  <font-awesome-icon  icon="plus"  size="lg" />
-                </b-btn>
-                <b-btn class="toolbar" ref="btn_edit" @click.stop="on_edit" v-b-tooltip.hover title="Edit item">
-                  <font-awesome-icon  icon="edit"  size="lg" />
-                  </b-btn>
-                <b-btn class="toolbar" ref="btn_clone"  @click.stop="on_clone" v-b-tooltip.hover title="Clone item">
-                  <font-awesome-icon :icon="['far', 'clone']"  size="lg" />
-                  </b-btn>              
-                <b-btn class="toolbar" ref="btn_del"  @click.stop="on_delete" v-b-tooltip.hover title="Delete item">
-                  <font-awesome-icon :icon="['far', 'trash-alt']"  size="lg" />
-                  </b-btn>              
-              </b-button-group>
+            <b-button-group size="sm">
+              <b-btn class="toolbar" ref="btn_add" @click.stop="on_new" v-b-tooltip.hover title="New item">
+                <font-awesome-icon icon="plus" size="lg" />
+              </b-btn>
+              <b-btn class="toolbar" ref="btn_edit" @click.stop="on_edit" v-b-tooltip.hover title="Edit item">
+                <font-awesome-icon icon="edit" size="lg" />
+              </b-btn>
+              <b-btn class="toolbar" ref="btn_clone" @click.stop="on_clone" v-b-tooltip.hover title="Clone item">
+                <font-awesome-icon :icon="['far', 'clone']" size="lg" />
+              </b-btn>
+              <b-btn class="toolbar" ref="btn_del" @click.stop="on_delete" v-b-tooltip.hover title="Delete item">
+                <font-awesome-icon :icon="['far', 'trash-alt']" size="lg" />
+              </b-btn>
+            </b-button-group>
           </span>
         </b-col>
       </b-row>
@@ -37,99 +35,75 @@
     <!-- Subobject List -->
     <div class="row justify-content-center align-items-center">
       <!-- <net-ip-obj-input style="width: 600px" ref="net_ip_obj"/> -->
-      <net-ip-obj-input 
-      ref="ref_netipobj_input" 
-      style="width: 90%" 
-      :show="show_netipobj_input" 
-      :selected_items="selected_items"
-      :netipobj="last_selected_item" 
-      @eventSubmitNetIpObjInput="on_submit_netipobj_input" 
-      @eventCloseNetIpObjInput="on_close_netipobj_input" 
-      @eventResetSelect="on_reset_select"/>
+      <net-ip-obj-input ref="ref_netipobj_input" style="width: 90%" :show="show_netipobj_input" :selected_items="selected_items"
+        :netipobj="last_selected_item" @eventSubmitNetIpObjInput="on_submit_netipobj_input" @eventCloseNetIpObjInput="on_close_netipobj_input"
+        @eventResetSelect="on_reset_select" />
     </div>
 
-    <b-table striped hover small fixed show-empty 
-      ref="net_ip_obj_table"
-      :items="get_items" 
-      :fields="fields" 
-      :sort-by.sync="sort_by"
-      :sort-desc.sync="sort_desc"      
-      :sort-direction="sort_dir"
-      @sort-changed="sorting_changed"
-      :current-page="current_page"
-      :per-page="per_page"
-      thead-class="table-text"
-      class="table-area" 
-      :filter="search_keyword"
-      @filtered="on_filtered"
-      :no-provider-paging=true
-      :no-provider-filtering=true
-      >
+    <b-table striped hover small fixed show-empty ref="net_ip_obj_table" :items="get_items" :fields="fields" :sort-by.sync="sort_by"
+      :sort-desc.sync="sort_desc" :sort-direction="sort_dir" @sort-changed="sorting_changed" :current-page="current_page"
+      :per-page="per_page" thead-class="table-text" class="table-area" :filter="search_keyword" @filtered="on_filtered"
+      :no-provider-paging=true :no-provider-filtering=true>
       <!-- :no-local-sorting=true -->
       <!-- :tbody-tr-class="row_class" -->
-      
+
       <!-- Checkbox column of the Table Header -->
       <template slot="HEAD__selected" slot-scope="row">
-        <b-form-checkbox 
-          @click.native.stop
-          v-model="select_all"
-          :indeterminate="indeterminate"
-          @change="toggle_select_all"                  
-        />
+        <b-form-checkbox @click.native.stop v-model="select_all" :indeterminate="indeterminate" @change="toggle_select_all" />
       </template>
       <template slot="HEAD_obj_id" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon"  size="sm"  />
-          {{row.label}} 
+        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
+        {{row.label}}
         <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon"/>
+          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
         </span>
       </template>
 
       <template slot="HEAD_obj_name" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon"  size="sm"  />
-          {{row.label}} 
+        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
+        {{row.label}}
         <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon"/>
+          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
         </span>
       </template>
 
       <template slot="HEAD_network_type" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon"  size="sm"  />
-          {{row.label}} 
+        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
+        {{row.label}}
         <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon"/>
+          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
         </span>
       </template>
 
       <template slot="HEAD_network_start" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon"  size="sm"  />
-          {{row.label}} 
+        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
+        {{row.label}}
         <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon"/>
+          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
         </span>
       </template>
 
       <template slot="HEAD_network_end" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon"  size="sm"  />
-          {{row.label}} 
+        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
+        {{row.label}}
         <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon"/>
+          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
         </span>
       </template>
 
       <template slot="HEAD_netmask" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon"  size="sm"  />
-          {{row.label}} 
+        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
+        {{row.label}}
         <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon"/>
+          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
         </span>
       </template>
 
       <template slot="HEAD_create_date" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon"  size="sm"  />
-          {{row.label}} 
+        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
+        {{row.label}}
         <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon"/>
+          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
         </span>
       </template>
 
@@ -148,20 +122,17 @@
           <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
           <!-- <span style="width: 20px"> -->
           <span>
-            <font-awesome-icon 
-            :class="get_expand_icon_class(row.item)"
-            @click.stop="toggle_show_child(row.item)" 
-            :icon="get_expand_icon(row.item)"
-            size="lg" />
+            <font-awesome-icon :class="get_expand_icon_class(row.item)" @click.stop="toggle_show_child(row.item)" :icon="get_expand_icon(row.item)"
+              size="lg" />
           </span>
           <span>
-            {{row.item.obj_id}}        
+            {{row.item.obj_id}}
           </span>
         </div>
       </template>
 
       <template slot="details" slot-scope="row">
-        <font-awesome-icon style="cursor:pointer" @click.stop="row.toggleDetails" icon="info-circle"  size="lg" />
+        <font-awesome-icon style="cursor:pointer" @click.stop="row.toggleDetails" icon="info-circle" size="lg" />
       </template>
 
       <template slot="row-details" slot-scope="row">
@@ -175,21 +146,14 @@
           <b-row align-h="end">
             <b-col cols="1">
               <b-button size="sm" @click="row.toggleDetails">Hide</b-button>
-            </b-col>          
-          </b-row>                    
+            </b-col>
+          </b-row>
         </b-card>
       </template>
     </b-table>
 
-    <b-pagination 
-    align="center" 
-    size="sm" 
-    :total-rows="total_rows" 
-    :per-page="per_page" 
-    v-model="current_page" 
-    class="page-nav" 
-    />
-  
+    <b-pagination align="center" size="sm" :total-rows="total_rows" :per-page="per_page" v-model="current_page" class="page-nav" />
+
   </b-card>
 
 </template>
@@ -212,7 +176,7 @@ export default {
     // BInputGroup
   },
 
-  data: function() {
+  data: function () {
     return {
       caption: "Network Objects",
       search_keyword: "",
@@ -223,8 +187,8 @@ export default {
 
       show_netipobj_input: false,
 
-      selected_items: { sel_items:[]},
-      last_selected_item:null,
+      selected_items: { sel_items: [] },
+      last_selected_item: null,
       select_all: false,
       indeterminate: false,
       sort_icon: "sort-up",
@@ -233,15 +197,15 @@ export default {
       items: netobj_data,
       current_page: 2,
       per_page: 3,
-      total_rows: 0,      
-      page_options: [ 5, 10, 15 ],
+      total_rows: 0,
+      page_options: [5, 10, 15],
     };
   },
 
   watch: {
   },
 
-  mounted: function() {
+  mounted: function () {
     // console.log(d);
     this.total_rows = this.items.length;
     normalize_items(this.items);
@@ -343,7 +307,7 @@ export default {
 
         if (all) {
           this.select_all = true;
-          this.indeterminate = false;                    
+          this.indeterminate = false;
         }
         else {
           this.select_all = false;
@@ -353,7 +317,7 @@ export default {
         if (this.selected_items.sel_items.indexOf(item) == -1) {
           this.selected_items.sel_items.push(item);
         }
-      } 
+      }
       else {
         this.last_selected_item = null;
 
@@ -399,7 +363,7 @@ export default {
             this.selected_items.sel_items.push(item);
           }
         }
-      } 
+      }
       else {
         this.last_selected_item = null;
         for (var i = 0; i < this.items.length; i++) {
@@ -415,7 +379,7 @@ export default {
 
       this.update_btn_state();
     },
-    
+
     get_left_padding(item) {
       // 'padding-left': (1 + this.column.collapseIcon * this.row.countParents() * 1.5) + 'rem'
       return { 'padding-left': (item._depth * 0.8) + 'rem' };
@@ -423,12 +387,12 @@ export default {
 
     get_expand_icon_class(item) {
       if (item._visible_child === 'none') {
-        return "no-children";        
+        return "no-children";
       }
-      
-      return "have-children";   
+
+      return "have-children";
     },
- 
+
     get_expand_icon(item) {
       if (item._visible_child === 'show') {
         return "angle-down"
@@ -479,7 +443,7 @@ export default {
           this.sort_desc = false;
         }
 
-        this.sort_changed ++;
+        this.sort_changed++;
       }
       else {
         this.sort_changed = 1;
@@ -490,7 +454,7 @@ export default {
       if (this.sort_desc)
         this.sort_icon = "sort-amount-down";
       else
-        this.sort_icon = "sort-amount-up";        
+        this.sort_icon = "sort-amount-up";
 
       sort_data(this.items, this.sort_by, this.sort_desc);
     },
@@ -517,8 +481,8 @@ export default {
   color: rgba(29, 28, 28, 0.753);
   font-size: 16px;
   font-style: normal;
-  text-align: justify; 
-  vertical-align:middle;
+  text-align: justify;
+  vertical-align: middle;
 }
 
 /* for table header text */
@@ -531,12 +495,12 @@ table.b-table > thead > tr > th.sorting::before,
 table.b-table > thead > tr > th.sorting::after,
 table.b-table > tfoot > tr > th.sorting::before,
 table.b-table > tfoot > tr > th.sorting::after {
-    position: absolute;
-    right: 0.75em;
-    display: none;
-    opacity: 0.4;
-    padding-bottom: inherit;
-    font-size: inherit;
+  position: absolute;
+  right: 0.75em;
+  display: none;
+  opacity: 0.4;
+  padding-bottom: inherit;
+  font-size: inherit;
 }
 
 /*
@@ -577,7 +541,7 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
 */
 
 .have-children {
-  cursor:pointer; 
+  cursor: pointer;
   color: rgb(15, 128, 235);
 }
 
@@ -585,8 +549,10 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
   color: rgb(196, 194, 194);
 }
 
-
-.custom-control, .custom-checkbox, .custom-control-inline, .options-column {
+.custom-control,
+.custom-checkbox,
+.custom-control-inline,
+.options-column {
   padding-top: 0.15em;
   /* padding-left: 2em; */
 }
@@ -613,9 +579,9 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
   /* color: rgba(184, 34, 34, 0.753); */
   /* font-size: 10px; */
   font-style: normal;
-  text-align: justify; 
+  text-align: justify;
   display: table-cell;
-  vertical-align:middle;
+  vertical-align: middle;
   text-align: center;
 }
 
@@ -630,7 +596,7 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
   margin: 0px;
 }
 
-.sort-icon { 
+.sort-icon {
   color: red;
   padding: 0;
   margin: 0;
@@ -641,7 +607,6 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
   background-color: rgb(190, 190, 190);
 } 
 */
-
 </style>
 
 

@@ -49,7 +49,8 @@ function collapse_children(items, start_index, parent) {
 
       // and push it back to its parent
       parent.children.push(item);
-    } else if (begin_matched) {
+    }
+    else if (begin_matched) {
       break;
       //return begin_matched;
     }
@@ -70,7 +71,7 @@ function save_expanded_items(items, expanded_items) {
         idx: idx,
         netobj_id: item.netobj_id,
         parent_id: item._parent_id,
-        visible_child: item._visible_child
+        visible_child: item._visible_child,
       };
 
       expanded_items.push(showed_item);
@@ -126,7 +127,8 @@ function dynamic_sort(property) {
     if (sortOrder == -1) {
       a = itemB[property];
       b = itemA[property];
-    } else {
+    }
+    else {
       a = itemA[property];
       b = itemB[property];
     }
@@ -142,7 +144,8 @@ function dynamic_sort(property) {
       }
 
       return aN === bN ? 0 : aN > bN ? 1 : -1;
-    } else {
+    }
+    else {
       return aA > bA ? 1 : -1;
     }
   };
@@ -254,14 +257,11 @@ export function toggle_child(items, nid) {
 
   let visible_child = item._visible_child;
 
-  if (
-    visible_child === "hide" &&
-    item.children != undefined &&
-    item.children.length > 0
-  ) {
+  if (visible_child === "hide" && item.children != undefined && item.children.length > 0) {
     // console.log("--> expanding child: %s", item.netobj_id);
     expand_children(items, item_index, item);
-  } else if (visible_child == "show") {
+  }
+  else if (visible_child == "show") {
     // console.log("--> collaping child: idx=%s, id=%s", item_index, item.netobj_id);
     collapse_children(items, item_index, item);
   }
@@ -280,7 +280,8 @@ export function sort_data(items, sort_by, sort_desc) {
 
   if (sort_by) {
     sort_items(items, sort_by, sort_desc);
-  } else {
+  }
+  else {
     sort_items(items, "_fix_idx", sort_desc);
   }
   //print_json(items, "sorted items");
