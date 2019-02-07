@@ -28,7 +28,7 @@
               <b-input-group-text class="left-side-label" slot="prepend">
                 Date
               </b-input-group-text>
-              <b-form-input disabled size="sm" type="text" v-model="local_netipobj.create_date" :formatter="date_format" />
+              <b-form-input disabled size="sm" type="text" v-model="local_created_date" />
             </b-input-group>
             <b-input-group size="sm" class="mb-2">
               <b-input-group-text class="left-side-label" slot="prepend">ID</b-input-group-text>
@@ -36,7 +36,8 @@
             </b-input-group>
             <b-input-group size="sm" class="mb-2">
               <b-input-group-text class="left-side-label" slot="prepend">Name</b-input-group-text>
-              <b-form-input size="sm" type="text" v-model="local_netipobj.obj_name" required placeholder="Enter Network object Name" />
+              <b-form-input size="sm" type="text" v-model="local_netipobj.obj_name" name="obj_name" v-validate="{ regex:/^[A-Za-z_-][A-Za-z0-9_-]*$/, required: true, min:3}"
+                :state="validate_state('obj_name')" placeholder="Enter Network object Name" />
             </b-input-group>
             <b-input-group size="sm">
               <b-input-group-text class="left-side-label" slot="prepend">Description</b-input-group-text>
@@ -58,21 +59,34 @@
             <b-row>
               <b-input-group size="sm" class="mb-2">
                 <b-input-group-text class="right-side-label" slot="prepend">IP Address</b-input-group-text>
-                <b-form-input :disabled="local_netipobj.ipaddr_type == 'group'" class="ip_addr" size="sm" type="text" v-model="local_netipobj.ipaddr_start"
-                  required placeholder="Enter IP address" :formatter="ip_formatter" />
-                <b-form-input v-if="local_netipobj.ipaddr_type === 'netmask'" class="ip_mask ml-1" size="sm" type="text" v-model="local_netipobj.netmask"
-                  required placeholder="Netmask" />
+                <b-form-input :disabled="local_netipobj.ipaddr_type === 'group'" class="ip_addr" size="sm" type="text" key="start_ip"
+                  name="start_ip" v-model="local_netipobj.ipaddr_start" v-validate="{ip: true, required: true}" :state="validate_state('start_ip')"
+                  placeholder="Enter IP address" />
 
-                <b-form-input v-if="local_netipobj.ipaddr_type === 'iprange'" class="ip_addr ml-1" size="sm" type="text" v-model="local_netipobj.netmask"
-                  required placeholder="End IP address" />
+                <b-form-input v-if="local_netipobj.ipaddr_type === 'netmask'" class="ip_mask ml-1" size="sm" type="text" key="mask"
+                  name="mask" v-model="local_netipobj.netmask" v-validate="{between:[1,32], required: true} " :state="validate_state('mask')"
+                  placeholder="Netmask" />
+
+                <b-form-input v-if="local_netipobj.ipaddr_type === 'iprange'" class="ip_addr ml-1" size="sm" type="text" key="end_ip"
+                  name="end_ip" v-model="local_netipobj.ipaddr_end" v-validate="{ip: true, required: true}" :state="validate_state('end_ip')"
+                  placeholder="Enter IP address" />
               </b-input-group>
             </b-row>
 
             <b-row>
               <b-input-group size="sm" class="mb-2">
                 <b-input-group-text class="right-side-label" slot="prepend">Subobject</b-input-group-text>
+                <!-- Subobj -->
+
                 <b-form-select ref="ref_subobj" multiple :select-size="5" @focusout.native="on_focus_out" v-model="selected_child"
-                  :options="local_netipobj.children" />
+                  key="subobj" name="subobj" v-validate="'required|child_len'" :state="validate_state('subobj')" :options="local_netipobj.children" />
+
+                <!-- <m-select ref="ref_subobj" multiple :select-size="5"
+                  data-vv-value-path="local_netipobj.children"
+                  :value="selected_child"
+                  key="subobj" name="subobj" v-validate="{required: true, min_value: 1}" 
+                  :state="validate_state('subobj')"
+                  :options="local_netipobj.children" /> -->
 
                 <b-col sm="2" class="align-self-center">
                   <div>
@@ -111,8 +125,13 @@
 
 <script>
 import { format_ipv4_address, array_move } from "./nodeHelper.js";
+// import MSelect from "./mSelect.vue";
+
 
 export default {
+  components: {
+    // MSelect,
+  },
   props: {
     netipobj: {
       type: Object,
@@ -133,16 +152,18 @@ export default {
       local_netipobj: {
         obj_id: "",
         obj_name: "",
-        create_date: "",
+        created_date: "",
         ipaddr_type: "",
         ipaddr_ver: "",
         ipaddr_start: "",
+        ipaddr_end: "",
         netmask: "",
         desc: "",
         children: []
       },
       local_selected_items: this.selected_items.sel_items,
       local_show: false,
+      local_created_date: "",
 
       title: "New Network Object",
       selected_child: [],
@@ -157,6 +178,17 @@ export default {
       ]
     };
   },
+
+  created() {
+    this.$validator.extend('child_len', {
+      getMessage: field => field + ' needs at least a child.',
+      validate: value => {
+        let l = this.local_netipobj.children.length;
+        return l > 0;
+      }
+    });
+  },
+
   mounted: function () {
     this.$nextTick(function () {
       // console.log("run updated!!!!!");
@@ -198,10 +230,8 @@ export default {
     selected_child(new_val, old_val) {
       this.update_subobj_btn_state();
     }
-    // subobj: function() {
-    //   console.log(this.subobj);
-    // },
   },
+
   computed: {},
   methods: {
     init_local_netipobj(obj) {
@@ -209,10 +239,11 @@ export default {
         // edit
         this.local_netipobj.obj_id = obj.obj_id;
         this.local_netipobj.obj_name = obj.obj_name;
-        this.local_netipobj.create_date = obj.create_date;
+        this.local_netipobj.created_date = obj.created_date;
         this.local_netipobj.ipaddr_type = obj.ipaddr_type;
         this.local_netipobj.ipaddr_ver = obj.ipaddr_ver;
         this.local_netipobj.ipaddr_start = obj.ipaddr_start;
+        this.local_netipobj.ipaddr_end = obj.ipaddr_end;
         this.local_netipobj.netmask = obj.netmask;
         this.local_netipobj.desc = obj.desc;
         this.local_netipobj.children = obj.children;
@@ -222,25 +253,43 @@ export default {
         let id = Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
         this.local_netipobj.obj_id = "id-" + id.toString();
         this.local_netipobj.obj_name = "";
-        // this.local_netipobj.create_date = d.toLocaleString();
-        this.local_netipobj.create_date = new Date();
+        this.local_netipobj.created_date = Date.now();
         this.local_netipobj.ipaddr_type = "netmask"; // goup, iprange, netmask
         this.local_netipobj.ipaddr_ver = "4"; // 4 or 6
         this.local_netipobj.ipaddr_start = "";
+        this.local_netipobj.ipaddr_end = "";
         this.local_netipobj.netmask = "";
         this.local_netipobj.desc = "";
         this.local_netipobj.children = [];
-        // { value: 'local_netipobj-1', text: 'local_netipobj-1'},
-        // { value: 'local_netipobj-2', text: 'local_netipobj-2'},
-        // { value: 'local_netipobj-3', text: 'local_netipobj-3'},
       }
+
+      let d = new Date(this.local_netipobj.created_date);
+      this.local_created_date = d.toLocaleString();
     },
 
     on_submit(evt) {
       evt.preventDefault();
       // alert(JSON.stringify(this.local_netipobj));
 
-      this.$emit("eventSubmitNetIpObjInput", this.local_netipobj);
+      this.$validator.validate().then(result => {
+        console.log(result);
+        if (result) {
+          this.$emit("eventSubmitNetIpObjInput", this.local_netipobj);
+        }
+        else {
+          console.log(this.errors);
+        }
+      });
+    },
+
+    validate_state(ref) {
+      let f = this.veeFields[ref];
+
+      if (f && (f.dirty || f.validated)) {
+        return !this.errors.has(ref)
+      }
+
+      return null
     },
 
     on_close(evt) {
@@ -272,19 +321,46 @@ export default {
         }
       }
 
+      if (this.selected_child.length == 0) {
+        this.selected_child[0] = this.local_netipobj.children[0];
+      }
+
+      this.$validator.validate('subobj');
+      // this.update_subobj_btn_state();
       this.reset_select();
     },
+
     on_del_subobj() {
       let len = this.selected_child.length;
+      let first_idx = 0;
+
       for (let i = 0; i < len; i++) {
         let name = this.selected_child[i];
         let idx = this.local_netipobj.children.indexOf(name);
-        if (idx != -1) {
-          this.local_netipobj.children.splice(idx, 1);
+
+        if (idx == -1) {
+          continue;
         }
+
+        if (i == 0) {
+          first_idx = idx;
+        }
+
+        this.local_netipobj.children.splice(idx, 1);
       }
 
       this.selected_child = [];
+      len = this.local_netipobj.children.length;
+
+      if (len > 0) {
+        if (first_idx >= len) {
+          first_idx = len - 1;
+        }
+
+        this.selected_child[0] = this.local_netipobj.children[first_idx];
+      }
+
+      this.$validator.validate('subobj');
       this.update_subobj_btn_state();
     },
 
@@ -325,17 +401,6 @@ export default {
       // }, 300);
     },
 
-    date_format(value, event) {
-      if (value) {
-        return value.toLocaleString();
-      }
-      return "";
-    },
-
-    ip_formatter(value, event) {
-      return value;
-    },
-
     update_subobj_btn_state() {
       if (!this.local_show) {
         return;
@@ -352,7 +417,8 @@ export default {
       if (this.$refs.ref_down_subobj)
         this.$refs.ref_down_subobj.disabled = this.selected_child.length <= 0;
     }
-  }
+  },
+
 };
 </script>
 
@@ -441,5 +507,14 @@ export default {
 .btn-secondary.disabled,
 .btn-secondary:disabled {
   color: #8f8e8e;
+}
+.was-validated .form-control:valid,
+.form-control.is-valid {
+  background-image: none;
+}
+
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+  background-image: none;
 }
 </style>

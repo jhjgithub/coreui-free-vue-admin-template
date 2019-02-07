@@ -451,10 +451,12 @@ export default {
         this.sort_by = ctx.sortBy;
       }
 
-      if (this.sort_desc)
+      if (this.sort_desc) {
         this.sort_icon = "sort-amount-down";
-      else
+      }
+      else {
         this.sort_icon = "sort-amount-up";
+      }
 
       sort_data(this.items, this.sort_by, this.sort_desc);
     },

@@ -1,6 +1,6 @@
 function get_item_index(items, nid) {
   let i = items.findIndex((item, idx) => {
-    return item.netobj_id == nid;
+    return item.obj_id == nid;
   });
 
   return i;
@@ -24,16 +24,16 @@ function collapse_children(items, start_index, parent) {
 
   for (let i = start_index; i < items.length; i++) {
     let item = items[i];
-    let pid = parent.netobj_id;
+    let pid = parent.obj_id;
 
-    //console.log("nid: %s, pid: %s", item.netobj_id, pid);
+    //console.log("nid: %s, pid: %s", item.obj_id, pid);
 
     if (item._parent_id === pid) {
-      //console.log("found item: nid=%s, pid=%s", item.netobj_id, item._parent_id);
+      //console.log("found item: nid=%s, pid=%s", item.obj_id, item._parent_id);
       //console.log("%d: %s", i, JSON.stringify(item, null, 2));
 
       if (item._visible_child === "show") {
-        // console.log("call recursive remove for %d", item.netobj_id);
+        // console.log("call recursive remove for %d", item.obj_id);
         collapse_children(items, i, item);
         item._visible_child = "hide";
       }
@@ -69,7 +69,7 @@ function save_expanded_items(items, expanded_items) {
     if (item._visible_child === "show") {
       let showed_item = {
         idx: idx,
-        netobj_id: item.netobj_id,
+        obj_id: item.obj_id,
         parent_id: item._parent_id,
         visible_child: item._visible_child,
       };
@@ -86,7 +86,7 @@ function collapsed_items(items, expanded_items) {
 
   expanded_items.forEach((item, idx) => {
     if (item._parent_id == null) {
-      let child_idx = get_item_index(items, item.netobj_id);
+      let child_idx = get_item_index(items, item.obj_id);
       if (child_idx != -1) {
         let child = items[child_idx];
         collapse_children(items, child_idx, child);
@@ -173,8 +173,8 @@ function apply_expanded_items(items, expanded_items) {
   // console.log("--> expanding items: %d", expanded_items.length);
 
   expanded_items.forEach((item, idx) => {
-    //console.log("expanding id: %s", item.netobj_id);
-    toggle_child(items, item.netobj_id);
+    //console.log("expanding id: %s", item.obj_id);
+    toggle_child(items, item.obj_id);
   });
 
   //print_json(expanded_items, "Last show");
@@ -253,16 +253,16 @@ export function toggle_child(items, nid) {
   let item = items[item_index];
 
   // console.log("%d: %s", item_index, JSON.stringify(item, null, 2));
-  // console.log("index: %s, nid: %s", item_index, item.netobj_id);
+  // console.log("index: %s, nid: %s", item_index, item.obj_id);
 
   let visible_child = item._visible_child;
 
   if (visible_child === "hide" && item.children != undefined && item.children.length > 0) {
-    // console.log("--> expanding child: %s", item.netobj_id);
+    // console.log("--> expanding child: %s", item.obj_id);
     expand_children(items, item_index, item);
   }
   else if (visible_child == "show") {
-    // console.log("--> collaping child: idx=%s, id=%s", item_index, item.netobj_id);
+    // console.log("--> collaping child: idx=%s, id=%s", item_index, item.obj_id);
     collapse_children(items, item_index, item);
   }
 }
