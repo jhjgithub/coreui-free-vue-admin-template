@@ -199,16 +199,20 @@ export function print_json(d, msg) {
   console.log("#### %s: %s", msg, JSON.stringify(d, null, 2));
 }
 
-export function deep_copy(arr) {
+export function deep_copy(obj_to, obj_from) {
+  for (let k in obj_from) {
+    obj_to[k] = obj_from[k];
+  }
+}
+
+export function deep_copy_array(arr) {
   let out = [];
 
   for (let i = 0, len = arr.length; i < len; i++) {
     let item = arr[i];
     let obj = {};
 
-    for (let k in item) {
-      obj[k] = item[k];
-    }
+    deep_copy(obj, item);
 
     out.push(obj);
   }
@@ -219,26 +223,32 @@ export function empty_array(arr) {
   arr.splice(0, arr.length);
 }
 
-export function normalize_items(items) {
+export function normalize_items(items, preserve) {
   let depth = 0;
 
-  function _normalize_items(cur_items, cur_depth) {
+  function _normalize_items(cur_items, cur_depth, preserve) {
     let fix_idx = 0;
 
     cur_items.forEach((item, idx) => {
       item._depth = cur_depth;
-      item._visible_child = "none";
+      if (!preserve) {
+        item._visible_child = "none";
+      }
+
       item._fix_idx = fix_idx.toString();
       fix_idx++;
 
       if (item.children && item.children.length > 0) {
-        item._visible_child = "hide";
-        _normalize_items(item.children, cur_depth + 1);
+        if (!preserve) {
+          item._visible_child = "hide";
+        }
+
+        _normalize_items(item.children, cur_depth + 1, preserve);
       }
     });
   }
 
-  _normalize_items(items, depth);
+  _normalize_items(items, depth, preserve);
 }
 
 export function toggle_child(items, nid) {
@@ -339,4 +349,58 @@ export function array_move(arr, fromIndex, toIndex) {
   var element = arr[fromIndex];
   arr.splice(fromIndex, 1);
   arr.splice(toIndex, 0, element);
+}
+
+export function apply_ipobj(items, info) {
+  let newobj = {};
+  let oldobj = items.find(i => i.obj_id === info.obj_id);
+
+  if (oldobj) {
+    newobj = oldobj;
+    console.log("update obj");
+  }
+
+  newobj.obj_id = info.obj_id;
+  newobj.obj_name = info.obj_name;
+  newobj.obj_type = info.obj_type;
+  newobj.created_date = info.created_date;
+  newobj.ipaddr_ver = info.ipaddr_ver;
+  newobj.ipaddr_start = info.ipaddr_start;
+  newobj.ipaddr_end = info.ipaddr_end;
+  newobj.netmask = info.netmask;
+  newobj.desc = info.desc;
+  // refresh children
+  newobj.children = [];
+
+  info.children.forEach(child_info => {
+    let new_child = {};
+    let c = items.find(child => child.obj_id === child_info.value);
+
+    if (c) {
+      deep_copy(new_child, c);
+      new_child._parent_id = newobj.obj_id;
+      newobj.children.push(new_child);
+    }
+    else {
+      console.log("Not found item: %s", child_info.value);
+    }
+  });
+
+  newobj._visible_child = "none"; // hide, show, none
+
+  if (newobj.children.length > 0) {
+    newobj._visible_child = "hide";
+  }
+
+  if (newobj !== oldobj) {
+    console.log("add obj");
+
+    newobj._selected = false;
+    newobj._parent_id = null;
+    newobj._depth = 0;
+
+    items.unshift(newobj);
+  }
+
+  normalize_items(items, true);
 }

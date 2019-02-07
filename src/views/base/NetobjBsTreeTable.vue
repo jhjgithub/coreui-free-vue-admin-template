@@ -67,7 +67,7 @@
         </span>
       </template>
 
-      <template slot="HEAD_network_type" slot-scope="row">
+      <template slot="HEAD_obj_type" slot-scope="row">
         <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
         {{row.label}}
         <span v-if="get_sort_by() == row.column">
@@ -75,7 +75,7 @@
         </span>
       </template>
 
-      <template slot="HEAD_network_start" slot-scope="row">
+      <template slot="HEAD_ipaddr_ver" slot-scope="row">
         <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
         {{row.label}}
         <span v-if="get_sort_by() == row.column">
@@ -83,7 +83,15 @@
         </span>
       </template>
 
-      <template slot="HEAD_network_end" slot-scope="row">
+      <template slot="HEAD_ipaddr_start" slot-scope="row">
+        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
+        {{row.label}}
+        <span v-if="get_sort_by() == row.column">
+          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
+        </span>
+      </template>
+
+      <template slot="HEAD_ipaddr_end" slot-scope="row">
         <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
         {{row.label}}
         <span v-if="get_sort_by() == row.column">
@@ -99,7 +107,7 @@
         </span>
       </template>
 
-      <template slot="HEAD_create_date" slot-scope="row">
+      <template slot="HEAD_created_date" slot-scope="row">
         <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
         {{row.label}}
         <span v-if="get_sort_by() == row.column">
@@ -163,8 +171,8 @@
 // import Vue from "vue";
 // import BInputGroup from "bootstrap-vue/es/components/input-group/input-group";
 
-import { normalize_items, toggle_child, sort_data, empty_array, print_json } from "./nodeHelper.js";
-import { netobj_fields, netobj_data, } from "./netobj_data_bstreetable.js";
+import { normalize_items, toggle_child, sort_data, empty_array, print_json, apply_ipobj } from "./nodeHelper.js";
+import { netobj_fields, netipobj_data, } from "./netobj_data_bstreetable.js";
 
 import "../../fa-config.js";
 import NetIpObjInput from "./NetIpObjInput";
@@ -194,7 +202,7 @@ export default {
       sort_icon: "sort-up",
 
       fields: netobj_fields,
-      items: netobj_data,
+      items: netipobj_data,
       current_page: 2,
       per_page: 3,
       total_rows: 0,
@@ -208,7 +216,7 @@ export default {
   mounted: function () {
     // console.log(d);
     this.total_rows = this.items.length;
-    normalize_items(this.items);
+    normalize_items(this.items, false);
     this.update_btn_state();
   },
   computed: {
@@ -241,7 +249,7 @@ export default {
       }
     },
 
-    change_netobj_box(is_show) {
+    change_netipobj_dlg(is_show) {
       this.show_netipobj_input = is_show;
       this.update_btn_state();
     },
@@ -251,14 +259,12 @@ export default {
       this.toggle_select_all(false);
 
       this.$root.$emit('bv::hide::tooltip');
-      this.change_netobj_box(true);
+      this.change_netipobj_dlg(true);
     },
 
     on_edit() {
-      console.log("click edit");
-
       this.$root.$emit('bv::hide::tooltip');
-      this.change_netobj_box(true);
+      this.change_netipobj_dlg(true);
     },
 
     on_clone() {
@@ -267,8 +273,12 @@ export default {
     on_delete() {
       console.log("click delete");
     },
+
     on_submit_netipobj_input(obj) {
       console.log("submit netobj: %s", JSON.stringify(obj));
+      apply_ipobj(this.items, obj);
+
+      this.$refs.net_ip_obj_table.refresh();
     },
     on_close_netipobj_input() {
       //console.log("close netobj");
@@ -276,7 +286,7 @@ export default {
 
       this.indeterminate = false;
       this.toggle_select_all(false);
-      this.change_netobj_box(false);
+      this.change_netipobj_dlg(false);
     },
     on_reset_select() {
       this.indeterminate = false;
@@ -464,6 +474,14 @@ export default {
     get_items(ctx, callback) {
       this.total_rows = this.items.length;
       return this.items;
+    },
+
+    show_datetime(value) {
+      let v = Number(value);
+      let d = new Date(v);
+      let s = d.toLocaleString();
+
+      return s;
     },
   }
 };
