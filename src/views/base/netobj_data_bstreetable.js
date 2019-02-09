@@ -10,7 +10,7 @@ export const netobj_fields = [
   },
 
   {
-    key: "obj_id",
+    key: "id",
     label: "ID",
     icon: "id-badge",
     sortable: true,
@@ -18,7 +18,7 @@ export const netobj_fields = [
   },
 
   {
-    key: "obj_name",
+    key: "name",
     label: "Name",
     icon: "user",
     sortable: true,
@@ -26,7 +26,7 @@ export const netobj_fields = [
   },
 
   {
-    key: "obj_type",
+    key: "type",
     label: "Type",
     sortable: true,
     thStyle: { width: "20px", maxWidth: "100px", minWidth: "50px" },

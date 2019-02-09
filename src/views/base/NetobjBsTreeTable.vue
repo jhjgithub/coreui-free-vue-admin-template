@@ -51,7 +51,7 @@
       <template slot="HEAD__selected" slot-scope="row">
         <b-form-checkbox @click.native.stop v-model="select_all" :indeterminate="indeterminate" @change="toggle_select_all" />
       </template>
-      <template slot="HEAD_obj_id" slot-scope="row">
+      <template slot="HEAD_id" slot-scope="row">
         <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
         {{row.label}}
         <span v-if="get_sort_by() == row.column">
@@ -59,7 +59,7 @@
         </span>
       </template>
 
-      <template slot="HEAD_obj_name" slot-scope="row">
+      <template slot="HEAD_name" slot-scope="row">
         <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
         {{row.label}}
         <span v-if="get_sort_by() == row.column">
@@ -67,7 +67,7 @@
         </span>
       </template>
 
-      <template slot="HEAD_obj_type" slot-scope="row">
+      <template slot="HEAD_type" slot-scope="row">
         <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
         {{row.label}}
         <span v-if="get_sort_by() == row.column">
@@ -125,7 +125,7 @@
       </template>
 
       <!-- <template slot="obj_id" slot-scope="row" :tbody-tr-class="hide-col"> -->
-      <template slot="obj_id" slot-scope="row">
+      <template slot="id" slot-scope="row">
         <div :style="get_left_padding(row.item)">
           <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
           <!-- <span style="width: 20px"> -->
@@ -134,7 +134,7 @@
               size="lg" />
           </span>
           <span>
-            {{row.item.obj_id}}
+            {{row.item.id}}
           </span>
         </div>
       </template>
@@ -170,9 +170,12 @@
 <script>
 // import Vue from "vue";
 // import BInputGroup from "bootstrap-vue/es/components/input-group/input-group";
+// import { normalize_items, toggle_child, sort_data, apply_ipobj } from "./nodeHelper.js";
+// import { netobj_fields, netipobj_data, } from "./netobj_data_bstreetable.js";
 
-import { normalize_items, toggle_child, sort_data, empty_array, print_json, apply_ipobj } from "./nodeHelper.js";
-import { netobj_fields, netipobj_data, } from "./netobj_data_bstreetable.js";
+import { print_json } from "./nodeHelper.js";
+import { netobj_fields } from "./netobj_data_bstreetable.js";
+import * as ipobj from  "./ipobj.js";
 
 import "../../fa-config.js";
 import NetIpObjInput from "./NetIpObjInput";
@@ -202,9 +205,10 @@ export default {
       sort_icon: "sort-up",
 
       fields: netobj_fields,
-      items: netipobj_data,
+      // items: netipobj_data,
+      items: [],
       current_page: 2,
-      per_page: 3,
+      per_page: 10,
       total_rows: 0,
       page_options: [5, 10, 15],
     };
@@ -214,11 +218,18 @@ export default {
   },
 
   mounted: function () {
-    // console.log(d);
+
+    let nodelist = new ipobj.ipnodelist();
+    ipobj.init_sample_node(nodelist);
+    this.items = nodelist;
+
     this.total_rows = this.items.length;
-    normalize_items(this.items, false);
+    nodelist.normalize_nodes(nodelist, 0);
+
+    // normalize_items(this.items, false);
     this.update_btn_state();
   },
+
   computed: {
   },
   methods: {
@@ -276,7 +287,7 @@ export default {
 
     on_submit_netipobj_input(obj) {
       console.log("submit netobj: %s", JSON.stringify(obj));
-      apply_ipobj(this.items, obj);
+      // apply_ipobj(this.items, obj);
 
       this.$refs.net_ip_obj_table.refresh();
     },
@@ -396,7 +407,8 @@ export default {
     },
 
     get_expand_icon_class(item) {
-      if (item._visible_child === 'none') {
+      // if (item._visible_child === ipobj.ipnode_visible.none) {
+      if (item.children.length == 0) {
         return "no-children";
       }
 
@@ -404,7 +416,8 @@ export default {
     },
 
     get_expand_icon(item) {
-      if (item._visible_child === 'show') {
+      // if (item._visible_child === ipobj.ipnode_visible.show) {
+      if (item._visible_child.length > 0) {
         return "angle-down"
       }
 
@@ -412,8 +425,10 @@ export default {
     },
 
     toggle_show_child(item) {
-      // console.log("clicked first_name:" + item.obj_id);
-      toggle_child(this.items, item.obj_id);
+      // console.log(this.items);
+      // console.log("clicked first_name:" + item.id);
+      // toggle_child(this.items, item.obj_id);
+      this.items.toggle_child(item);
       this.$refs.net_ip_obj_table.refresh();
     },
 
@@ -435,7 +450,8 @@ export default {
         this.sort_desc = false;
         this.sort_by = null;
 
-        sort_data(this.items, null, false);
+        this.items.sort_data(null, false);
+        // sort_data(this.items, null, false);
 
         return
       }
@@ -468,7 +484,8 @@ export default {
         this.sort_icon = "sort-amount-up";
       }
 
-      sort_data(this.items, this.sort_by, this.sort_desc);
+      this.items.sort_data(this.sort_by, this.sort_desc);
+      // sort_data(this.items, this.sort_by, this.sort_desc);
     },
 
     get_items(ctx, callback) {

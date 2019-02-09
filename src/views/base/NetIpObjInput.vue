@@ -122,6 +122,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { format_ipv4_address, array_move } from "./nodeHelper.js";
 // import MSelect from "./mSelect.vue";
 
