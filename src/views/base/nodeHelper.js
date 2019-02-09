@@ -1,3 +1,5 @@
+
+/*
 function get_item_index(items, nid) {
   let i = items.findIndex((item, idx) => {
     return item.obj_id == nid;
@@ -106,17 +108,6 @@ function dynamic_sort(property) {
     property = property.substr(1);
   }
 
-  /*
-  return function (a,b) {
-          if (sortOrder == -1) {
-                  return b[property].localeCompare(a[property]);
-          } 
-          else {
-                  return a[property].localeCompare(b[property]);
-          }        
-  }
-  */
-
   const reA = /[^a-zA-Z]/g;
   const reN = /[^0-9]/g;
 
@@ -192,37 +183,11 @@ function removeChar(data) {
 
   return b;
 }
+*/
 
 ///////////////////////////////////////////
 
-export function print_json(d, msg) {
-  console.log("#### %s: %s", msg, JSON.stringify(d, null, 2));
-}
-
-export function deep_copy(obj_to, obj_from) {
-  for (let k in obj_from) {
-    obj_to[k] = obj_from[k];
-  }
-}
-
-export function deep_copy_array(arr) {
-  let out = [];
-
-  for (let i = 0, len = arr.length; i < len; i++) {
-    let item = arr[i];
-    let obj = {};
-
-    deep_copy(obj, item);
-
-    out.push(obj);
-  }
-  return out;
-}
-
-export function empty_array(arr) {
-  arr.splice(0, arr.length);
-}
-
+/*
 export function normalize_items(items, preserve) {
   let depth = 0;
 
@@ -345,12 +310,6 @@ export function format_ipv4_address(value) {
   return ip;
 }
 
-export function array_move(arr, fromIndex, toIndex) {
-  var element = arr[fromIndex];
-  arr.splice(fromIndex, 1);
-  arr.splice(toIndex, 0, element);
-}
-
 export function apply_ipobj(items, info) {
   let newobj = {};
   let oldobj = items.find(i => i.obj_id === info.obj_id);
@@ -403,4 +362,39 @@ export function apply_ipobj(items, info) {
   }
 
   normalize_items(items, true);
+}
+*/
+
+export function print_json(d, msg) {
+  console.log("#### %s: %s", msg, JSON.stringify(d, null, 2));
+}
+
+export function deep_copy(obj_to, obj_from) {
+  for (let k in obj_from) {
+    obj_to[k] = obj_from[k];
+  }
+}
+
+export function deep_copy_array(arr) {
+  let out = [];
+
+  for (let i = 0, len = arr.length; i < len; i++) {
+    let item = arr[i];
+    let obj = {};
+
+    deep_copy(obj, item);
+
+    out.push(obj);
+  }
+  return out;
+}
+
+export function empty_array(arr) {
+  arr.splice(0, arr.length);
+}
+
+export function array_move(arr, fromIndex, toIndex) {
+  var element = arr[fromIndex];
+  arr.splice(fromIndex, 1);
+  arr.splice(toIndex, 0, element);
 }

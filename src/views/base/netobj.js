@@ -1,19 +1,30 @@
-import * as _ from "lodash";
+import * as lodash from "lodash";
+import * as utils from "./utils.js";
 import "./enum.js";
-import { print_json, empty_array } from "./nodeHelper.js";
 
 ////////////////////////////////
 
-export var ipnode_type = _.enum("none", "group", "netmask", "range");
-export var ipnode_ipver = _.enum("none", "v4", "v6");
-// export var ipnode_visible = _.enum("none", "hide", "show");
+export var ipobj_type = lodash.enum("group", "netmask", "range");
+export var ipobj_ipver = lodash.enum("v4", "v6");
+// export var ipnode_visible = lodash.enum("none", "hide", "show");
 
-export class ipnode {
+export const ipobj_type_list = [
+  { text: "Group", value: ipobj_type.group },
+  { text: "Netmask", value: ipobj_type.netmask },
+  { text: "IP Range", value: ipobj_type.range },
+];
+
+export const ipobj_ipver_list = [
+  { text: "IPv4", value: ipobj_ipver.v4 },
+  { text: "IPv6", value: ipobj_ipver.v6 },
+];
+
+export class ipobj {
   constructor(id) {
     this.id = id;
     this.name = "";
-    this.type = ipnode_type.netmask;
-    this.ipaddr_ver = ipnode_ipver.v4;
+    this.type = ipobj_type.netmask;
+    this.ipaddr_ver = ipobj_ipver.v4;
     this.ipaddr_start = "";
     this.ipaddr_end = "";
     this.netmask = "";
@@ -22,6 +33,7 @@ export class ipnode {
     this.children = [];
 
     // for internal
+    // bootstrap table에서 _로 시작하는 property는 검색에서 제외.
     this._selected = false;
     this._depth = 0;
     this._parent_id = [];
@@ -31,15 +43,15 @@ export class ipnode {
   }
 
   clone_deep() {
-    return _.cloneDeep(this);
+    return lodash.cloneDeep(this);
   }
 
   assign(from) {
-    _.assign(this, from);
+    lodash.assign(this, from);
   }
 
   reset() {
-    let n = new ipnode("");
+    let n = new ipobj("");
     this.assign(n);
   }
 
@@ -62,21 +74,21 @@ export class ipnode {
 
 ///////////////////////////////////////////////
 
-export function ipnodelist() {
+export function ipobjlist() {
   Array.call(this);
 }
 
-ipnodelist.prototype = Object.create(Array.prototype);
+ipobjlist.prototype = Object.create(Array.prototype);
 
-ipnodelist.prototype.remove_at = function(idx) {
+ipobjlist.prototype.remove_at = function(idx) {
   return this.splice(idx, 1);
 };
 
-ipnodelist.prototype.insert_at = function(idx, item) {
+ipobjlist.prototype.insert_at = function(idx, item) {
   this.splice(idx, 0, item);
 };
 
-ipnodelist.prototype.get_root_node = function(id) {
+ipobjlist.prototype.get_root_node = function(id) {
   let node = this.find((node) => {
     return node._depth == 0 && node.id === id;
   });
@@ -84,7 +96,7 @@ ipnodelist.prototype.get_root_node = function(id) {
   return node;
 };
 
-ipnodelist.prototype.get_node_index = function(node) {
+ipobjlist.prototype.get_node_index = function(node) {
   let i = this.findIndex((n) => {
     return n == node;
   });
@@ -92,7 +104,7 @@ ipnodelist.prototype.get_node_index = function(node) {
   return i;
 };
 
-ipnodelist.prototype.expand_children = function(parent) {
+ipobjlist.prototype.expand_children = function(parent) {
   if (parent.children.length < 1) {
     return;
   }
@@ -109,8 +121,8 @@ ipnodelist.prototype.expand_children = function(parent) {
         c._depth = parent._depth + 1;
         c._fix_idx = -1;
 
-        empty_array(c._parent_id);
-        empty_array(c._visible_child);
+        utils.array_empty(c._parent_id);
+        utils.array_empty(c._visible_child);
 
         // set parent id
         c._parent_id.push(parent.id);
@@ -130,7 +142,7 @@ ipnodelist.prototype.expand_children = function(parent) {
   // print_json(parent, "expand node:");
 };
 
-ipnodelist.prototype.collapse_children = function(parent) {
+ipobjlist.prototype.collapse_children = function(parent) {
   parent._visible_child.forEach((child) => {
     if (child._visible_child.length > 0) {
       this.collapse_children(child);
@@ -140,10 +152,10 @@ ipnodelist.prototype.collapse_children = function(parent) {
     this.remove_at(i);
   });
 
-  empty_array(parent._visible_child);
+  utils.array_empty(parent._visible_child);
 };
 
-ipnodelist.prototype.normalize_nodes = function(nodes, depth) {
+ipobjlist.prototype.normalize_nodes = function(nodes, depth) {
   let fix_idx = 0;
 
   // console.log("depth: %d", depth);
@@ -156,7 +168,7 @@ ipnodelist.prototype.normalize_nodes = function(nodes, depth) {
   });
 };
 
-ipnodelist.prototype.toggle_child = function(node) {
+ipobjlist.prototype.toggle_child = function(node) {
   if (node.children == undefined || node.children.length < 1) {
     return;
   }
@@ -171,7 +183,7 @@ ipnodelist.prototype.toggle_child = function(node) {
   }
 };
 
-ipnodelist.prototype.dynamic_sort = function(property) {
+ipobjlist.prototype.dynamic_sort = function(property) {
   let sortOrder = 1;
 
   if (property[0] === "-") {
@@ -224,7 +236,7 @@ ipnodelist.prototype.dynamic_sort = function(property) {
   };
 };
 
-ipnodelist.prototype.do_sort = function(items, sort_by, sort_desc) {
+ipobjlist.prototype.do_sort = function(items, sort_by, sort_desc) {
   // console.log("--> sorting items: %d", items.length);
 
   let field = sort_by;
@@ -242,15 +254,15 @@ ipnodelist.prototype.do_sort = function(items, sort_by, sort_desc) {
   });
 };
 
-ipnodelist.prototype.remove_subnode = function() {
+ipobjlist.prototype.remove_subnode = function() {
   for (var i = this.length; i--; ) {
     if (this[i]._depth > 0) {
-      this.splice(i, 1);
+      this.remove_at(i);
     }
   }
 };
 
-ipnodelist.prototype.restore_subnode = function(nodes) {
+ipobjlist.prototype.restore_subnode = function(nodes) {
   for (let i = 0; i < nodes.length; i++) {
     let node = nodes[i];
     let idx = i;
@@ -261,12 +273,12 @@ ipnodelist.prototype.restore_subnode = function(nodes) {
       }
 
       idx++;
-      this.splice(idx, 0, child);
+      this.insert_at(idx, child);
     });
   }
 };
 
-ipnodelist.prototype.sort_data = function(sort_by, sort_desc) {
+ipobjlist.prototype.sort_data = function(sort_by, sort_desc) {
   //print_json(expanded_items, "current Last Status");
 
   this.remove_subnode();
@@ -281,69 +293,84 @@ ipnodelist.prototype.sort_data = function(sort_by, sort_desc) {
   this.restore_subnode(this);
 };
 
+ipobjlist.prototype.apply_ipobj = function(ipobj) {
+  let oldobj = this.get_root_node(ipobj.id);
+
+  if (oldobj) {
+    let v = oldobj._visible_child;
+    oldobj.assign(ipobj);
+    oldobj.visible_child = v;
+    return;
+  }
+
+  let newobj = ipobj.clone_deep();
+  this.unshift(newobj);
+  this.normalize_nodes(this, 0);
+}
+
 ////////////////////////////
 
-export function init_sample_node(ipnodelist) {
-  let a = new ipnode();
+export function init_sample_ipobj(ipobjlist) {
+  let a = new ipobj();
   a.id = "netobj-a";
   a.name = "WebServer1";
-  a.type = ipnode_type.range;
-  a.ipaddr_ver = ipnode_ipver.v4;
+  a.type = ipobj_type.range;
+  a.ipaddr_ver = ipobj_ipver.v4;
   a.ipaddr_start = "1.1.1.1";
   a.ipaddr_end = "1.1.1.254";
   a.netmask = "";
   a.created_date = "1549529617446";
   a.desc = "network object 1";
 
-  let b = new ipnode();
+  let b = new ipobj();
   b.id = "netobj-b";
   b.name = "WebServer2";
-  b.type = ipnode_type.netmask;
-  b.ipaddr_ver = ipnode_ipver.v4;
+  b.type = ipobj_type.netmask;
+  b.ipaddr_ver = ipobj_ipver.v4;
   b.ipaddr_start = "2.1.1.1";
   b.ipaddr_end = "";
   b.netmask = "24";
   b.created_date = "1559929617446";
   b.desc = "network object 2";
 
-  let c = new ipnode();
+  let c = new ipobj();
   c.id = "netobj-c";
   c.name = "WebServer3";
-  c.type = ipnode_type.netmask;
-  c.ipaddr_ver = ipnode_ipver.v4;
+  c.type = ipobj_type.netmask;
+  c.ipaddr_ver = ipobj_ipver.v4;
   c.ipaddr_start = "9.1.1.1";
   c.ipaddr_end = "";
   c.netmask = "24";
   c.created_date = "1539129617446";
   c.desc = "network object 3";
 
-  let d = new ipnode();
+  let d = new ipobj();
   d.id = "netobj-d";
   d.name = "WebServer4";
-  d.type = ipnode_type.range;
-  d.ipaddr_ver = ipnode_ipver.v4;
+  d.type = ipobj_type.range;
+  d.ipaddr_ver = ipobj_ipver.v4;
   d.ipaddr_start = "192.168.1.1";
   d.ipaddr_end = "192.168.1.100";
   d.netmask = "";
   d.created_date = "1501129617446";
   d.desc = "network object 4";
 
-  let e = new ipnode();
+  let e = new ipobj();
   e.id = "netobj-e";
   e.name = "WebServer5";
-  e.type = ipnode_type.range;
-  e.ipaddr_ver = ipnode_ipver.v4;
+  e.type = ipobj_type.range;
+  e.ipaddr_ver = ipobj_ipver.v4;
   e.ipaddr_start = "172.1.1.1";
   e.ipaddr_end = "172.1.1.230";
   e.netmask = "";
   e.created_date = "1501229617446";
   e.desc = "network object 5";
 
-  let f = new ipnode();
+  let f = new ipobj();
   f.id = "netobj-f";
   f.name = "Group6";
-  f.type = ipnode_type.group;
-  f.ipaddr_ver = ipnode_ipver.none;
+  f.type = ipobj_type.group;
+  f.ipaddr_ver = ipobj_ipver.none;
   f.ipaddr_start = "";
   f.ipaddr_end = "";
   f.netmask = "";
@@ -351,12 +378,12 @@ export function init_sample_node(ipnodelist) {
   f.desc = "network group 6";
   f.children = [];
 
-  ipnodelist.push(b);
-  ipnodelist.push(a);
-  ipnodelist.push(c);
-  ipnodelist.push(f);
-  ipnodelist.push(d);
-  ipnodelist.push(e);
+  ipobjlist.push(b);
+  ipobjlist.push(a);
+  ipobjlist.push(c);
+  ipobjlist.push(f);
+  ipobjlist.push(d);
+  ipobjlist.push(e);
 
   a.add_child(e);
   a.add_child(f);

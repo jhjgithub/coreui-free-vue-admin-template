@@ -35,8 +35,9 @@
     <!-- Subobject List -->
     <div class="row justify-content-center align-items-center">
       <!-- <net-ip-obj-input style="width: 600px" ref="net_ip_obj"/> -->
-      <net-ip-obj-input ref="ref_netipobj_input" style="width: 90%" :show="show_netipobj_input" :selected_items="selected_items"
-        :netipobj="last_selected_item" @eventSubmitNetIpObjInput="on_submit_netipobj_input" @eventCloseNetIpObjInput="on_close_netipobj_input"
+      <net-ip-obj-input ref="ref_netipobj_input" style="width: 90%" :show="netipobj_input_show" 
+        :selected_items="selected_items" :subobj_list="netipobj_subobj_list"
+        :ipobj="last_selected_item" @eventSubmitNetIpObjInput="on_submit_netipobj_input" @eventCloseNetIpObjInput="on_close_netipobj_input"
         @eventResetSelect="on_reset_select" />
     </div>
 
@@ -173,9 +174,9 @@
 // import { normalize_items, toggle_child, sort_data, apply_ipobj } from "./nodeHelper.js";
 // import { netobj_fields, netipobj_data, } from "./netobj_data_bstreetable.js";
 
-import { print_json } from "./nodeHelper.js";
+import * as utils from "./utils.js";
 import { netobj_fields } from "./netobj_data_bstreetable.js";
-import * as ipobj from  "./ipobj.js";
+import * as netobj from  "./netobj.js";
 
 import "../../fa-config.js";
 import NetIpObjInput from "./NetIpObjInput";
@@ -196,7 +197,8 @@ export default {
       sort_dir: 'last',
       sort_changed: 0,
 
-      show_netipobj_input: false,
+      netipobj_input_show: false,
+      netipobj_subobj_list: [],
 
       selected_items: { sel_items: [] },
       last_selected_item: null,
@@ -205,8 +207,7 @@ export default {
       sort_icon: "sort-up",
 
       fields: netobj_fields,
-      // items: netipobj_data,
-      items: [],
+      items: new netobj.ipobjlist(),
       current_page: 2,
       per_page: 10,
       total_rows: 0,
@@ -219,12 +220,12 @@ export default {
 
   mounted: function () {
 
-    let nodelist = new ipobj.ipnodelist();
-    ipobj.init_sample_node(nodelist);
-    this.items = nodelist;
+    // let nodelist = new netobj.ipobjlist();
+    // this.items = nodelist;
+    netobj.init_sample_ipobj(this.items);
 
     this.total_rows = this.items.length;
-    nodelist.normalize_nodes(nodelist, 0);
+    this.items.normalize_nodes(this.items, 0);
 
     // normalize_items(this.items, false);
     this.update_btn_state();
@@ -240,7 +241,7 @@ export default {
     update_btn_state() {
       let len = this.selected_items.sel_items.length;
 
-      if (this.show_netipobj_input) {
+      if (this.netipobj_input_show) {
         this.$refs.btn_add.disabled = true;
         this.$refs.btn_edit.disabled = true;
         this.$refs.btn_clone.disabled = true;
@@ -261,7 +262,7 @@ export default {
     },
 
     change_netipobj_dlg(is_show) {
-      this.show_netipobj_input = is_show;
+      this.netipobj_input_show = is_show;
       this.update_btn_state();
     },
 
@@ -275,6 +276,20 @@ export default {
 
     on_edit() {
       this.$root.$emit('bv::hide::tooltip');
+      if (this.last_selected_item && this.last_selected_item.children.length > 0) {
+        let c = this.last_selected_item.children;
+        this.netipobj_subobj_list = [];
+        c.forEach(i => {
+          let node = this.items.get_root_node(i);
+          let info = {
+            value: node.id,
+            text: node.name
+          };
+
+          this.netipobj_subobj_list.push(info);
+        });
+      }
+
       this.change_netipobj_dlg(true);
     },
 
@@ -285,9 +300,9 @@ export default {
       console.log("click delete");
     },
 
-    on_submit_netipobj_input(obj) {
-      console.log("submit netobj: %s", JSON.stringify(obj));
-      // apply_ipobj(this.items, obj);
+    on_submit_netipobj_input(ipobj) {
+      utils.print_json(ipobj, "submitted ipobj:");
+      this.items.apply_ipobj(ipobj);
 
       this.$refs.net_ip_obj_table.refresh();
     },
@@ -407,7 +422,6 @@ export default {
     },
 
     get_expand_icon_class(item) {
-      // if (item._visible_child === ipobj.ipnode_visible.none) {
       if (item.children.length == 0) {
         return "no-children";
       }
@@ -416,7 +430,6 @@ export default {
     },
 
     get_expand_icon(item) {
-      // if (item._visible_child === ipobj.ipnode_visible.show) {
       if (item._visible_child.length > 0) {
         return "angle-down"
       }
