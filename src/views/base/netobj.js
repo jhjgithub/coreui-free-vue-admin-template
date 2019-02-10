@@ -1,3 +1,4 @@
+
 import * as lodash from "lodash";
 import * as utils from "./utils.js";
 import "./enum.js";
@@ -11,7 +12,7 @@ export var ipobj_ipver = lodash.enum("v4", "v6");
 export const ipobj_type_list = [
   { text: "Group", value: ipobj_type.group },
   { text: "Netmask", value: ipobj_type.netmask },
-  { text: "IP Range", value: ipobj_type.range },
+  { text: "Range", value: ipobj_type.range },
 ];
 
 export const ipobj_ipver_list = [
@@ -80,15 +81,15 @@ export function ipobjlist() {
 
 ipobjlist.prototype = Object.create(Array.prototype);
 
-ipobjlist.prototype.remove_at = function(idx) {
+ipobjlist.prototype.remove_at = function (idx) {
   return this.splice(idx, 1);
 };
 
-ipobjlist.prototype.insert_at = function(idx, item) {
+ipobjlist.prototype.insert_at = function (idx, item) {
   this.splice(idx, 0, item);
 };
 
-ipobjlist.prototype.get_root_node = function(id) {
+ipobjlist.prototype.get_root_node = function (id) {
   let node = this.find((node) => {
     return node._depth == 0 && node.id === id;
   });
@@ -96,7 +97,7 @@ ipobjlist.prototype.get_root_node = function(id) {
   return node;
 };
 
-ipobjlist.prototype.get_node_index = function(node) {
+ipobjlist.prototype.get_node_index = function (node) {
   let i = this.findIndex((n) => {
     return n == node;
   });
@@ -104,7 +105,7 @@ ipobjlist.prototype.get_node_index = function(node) {
   return i;
 };
 
-ipobjlist.prototype.expand_children = function(parent) {
+ipobjlist.prototype.expand_children = function (parent) {
   if (parent.children.length < 1) {
     return;
   }
@@ -142,7 +143,7 @@ ipobjlist.prototype.expand_children = function(parent) {
   // print_json(parent, "expand node:");
 };
 
-ipobjlist.prototype.collapse_children = function(parent) {
+ipobjlist.prototype.collapse_children = function (parent) {
   parent._visible_child.forEach((child) => {
     if (child._visible_child.length > 0) {
       this.collapse_children(child);
@@ -155,7 +156,7 @@ ipobjlist.prototype.collapse_children = function(parent) {
   utils.array_empty(parent._visible_child);
 };
 
-ipobjlist.prototype.normalize_nodes = function(nodes, depth) {
+ipobjlist.prototype.normalize_nodes = function (nodes, depth) {
   let fix_idx = 0;
 
   // console.log("depth: %d", depth);
@@ -168,7 +169,7 @@ ipobjlist.prototype.normalize_nodes = function(nodes, depth) {
   });
 };
 
-ipobjlist.prototype.toggle_child = function(node) {
+ipobjlist.prototype.toggle_child = function (node) {
   if (node.children == undefined || node.children.length < 1) {
     return;
   }
@@ -183,7 +184,7 @@ ipobjlist.prototype.toggle_child = function(node) {
   }
 };
 
-ipobjlist.prototype.dynamic_sort = function(property) {
+ipobjlist.prototype.dynamic_sort = function (property) {
   let sortOrder = 1;
 
   if (property[0] === "-") {
@@ -206,7 +207,7 @@ ipobjlist.prototype.dynamic_sort = function(property) {
   const reN = /[^0-9]/g;
 
   // to properly handle mixed string with alphabet and digit
-  return function(itemA, itemB) {
+  return function (itemA, itemB) {
     let a, b;
 
     if (sortOrder == -1) {
@@ -236,7 +237,7 @@ ipobjlist.prototype.dynamic_sort = function(property) {
   };
 };
 
-ipobjlist.prototype.do_sort = function(items, sort_by, sort_desc) {
+ipobjlist.prototype.do_sort = function (items, sort_by, sort_desc) {
   // console.log("--> sorting items: %d", items.length);
 
   let field = sort_by;
@@ -254,15 +255,15 @@ ipobjlist.prototype.do_sort = function(items, sort_by, sort_desc) {
   });
 };
 
-ipobjlist.prototype.remove_subnode = function() {
-  for (var i = this.length; i--; ) {
+ipobjlist.prototype.remove_subnode = function () {
+  for (var i = this.length; i--;) {
     if (this[i]._depth > 0) {
       this.remove_at(i);
     }
   }
 };
 
-ipobjlist.prototype.restore_subnode = function(nodes) {
+ipobjlist.prototype.restore_subnode = function (nodes) {
   for (let i = 0; i < nodes.length; i++) {
     let node = nodes[i];
     let idx = i;
@@ -278,7 +279,7 @@ ipobjlist.prototype.restore_subnode = function(nodes) {
   }
 };
 
-ipobjlist.prototype.sort_data = function(sort_by, sort_desc) {
+ipobjlist.prototype.sort_data = function (sort_by, sort_desc) {
   //print_json(expanded_items, "current Last Status");
 
   this.remove_subnode();
@@ -293,7 +294,7 @@ ipobjlist.prototype.sort_data = function(sort_by, sort_desc) {
   this.restore_subnode(this);
 };
 
-ipobjlist.prototype.apply_ipobj = function(ipobj) {
+ipobjlist.prototype.apply_ipobj = function (ipobj) {
   let oldobj = this.get_root_node(ipobj.id);
 
   if (oldobj) {
@@ -370,7 +371,7 @@ export function init_sample_ipobj(ipobjlist) {
   f.id = "netobj-f";
   f.name = "Group6";
   f.type = ipobj_type.group;
-  f.ipaddr_ver = ipobj_ipver.none;
+  f.ipaddr_ver = ipobj_ipver.v4;
   f.ipaddr_start = "";
   f.ipaddr_end = "";
   f.netmask = "";
@@ -388,4 +389,6 @@ export function init_sample_ipobj(ipobjlist) {
   a.add_child(e);
   a.add_child(f);
   e.add_child(d);
+
+  utils.print_json(a, "a");
 }

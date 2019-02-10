@@ -172,8 +172,6 @@ export default {
     this.$validator.extend('child_len', {
       getMessage: field => field + ' needs at least a child.',
       validate: value => {
-        console.log("check child_len=%d", this.local_ipobj.children.length);
-
         if (this.local_ipobj.type == netobj.ipobj_type.group) {
           let l = this.local_ipobj.children.length;
           return l > 0;
@@ -283,22 +281,36 @@ export default {
       this.$validator.reset();
     },
 
+    normalize() {
+      let ipobj = this.local_ipobj;
+      ipobj.children = [];
+      this.local_subobj_list.forEach((c) => {
+        ipobj.children.push(c.value);
+      });
+
+      if (ipobj.type == netobj.ipobj_type.group) {
+        ipobj.ipaddr_start = "";
+        ipobj.ipaddr_end = "";
+        ipobj.netmask = "";
+      }
+      else if (ipobj.type == netobj.ipobj_type.netmask) {
+        ipobj.ipaddr_end = "";
+      }
+      else {
+        ipobj.netmask = "";
+      }
+    },
+
     on_submit(evt) {
       evt.preventDefault();
 
       this.$validator.validate().then(result => {
-        if (result) {
-          this.local_ipobj.children = [];
-
-          this.local_subobj_list.forEach((c) => {
-            this.local_ipobj.children.push(c.value);
-          });
-
-          this.$emit("eventSubmitNetIpObjInput", this.local_ipobj);
-        }
-        else {
+        if (!result) {
           console.log(this.errors);
         }
+
+        this.normalize();
+        this.$emit("eventSubmitNetIpObjInput", this.local_ipobj);
       });
     },
 

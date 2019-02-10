@@ -48,96 +48,46 @@
       <!-- :no-local-sorting=true -->
       <!-- :tbody-tr-class="row_class" -->
 
-      <!-- Checkbox column of the Table Header -->
-      <template slot="HEAD__selected" slot-scope="row">
-        <b-form-checkbox @click.native.stop v-model="select_all" :indeterminate="indeterminate" @change="toggle_select_all" />
-      </template>
-      <template slot="HEAD_id" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
-        {{row.label}}
-        <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
-        </span>
-      </template>
-
-      <template slot="HEAD_name" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
-        {{row.label}}
-        <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
-        </span>
-      </template>
-
-      <template slot="HEAD_type" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
-        {{row.label}}
-        <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
-        </span>
+      <!-- Table Header -->
+      <template v-for="(f, idx) in fields" :slot="'HEAD_' + f.key" slot-scope="row">
+        <!-- Checkbox column -->
+        <template v-if="f.ley =='_selected'">
+          <b-form-checkbox :key="'col_chk_' + idx" @click.native.stop v-model="select_all" 
+          :indeterminate="indeterminate" @change="toggle_select_all" />
+        </template>
+        <template v-else-if="f.key == 'details'">
+            ...
+        </template>
+        <template v-else>
+          <font-awesome-icon :key="'col_com_' + idx" v-if="row.field.icon" :icon="row.field.icon" size="sm" />
+          {{row.label}}
+          <span :key="'col_sort_' + idx" v-if="get_sort_by() == row.column">
+            <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
+          </span>
+        </template>
       </template>
 
-      <template slot="HEAD_ipaddr_ver" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
-        {{row.label}}
-        <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
-        </span>
-      </template>
-
-      <template slot="HEAD_ipaddr_start" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
-        {{row.label}}
-        <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
-        </span>
-      </template>
-
-      <template slot="HEAD_ipaddr_end" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
-        {{row.label}}
-        <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
-        </span>
-      </template>
-
-      <template slot="HEAD_netmask" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
-        {{row.label}}
-        <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
-        </span>
-      </template>
-
-      <template slot="HEAD_created_date" slot-scope="row">
-        <font-awesome-icon v-if="row.field.icon" :icon="row.field.icon" size="sm" />
-        {{row.label}}
-        <span v-if="get_sort_by() == row.column">
-          <font-awesome-icon :icon="sort_icon" size="sm" class="sort-icon" />
-        </span>
-      </template>
-
-      <template slot="HEAD_details" slot-scope="row">
-        ...
-      </template>
-
+      <!-- Table Data -->
       <!-- Checkbox column of the rows -->
       <template slot="_selected" slot-scope="row">
         <b-form-checkbox @click.native.stop v-model="row.item._selected" @change="select_row(row.item)" />
       </template>
 
-      <!-- <template slot="obj_id" slot-scope="row" :tbody-tr-class="hide-col"> -->
       <template slot="id" slot-scope="row">
         <div :style="get_left_padding(row.item)">
-          <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
-          <!-- <span style="width: 20px"> -->
           <span>
-            <font-awesome-icon :class="get_expand_icon_class(row.item)" @click.stop="toggle_show_child(row.item)" :icon="get_expand_icon(row.item)"
-              size="lg" />
+            <font-awesome-icon :class="get_expand_icon_class(row.item)" @click.stop="toggle_show_child(row.item)" :icon="get_expand_icon(row.item)" size="lg" />
           </span>
-          <span>
-            {{row.item.id}}
-          </span>
+          <span> {{row.item.id}} </span>
         </div>
+      </template>
+
+      <template slot="type" slot-scope="row">
+        {{ipobj_type_list[row.item.type].text}}
+      </template>
+
+      <template slot="ipaddr_ver" slot-scope="row">
+        {{ipobj_ipver_list[row.item.ipaddr_ver].text}}
       </template>
 
       <template slot="details" slot-scope="row">
@@ -200,14 +150,17 @@ export default {
       netipobj_input_show: false,
       netipobj_subobj_list: [],
 
+      ipobj_type_list: netobj.ipobj_type_list,
+      ipobj_ipver_list: netobj.ipobj_ipver_list,
+
       selected_items: { sel_items: [] },
       last_selected_item: null,
       select_all: false,
       indeterminate: false,
-      sort_icon: "sort-up",
+      sort_icon: "sort-amount-up",
 
       fields: netobj_fields,
-      items: new netobj.ipobjlist(),
+      items: null,
       current_page: 2,
       per_page: 10,
       total_rows: 0,
@@ -220,8 +173,8 @@ export default {
 
   mounted: function () {
 
-    // let nodelist = new netobj.ipobjlist();
-    // this.items = nodelist;
+    let nodelist = new netobj.ipobjlist();
+    this.items = nodelist;
     netobj.init_sample_ipobj(this.items);
 
     this.total_rows = this.items.length;
@@ -502,6 +455,10 @@ export default {
     },
 
     get_items(ctx, callback) {
+      if (!this.items) {
+        return null;
+      }
+
       this.total_rows = this.items.length;
       return this.items;
     },
