@@ -390,5 +390,5 @@ export function init_sample_ipobj(ipobjlist) {
   a.add_child(f);
   e.add_child(d);
 
-  utils.print_json(a, "a");
+  // utils.print_json(a, "a");
 }
