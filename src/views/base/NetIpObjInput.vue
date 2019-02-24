@@ -146,7 +146,7 @@ export default {
       type: String,
       default: "new",
     },
-    selected_items: {
+    selected_item: {
       type: Object,
       default: () => { }
     }
@@ -156,7 +156,7 @@ export default {
     return {
       local_ipobj: new netobj.ipobj(),
       local_subobj_list: [],
-      local_selected_items: this.selected_items.sel_items,
+      local_selected_items: this.selected_item.items,
       local_show: false,
       local_created_date: "",
       ipobj_type: netobj.ipobj_type,
@@ -244,7 +244,7 @@ export default {
     show(new_val, old_val) {
       this.local_show = this.show;
     },
-    selected_items: {
+    selected_item: {
       // immediate: true,
       deep: true,
       handler(new_val, old_val) {
@@ -267,11 +267,9 @@ export default {
       }
       else {
         // new
-        let id = Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
         let a = new netobj.ipobj();
-        a.id = "id-" + id.toString();
-        a.created_date = Date.now().toString();
-
+        a.init_id()
+        a.init_created_date();
         this.local_ipobj = a;
       }
 

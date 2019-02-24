@@ -31,3 +31,5 @@ yarn-error.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 src/views/tags
+.tags
+tags

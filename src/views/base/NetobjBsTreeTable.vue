@@ -36,14 +36,14 @@
     <div class="row justify-content-center align-items-center">
       <!-- <net-ip-obj-input style="width: 600px" ref="net_ip_obj"/> -->
       <net-ip-obj-input ref="ref_netipobj_input" style="width: 90%" :show="netipobj_input_show" 
-        :selected_items="selected_items" :subobj_list="netipobj_subobj_list"
+        :selected_item="selected_item" :subobj_list="netipobj_subobj_list"
         :ipobj="last_selected_item" @eventSubmitNetIpObjInput="on_submit_netipobj_input" @eventCloseNetIpObjInput="on_close_netipobj_input"
         @eventResetSelect="on_reset_select" />
     </div>
 
     <b-table striped hover small fixed show-empty ref="net_ip_obj_table" :items="get_items" :fields="fields" :sort-by.sync="sort_by"
       :sort-desc.sync="sort_desc" :sort-direction="sort_dir" @sort-changed="sorting_changed" :current-page="current_page"
-      :per-page="per_page" thead-class="table-text" class="table-area" :filter="search_keyword" @filtered="on_filtered"
+      :per-page="per_page" thead-class="table-head" class="table-area" :filter="search_keyword" @filtered="on_filtered"
       :no-provider-paging=true :no-provider-filtering=true>
       <!-- :no-local-sorting=true -->
       <!-- :tbody-tr-class="row_class" -->
@@ -153,7 +153,7 @@ export default {
       ipobj_type_list: netobj.ipobj_type_list,
       ipobj_ipver_list: netobj.ipobj_ipver_list,
 
-      selected_items: { sel_items: [] },
+      selected_item: { items: [] },
       last_selected_item: null,
       select_all: false,
       indeterminate: false,
@@ -182,6 +182,16 @@ export default {
 
     // normalize_items(this.items, false);
     this.update_btn_state();
+
+    /*
+    var items1 = new netobj.SubArray();
+    console.log(items1);
+    this.items1 = items1;
+    this.items1.push("aaaa");
+    console.log(this.items1);
+    this.items1.push("bbb");
+    console.log(this.items1.last());
+    */
   },
 
   computed: {
@@ -192,7 +202,7 @@ export default {
     },
 
     update_btn_state() {
-      let len = this.selected_items.sel_items.length;
+      let len = this.selected_item.items.length;
 
       if (this.netipobj_input_show) {
         this.$refs.btn_add.disabled = true;
@@ -247,16 +257,32 @@ export default {
     },
 
     on_clone() {
-      console.log("click clone");
+      this.selected_item.items.forEach(item => {
+        if (item._depth == 0) {
+          this.items.clone_item(item);
+        }
+      });
+
+      this.$refs.net_ip_obj_table.refresh();
     },
+
     on_delete() {
-      console.log("click delete");
+      this.selected_item.items.forEach(item => {
+        if (item._depth == 0) {
+          this.items.remove_item(item);
+        }
+        else {
+          // subitem은 edit에서 편집해야 한다.
+          // this.items.remove_child_item(item);
+        }
+      });
+
+      this.$refs.net_ip_obj_table.refresh();
     },
 
     on_submit_netipobj_input(ipobj) {
-      utils.print_json(ipobj, "submitted ipobj:");
+      // utils.print_json(ipobj, "submitted ipobj:");
       this.items.apply_ipobj(ipobj);
-
       this.$refs.net_ip_obj_table.refresh();
     },
     on_close_netipobj_input() {
@@ -303,8 +329,8 @@ export default {
           this.indeterminate = true;
         }
 
-        if (this.selected_items.sel_items.indexOf(item) == -1) {
-          this.selected_items.sel_items.push(item);
+        if (this.selected_item.items.indexOf(item) == -1) {
+          this.selected_item.items.push(item);
         }
       }
       else {
@@ -327,14 +353,14 @@ export default {
           this.indeterminate = true;
         }
 
-        let idx = this.selected_items.sel_items.indexOf(item);
+        let idx = this.selected_item.items.indexOf(item);
         if (idx >= 0) {
-          this.selected_items.sel_items.splice(idx, 1);
+          this.selected_item.items.splice(idx, 1);
         }
       }
 
       this.update_btn_state();
-      // console.log(this.selected_items);
+      // console.log(this.selected_item);
     },
 
     toggle_select_all(checked) {
@@ -348,8 +374,8 @@ export default {
             this.last_selected_item = item;
           }
 
-          if (this.selected_items.sel_items.indexOf(item) == -1) {
-            this.selected_items.sel_items.push(item);
+          if (this.selected_item.items.indexOf(item) == -1) {
+            this.selected_item.items.push(item);
           }
         }
       }
@@ -359,9 +385,9 @@ export default {
           let item = this.items[i];
           item._selected = false;
 
-          let idx = this.selected_items.sel_items.indexOf(item);
+          let idx = this.selected_item.items.indexOf(item);
           if (idx >= 0) {
-            this.selected_items.sel_items.splice(idx, 1);
+            this.selected_item.items.splice(idx, 1);
           }
         }
       }
@@ -482,7 +508,7 @@ export default {
 }
 
 /* for table header */
-.table-text {
+.table-head {
   padding: 0;
   margin: 0;
   color: rgba(29, 28, 28, 0.753);
@@ -595,6 +621,10 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
 .table-area {
   /* padding-bottom: 0px; */
   margin: 0;
+}
+
+.table td {
+  vertical-align: middle;
 }
 
 .page-nav {

@@ -43,6 +43,23 @@ export class ipobj {
     this._fix_idx = -1;
   }
 
+  init_internal_data() {
+    this._selected = false;
+    this._depth = 0;
+    this._parent_id = [];
+    this._visible_child = [];
+    this._fix_idx = -1;
+  }
+
+  init_id() {
+    let id = Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
+    this.id = "id-" + id.toString();
+  }
+
+  init_created_date() {
+    this.created_date = Date.now().toString();
+  }
+
   clone_deep() {
     return lodash.cloneDeep(this);
   }
@@ -75,6 +92,26 @@ export class ipobj {
 
 ///////////////////////////////////////////////
 
+export class SubArray extends Array {
+  constructor(...args) {
+    super(...args);
+  }
+  last() {
+    return this[this.length - 1];
+  }
+}
+
+// export function SubArray() {
+//   Array.call(this);
+// }
+
+// SubArray.prototype = Object.create(Array.prototype);
+
+// ipobjlist.prototype.remove_at = function (idx) {
+//   return this.splice(idx, 1);
+// };
+///////////////////////////////////////////////
+
 export function ipobjlist() {
   Array.call(this);
 }
@@ -104,6 +141,68 @@ ipobjlist.prototype.get_node_index = function (node) {
 
   return i;
 };
+
+ipobjlist.prototype.clone_item = function (item) {
+  let idx = this.get_node_index(item);
+  let n = item.clone_deep();
+
+  n.name = n.name + "_cloned"
+  n.init_internal_data();
+  n.init_created_date()
+  n.init_id()
+
+  this.insert_at(idx, n);
+  this.normalize_nodes(this, 0);
+}
+
+ipobjlist.prototype.remove_item = function (ditem) {
+  let len = this.length;
+  for (let i = len - 1; i >= 0; i--) {
+    let item = this[i];
+    // console.log("cur.name=%s", item.name);
+
+    if (item.id == ditem.id && item.name == ditem.name) {
+      this.remove_at(i);
+    }
+    else if (item.children && item.children.length > 0) {
+      item.children = item.children.filter(function (child_id) {
+        return child_id !== ditem.id;
+      });
+
+      if (item._visible_child && item._visible_child.length > 0) {
+        item._visible_child = item._visible_child.filter(function (child) {
+          return child.id !== ditem.id;
+        });
+      }
+    }
+  }
+
+  this.normalize_nodes(this, 0);
+}
+
+ipobjlist.prototype.remove_child_item = function (ditem) {
+  if (!ditem._parent_id) {
+    return;
+  }
+
+  let pid = ditem._parent_id[0];
+  let parent = this.get_root_node(pid);
+
+  parent.children = parent.children.filter(function (child_id) {
+    return child_id !== ditem.id;
+  });
+
+  if (parent._visible_child && parent._visible_child.length > 0) {
+    parent._visible_child = parent._visible_child.filter(function (child) {
+      return child.id !== ditem.id;
+    });
+  }
+
+  // utils.print_json(parent, "after child parent");
+
+  let idx = this.get_node_index(ditem);
+  this.remove_at(idx);
+}
 
 ipobjlist.prototype.expand_children = function (parent) {
   if (parent.children.length < 1) {
