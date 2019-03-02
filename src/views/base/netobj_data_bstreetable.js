@@ -78,9 +78,9 @@ export const netobj_fields = [
 
 export const netipobj_data = [
   {
-    obj_id: "netobj-1",
-    obj_name: "WebServer",
-    obj_type: "range", // range, netmask, group
+    id: "netobj-1",
+    name: "WebServer",
+    type: "range", // range, netmask, group
     ipaddr_ver: "4",
     ipaddr_start: "1.1.1.1",
     ipaddr_end: "1.1.1.254",
@@ -93,9 +93,9 @@ export const netipobj_data = [
     _depth: 0,
     children: [
       {
-        obj_id: "netobj-6",
-        obj_name: "WebServer6",
-        obj_type: "group", // range, netmask, group
+        id: "netobj-6",
+        name: "WebServer6",
+        type: "group", // range, netmask, group
         ipaddr_ver: "",
         ipaddr_start: "",
         ipaddr_end: "",
@@ -107,10 +107,10 @@ export const netipobj_data = [
         _visible_child: "none", // hide, show, none
       },
       {
-        obj_id: "netobj-3",
-        obj_name: "WebServer3",
+        id: "netobj-3",
+        name: "WebServer3",
         created_date: '1549529217446',
-        obj_type: "netmask", // range, netmask, group
+        type: "netmask", // range, netmask, group
         ipaddr_ver: "4",
         ipaddr_start: "2.2.1.0",
         ipaddr_end: "",
@@ -122,11 +122,11 @@ export const netipobj_data = [
         _depth: 1,
         children: [
           {
-            obj_id: "netobj-5",
-            obj_name: "WebServer5",
+            id: "netobj-5",
+            name: "WebServer5",
             created_date: '1549529617446',
             ipaddr_ver: "",
-            obj_type: "group", // range, netmask, group
+            type: "group", // range, netmask, group
             ipaddr_start: "",
             ipaddr_end: "",
             netmask: "",
@@ -140,10 +140,10 @@ export const netipobj_data = [
     ],
   },
   {
-    obj_id: "netobj-4",
-    obj_name: "WebServer4",
+    id: "netobj-4",
+    name: "WebServer4",
     created_date: '1549520617446',
-    obj_type: "group", // range, netmask, group
+    type: "group", // range, netmask, group
     ipaddr_ver: "",
     ipaddr_start: "",
     ipaddr_end: "",
@@ -154,10 +154,10 @@ export const netipobj_data = [
     _visible_child: "none", // hide, show, none
   },
   {
-    obj_id: "netobj-2",
-    obj_name: "WebServer1",
+    id: "netobj-2",
+    name: "WebServer1",
     created_date: '1549521617446',
-    obj_type: "netmask", // range, netmask, group
+    type: "netmask", // range, netmask, group
     ipaddr_ver: "4",
     ipaddr_start: "1.1.1.0",
     ipaddr_end: "1.1.1.254",

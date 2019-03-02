@@ -34,24 +34,28 @@
 
     <!-- Subobject List -->
     <div class="row justify-content-center align-items-center">
-      <!-- <net-ip-obj-input style="width: 600px" ref="net_ip_obj"/> -->
       <net-ip-obj-input ref="ref_netipobj_input" style="width: 90%" :show="netipobj_input_show" 
         :selected_item="selected_item" :subobj_list="netipobj_subobj_list"
         :ipobj="last_selected_item" @eventSubmitNetIpObjInput="on_submit_netipobj_input" @eventCloseNetIpObjInput="on_close_netipobj_input"
         @eventResetSelect="on_reset_select" />
     </div>
 
-    <b-table striped hover small fixed show-empty ref="net_ip_obj_table" :items="get_items" :fields="fields" :sort-by.sync="sort_by"
-      :sort-desc.sync="sort_desc" :sort-direction="sort_dir" @sort-changed="sorting_changed" :current-page="current_page"
-      :per-page="per_page" thead-class="table-head" class="table-area" :filter="search_keyword" @filtered="on_filtered"
-      :no-provider-paging=true :no-provider-filtering=true>
-      <!-- :no-local-sorting=true -->
-      <!-- :tbody-tr-class="row_class" -->
+    <!-- <b-table striped hover small fixed show-empty ref="net_ip_obj_table" :items="get_items" :fields="fields" 
+    :sort-by.sync="sort_by" :sort-desc.sync="sort_desc" :sort-direction="sort_dir" 
+    @sort-changed="sorting_changed" :current-page="current_page"
+    :per-page="per_page" thead-class="table-head" class="table-area" :filter="search_keyword" @filtered="on_filtered"
+    :no-provider-paging=true :no-provider-filtering=true > -->
 
+    <b-table striped hover small fixed show-empty ref="net_ip_obj_table" :items="get_items" :fields="fields"  
+    :sort-by.sync="sort_by" :sort-desc.sync="sort_desc" :sort-direction="sort_dir" 
+    @sort-changed="sorting_changed" :current-page="current_page"
+    :per-page="per_page" thead-class="table-head" class="table-area" :filter="search_keyword" 
+    @filtered="on_filtered" :no-provider-paging=false :no-provider-filtering=true
+    >
       <!-- Table Header -->
       <template v-for="(f, idx) in fields" :slot="'HEAD_' + f.key" slot-scope="row">
         <!-- Checkbox column -->
-        <template v-if="f.ley =='_selected'">
+        <template v-if="f.key =='_selected'">
           <b-form-checkbox :key="'col_chk_' + idx" @click.native.stop v-model="select_all" 
           :indeterminate="indeterminate" @change="toggle_select_all" />
         </template>
@@ -69,6 +73,7 @@
 
       <!-- Table Data -->
       <!-- Checkbox column of the rows -->
+      
       <template slot="_selected" slot-scope="row">
         <b-form-checkbox @click.native.stop v-model="row.item._selected" @change="select_row(row.item)" />
       </template>
@@ -109,23 +114,28 @@
           </b-row>
         </b-card>
       </template>
+     
     </b-table>
 
     <b-pagination align="center" size="sm" :total-rows="total_rows" :per-page="per_page" v-model="current_page" class="page-nav" />
 
-  </b-card>
+    <b-modal title="Do you really DELETE object(s) ?" class="modal-danger" centered  v-model="show_netobjdel_confirm" @ok="on_delete_confirmed" ok-variant="danger" :no-close-on-backdrop=false >
+      <template v-for="(f, idx) in selected_item.items">
+        <b-container fluid :key="idx">
+        <b-row class="mb-1 text-center justify-content-md-center" :key="idx">{{f.name}} </b-row>
+        </b-container>
+      </template>
 
+    </b-modal>
+
+  </b-card>
 </template>
 
 
 <script>
-// import Vue from "vue";
-// import BInputGroup from "bootstrap-vue/es/components/input-group/input-group";
-// import { normalize_items, toggle_child, sort_data, apply_ipobj } from "./nodeHelper.js";
-// import { netobj_fields, netipobj_data, } from "./netobj_data_bstreetable.js";
 
 import * as utils from "./utils.js";
-import { netobj_fields } from "./netobj_data_bstreetable.js";
+import { netobj_fields, netipobj_data } from "./netobj_data_bstreetable.js";
 import * as netobj from  "./netobj.js";
 
 import "../../fa-config.js";
@@ -134,8 +144,6 @@ import NetIpObjInput from "./NetIpObjInput";
 export default {
   components: {
     NetIpObjInput,
-    // NetObj1,
-    // BInputGroup
   },
 
   data: function () {
@@ -160,11 +168,17 @@ export default {
       sort_icon: "sort-amount-up",
 
       fields: netobj_fields,
-      items: null,
+      items: [],
       current_page: 2,
       per_page: 10,
       total_rows: 0,
       page_options: [5, 10, 15],
+
+      show_netobjdel_confirm: false,
+      show_netobjdel_contents: "",
+      transProps: {
+        name: 'flip-list'
+      },
     };
   },
 
@@ -172,26 +186,6 @@ export default {
   },
 
   mounted: function () {
-
-    let nodelist = new netobj.ipobjlist();
-    this.items = nodelist;
-    netobj.init_sample_ipobj(this.items);
-
-    this.total_rows = this.items.length;
-    this.items.normalize_nodes(this.items, 0);
-
-    // normalize_items(this.items, false);
-    this.update_btn_state();
-
-    /*
-    var items1 = new netobj.SubArray();
-    console.log(items1);
-    this.items1 = items1;
-    this.items1.push("aaaa");
-    console.log(this.items1);
-    this.items1.push("bbb");
-    console.log(this.items1.last());
-    */
   },
 
   computed: {
@@ -210,7 +204,7 @@ export default {
         this.$refs.btn_clone.disabled = true;
         this.$refs.btn_del.disabled = true;
       }
-      else if (this.last_selected_item) {
+      else if (len > 0) {
         this.$refs.btn_add.disabled = false;
         this.$refs.btn_edit.disabled = false;
         this.$refs.btn_clone.disabled = false;
@@ -269,6 +263,17 @@ export default {
     on_delete() {
       this.selected_item.items.forEach(item => {
         if (item._depth == 0) {
+          this.show_netobjdel_contents += item.name;
+        }
+      });
+
+      this.show_netobjdel_confirm = true;
+    },
+
+    on_delete_confirmed() {
+      this.show_netobjdel_confirm = false;
+      this.selected_item.items.forEach(item => {
+        if (item._depth == 0) {
           this.items.remove_item(item);
         }
         else {
@@ -311,63 +316,56 @@ export default {
 
     select_row(item) {
       item._selected = !item._selected;
+      let idx = this.selected_item.items.indexOf(item);
 
       if (item._selected) {
         this.last_selected_item = item;
-        var all = true;
-        for (var i = 0; i < this.items.length; i++) {
-          if (!this.items[i]._selected)
-            all = false;
-        }
-
-        if (all) {
-          this.select_all = true;
-          this.indeterminate = false;
-        }
-        else {
-          this.select_all = false;
-          this.indeterminate = true;
-        }
-
-        if (this.selected_item.items.indexOf(item) == -1) {
+        if (idx == -1) {
           this.selected_item.items.push(item);
         }
       }
       else {
-        this.last_selected_item = null;
-
-        // change color to show status
-        // item._rowVariant = "default";
-        var all = false;
-        for (var i = 0; i < this.items.length; i++) {
-          if (this.items[i]._selected)
-            all = true;
-        }
-
-        if (!all) {
-          this.select_all = false;
-          this.indeterminate = false;
+        let len = this.selected_item.items.length;
+        if (len > 0) {
+          this.last_selected_item = this.selected_item.items[len-1];
         }
         else {
-          this.select_all = false;
-          this.indeterminate = true;
+          this.last_selected_item = null;
         }
 
-        let idx = this.selected_item.items.indexOf(item);
         if (idx >= 0) {
           this.selected_item.items.splice(idx, 1);
         }
       }
 
+      let selcnt = 0;
+      for (var i = 0; i < this.items.ipobjs.length; i++) {
+        if (this.items.ipobjs[i]._selected) {
+          selcnt ++;
+        }
+      }
+
+      if (selcnt == 0) {
+        this.select_all = false;
+        this.indeterminate = false;
+      }
+      else if (selcnt == this.items.ipobjs.length) {
+        this.select_all = true;
+        this.indeterminate = false;
+      }
+      else {
+        this.select_all = false;
+        this.indeterminate = true;
+      }
+
       this.update_btn_state();
-      // console.log(this.selected_item);
     },
 
     toggle_select_all(checked) {
       this.select_all = checked;
       if (this.select_all) {
-        for (var i = 0; i < this.items.length; i++) {
-          let item = this.items[i];
+        for (var i = 0; i < this.items.ipobjs.length; i++) {
+          let item = this.items.ipobjs[i];
           item._selected = true;
 
           if (this.last_selected_item == null) {
@@ -381,8 +379,8 @@ export default {
       }
       else {
         this.last_selected_item = null;
-        for (var i = 0; i < this.items.length; i++) {
-          let item = this.items[i];
+        for (var i = 0; i < this.items.ipobjs.length; i++) {
+          let item = this.items.ipobjs[i];
           item._selected = false;
 
           let idx = this.selected_item.items.indexOf(item);
@@ -481,12 +479,17 @@ export default {
     },
 
     get_items(ctx, callback) {
-      if (!this.items) {
-        return null;
+      if (this.items.length < 1) {
+        let l = new netobj.ipobjlist();
+        this.items = l;
+
+        netobj.init_sample_ipobj(this.items);
+        this.items.normalize_nodes();
+        this.update_btn_state();
       }
 
-      this.total_rows = this.items.length;
-      return this.items;
+      this.total_rows = this.items.ipobjs.length;
+      return this.items.ipobjs;
     },
 
     show_datetime(value) {
@@ -496,6 +499,15 @@ export default {
 
       return s;
     },
+
+    // rowClass(item, type) {
+    //   if (!item) 
+    //     return
+    //   if (item.id == "netobj-b") {
+    //     return 'hide_row'
+    //   }
+    // },
+
   }
 };
 
@@ -524,10 +536,13 @@ export default {
 }
 
 /* hide default sort icon */
+/* 
 table.b-table > thead > tr > th.sorting::before,
 table.b-table > thead > tr > th.sorting::after,
 table.b-table > tfoot > tr > th.sorting::before,
-table.b-table > tfoot > tr > th.sorting::after {
+table.b-table > tfoot > tr > th.sorting::after { 
+*/
+.b-table.table > thead > tr > th[aria-sort]::after, .b-table.table > tfoot > tr > th[aria-sort]::after {
   position: absolute;
   right: 0.75em;
   display: none;
@@ -639,11 +654,20 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
   margin: 0;
 }
 
+table#table-transition-example .flip-list-move {
+  transition: transform 1s;
+}
+
 /* 
 .toolbar {
   background-color: rgb(190, 190, 190);
 } 
 */
+
+.hide_row {
+  display: none;
+}
+
 </style>
 
 

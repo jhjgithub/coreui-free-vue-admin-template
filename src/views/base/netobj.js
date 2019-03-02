@@ -1,4 +1,3 @@
-
 import * as lodash from "lodash";
 import * as utils from "./utils.js";
 import "./enum.js";
@@ -107,305 +106,314 @@ export class SubArray extends Array {
 
 // SubArray.prototype = Object.create(Array.prototype);
 
-// ipobjlist.prototype.remove_at = function (idx) {
+// remove_at(idx) {
 //   return this.splice(idx, 1);
-// };
+// }
 ///////////////////////////////////////////////
 
-export function ipobjlist() {
-  Array.call(this);
-}
+export class ipobjlist {
+  constructor() {
+    this.ipobjs = [];
+  }
 
-ipobjlist.prototype = Object.create(Array.prototype);
+  push(item) {
+    this.ipobjs.push(item);
+  }
 
-ipobjlist.prototype.remove_at = function (idx) {
-  return this.splice(idx, 1);
-};
+  remove_at(idx) {
+    return this.ipobjs.splice(idx, 1);
+  }
 
-ipobjlist.prototype.insert_at = function (idx, item) {
-  this.splice(idx, 0, item);
-};
+  insert_at(idx, item) {
+    this.ipobjs.splice(idx, 0, item);
+  }
 
-ipobjlist.prototype.get_root_node = function (id) {
-  let node = this.find((node) => {
-    return node._depth == 0 && node.id === id;
-  });
+  get_root_node(id) {
+    let node = this.ipobjs.find((node) => {
+      return node._depth == 0 && node.id === id;
+    });
 
-  return node;
-};
+    return node;
+  }
 
-ipobjlist.prototype.get_node_index = function (node) {
-  let i = this.findIndex((n) => {
-    return n == node;
-  });
+  get_node_index(node) {
+    let i = this.ipobjs.findIndex((n) => {
+      return n == node;
+    });
 
-  return i;
-};
+    return i;
+  }
 
-ipobjlist.prototype.clone_item = function (item) {
-  let idx = this.get_node_index(item);
-  let n = item.clone_deep();
+  clone_item(item) {
+    let idx = this.get_node_index(item);
+    let n = item.clone_deep();
 
-  n.name = n.name + "_cloned"
-  n.init_internal_data();
-  n.init_created_date()
-  n.init_id()
+    n.name = n.name + "_cloned"
+    n.init_internal_data();
+    n.init_created_date()
+    n.init_id()
 
-  this.insert_at(idx, n);
-  this.normalize_nodes(this, 0);
-}
+    this.insert_at(idx, n);
+    this.normalize_nodes();
+  }
 
-ipobjlist.prototype.remove_item = function (ditem) {
-  let len = this.length;
-  for (let i = len - 1; i >= 0; i--) {
-    let item = this[i];
-    // console.log("cur.name=%s", item.name);
+  remove_item(ditem) {
+    let len = this.ipobjs.length;
+    for (let i = len - 1; i >= 0; i--) {
+      let item = this.ipobjs[i];
+      // console.log("cur.name=%s", item.name);
 
-    if (item.id == ditem.id && item.name == ditem.name) {
-      this.remove_at(i);
-    }
-    else if (item.children && item.children.length > 0) {
-      item.children = item.children.filter(function (child_id) {
-        return child_id !== ditem.id;
-      });
-
-      if (item._visible_child && item._visible_child.length > 0) {
-        item._visible_child = item._visible_child.filter(function (child) {
-          return child.id !== ditem.id;
+      if (item.id == ditem.id && item.name == ditem.name) {
+        this.remove_at(i);
+      }
+      else if (item.children && item.children.length > 0) {
+        item.children = item.children.filter(function (child_id) {
+          return child_id !== ditem.id;
         });
+
+        if (item._visible_child && item._visible_child.length > 0) {
+          item._visible_child = item._visible_child.filter(function (child) {
+            return child.id !== ditem.id;
+          });
+        }
       }
     }
+
+    this.normalize_nodes();
   }
 
-  this.normalize_nodes(this, 0);
-}
+  remove_child_item(ditem) {
+    if (!ditem._parent_id) {
+      return;
+    }
 
-ipobjlist.prototype.remove_child_item = function (ditem) {
-  if (!ditem._parent_id) {
-    return;
+    let pid = ditem._parent_id[0];
+    let parent = this.get_root_node(pid);
+
+    parent.children = parent.children.filter(function (child_id) {
+      return child_id !== ditem.id;
+    });
+
+    if (parent._visible_child && parent._visible_child.length > 0) {
+      parent._visible_child = parent._visible_child.filter(function (child) {
+        return child.id !== ditem.id;
+      });
+    }
+
+    // utils.print_json(parent, "after child parent");
+
+    let idx = this.get_node_index(ditem);
+    this.remove_at(idx);
   }
 
-  let pid = ditem._parent_id[0];
-  let parent = this.get_root_node(pid);
+  expand_children(parent) {
+    if (parent.children.length < 1) {
+      return;
+    }
 
-  parent.children = parent.children.filter(function (child_id) {
-    return child_id !== ditem.id;
-  });
+    let idx = this.get_node_index(parent);
 
-  if (parent._visible_child && parent._visible_child.length > 0) {
-    parent._visible_child = parent._visible_child.filter(function (child) {
-      return child.id !== ditem.id;
+    parent.children.forEach((child_id) => {
+      let child_org = this.get_root_node(child_id);
+
+      if (child_org) {
+        let c = child_org.clone_deep();
+
+        if (c) {
+          c._depth = parent._depth + 1;
+          c._fix_idx = -1;
+
+          utils.array_empty(c._parent_id);
+          utils.array_empty(c._visible_child);
+
+          // set parent id
+          c._parent_id.push(parent.id);
+          parent._visible_child.push(c);
+
+          // move clone at root level to be shown
+          idx++;
+          this.insert_at(idx, c);
+        }
+        else {
+          console.log("no data");
+        }
+      }
+    });
+
+    this.normalize_nodes(parent._visible_child, parent._depth + 1);
+    // print_json(parent, "expand node:");
+  }
+
+  collapse_children(parent) {
+    parent._visible_child.forEach((child) => {
+      if (child._visible_child.length > 0) {
+        this.collapse_children(child);
+      }
+
+      let i = this.get_node_index(child);
+      this.remove_at(i);
+    });
+
+    utils.array_empty(parent._visible_child);
+  }
+
+  normalize_nodes(nodes = null, depth = 0) {
+    let fix_idx = 0;
+
+    if (!nodes) {
+      nodes = this.ipobjs;
+    }
+
+    // console.log("depth: %d", depth);
+
+    nodes.forEach((node) => {
+      if (node._depth == depth) {
+        node._fix_idx = fix_idx.toString();
+        fix_idx++;
+      }
     });
   }
 
-  // utils.print_json(parent, "after child parent");
+  toggle_child(node) {
+    if (node.children == undefined || node.children.length < 1) {
+      return;
+    }
 
-  let idx = this.get_node_index(ditem);
-  this.remove_at(idx);
-}
+    let visible_child = node._visible_child;
 
-ipobjlist.prototype.expand_children = function (parent) {
-  if (parent.children.length < 1) {
-    return;
+    if (visible_child.length < 1) {
+      this.expand_children(node);
+    }
+    else if (visible_child.length > 0) {
+      this.collapse_children(node);
+    }
   }
 
-  let idx = this.get_node_index(parent);
+  dynamic_sort(property) {
+    let sortOrder = 1;
 
-  parent.children.forEach((child_id) => {
-    let child_org = this.get_root_node(child_id);
+    if (property[0] === "-") {
+      sortOrder = -1;
+      property = property.substr(1);
+    }
 
-    if (child_org) {
-      let c = child_org.clone_deep();
+    /*
+    return function (a,b) {
+            if (sortOrder == -1) {
+                    return b[property].localeCompare(a[property]);
+            } 
+            else {
+                    return a[property].localeCompare(b[property]);
+            }        
+    }
+    */
 
-      if (c) {
-        c._depth = parent._depth + 1;
-        c._fix_idx = -1;
+    const reA = /[^a-zA-Z]/g;
+    const reN = /[^0-9]/g;
 
-        utils.array_empty(c._parent_id);
-        utils.array_empty(c._visible_child);
+    // to properly handle mixed string with alphabet and digit
+    return function (itemA, itemB) {
+      let a, b;
 
-        // set parent id
-        c._parent_id.push(parent.id);
-        parent._visible_child.push(c);
-
-        // move clone at root level to be shown
-        idx++;
-        this.insert_at(idx, c);
+      if (sortOrder == -1) {
+        a = itemB[property];
+        b = itemA[property];
       }
       else {
-        console.log("no data");
-      }
-    }
-  });
-
-  this.normalize_nodes(parent._visible_child, parent._depth + 1);
-  // print_json(parent, "expand node:");
-};
-
-ipobjlist.prototype.collapse_children = function (parent) {
-  parent._visible_child.forEach((child) => {
-    if (child._visible_child.length > 0) {
-      this.collapse_children(child);
-    }
-
-    let i = this.get_node_index(child);
-    this.remove_at(i);
-  });
-
-  utils.array_empty(parent._visible_child);
-};
-
-ipobjlist.prototype.normalize_nodes = function (nodes, depth) {
-  let fix_idx = 0;
-
-  // console.log("depth: %d", depth);
-
-  nodes.forEach((node) => {
-    if (node._depth == depth) {
-      node._fix_idx = fix_idx.toString();
-      fix_idx++;
-    }
-  });
-};
-
-ipobjlist.prototype.toggle_child = function (node) {
-  if (node.children == undefined || node.children.length < 1) {
-    return;
-  }
-
-  let visible_child = node._visible_child;
-
-  if (visible_child.length < 1) {
-    this.expand_children(node);
-  }
-  else if (visible_child.length > 0) {
-    this.collapse_children(node);
-  }
-};
-
-ipobjlist.prototype.dynamic_sort = function (property) {
-  let sortOrder = 1;
-
-  if (property[0] === "-") {
-    sortOrder = -1;
-    property = property.substr(1);
-  }
-
-  /*
-  return function (a,b) {
-          if (sortOrder == -1) {
-                  return b[property].localeCompare(a[property]);
-          } 
-          else {
-                  return a[property].localeCompare(b[property]);
-          }        
-  }
-  */
-
-  const reA = /[^a-zA-Z]/g;
-  const reN = /[^0-9]/g;
-
-  // to properly handle mixed string with alphabet and digit
-  return function (itemA, itemB) {
-    let a, b;
-
-    if (sortOrder == -1) {
-      a = itemB[property];
-      b = itemA[property];
-    }
-    else {
-      a = itemA[property];
-      b = itemB[property];
-    }
-
-    let aA = a.replace(reA, "");
-    let bA = b.replace(reA, "");
-
-    if (aA === bA) {
-      let aN = parseInt(a.replace(reN, ""), 10);
-      let bN = parseInt(b.replace(reN, ""), 10);
-      if (isNaN(bN) || isNaN(bN)) {
-        return a > b ? 1 : -1;
+        a = itemA[property];
+        b = itemB[property];
       }
 
-      return aN === bN ? 0 : aN > bN ? 1 : -1;
-    }
-    else {
-      return aA > bA ? 1 : -1;
-    }
-  };
-};
+      let aA = a.replace(reA, "");
+      let bA = b.replace(reA, "");
 
-ipobjlist.prototype.do_sort = function (items, sort_by, sort_desc) {
-  // console.log("--> sorting items: %d", items.length);
+      if (aA === bA) {
+        let aN = parseInt(a.replace(reN, ""), 10);
+        let bN = parseInt(b.replace(reN, ""), 10);
+        if (isNaN(bN) || isNaN(bN)) {
+          return a > b ? 1 : -1;
+        }
 
-  let field = sort_by;
-
-  if (sort_desc) {
-    field = "-" + sort_by;
-  }
-
-  items.sort(this.dynamic_sort(field));
-
-  items.forEach((item) => {
-    if (item._visible_child && item._visible_child.length > 1) {
-      this.do_sort(item._visible_child, sort_by, sort_desc);
-    }
-  });
-};
-
-ipobjlist.prototype.remove_subnode = function () {
-  for (var i = this.length; i--;) {
-    if (this[i]._depth > 0) {
-      this.remove_at(i);
-    }
-  }
-};
-
-ipobjlist.prototype.restore_subnode = function (nodes) {
-  for (let i = 0; i < nodes.length; i++) {
-    let node = nodes[i];
-    let idx = i;
-
-    node._visible_child.forEach((child) => {
-      if (child._visible_child.lehgth > 0) {
-        this.restore_subnode(child);
+        return aN === bN ? 0 : aN > bN ? 1 : -1;
       }
+      else {
+        return aA > bA ? 1 : -1;
+      }
+    }
+  }
 
-      idx++;
-      this.insert_at(idx, child);
+  do_sort(items, sort_by, sort_desc) {
+    // console.log("--> sorting items: %d", items.length);
+
+    let field = sort_by;
+
+    if (sort_desc) {
+      field = "-" + sort_by;
+    }
+
+    items.sort(this.dynamic_sort(field));
+
+    items.forEach((item) => {
+      if (item._visible_child && item._visible_child.length > 1) {
+        this.do_sort(item._visible_child, sort_by, sort_desc);
+      }
     });
   }
-};
 
-ipobjlist.prototype.sort_data = function (sort_by, sort_desc) {
-  //print_json(expanded_items, "current Last Status");
-
-  this.remove_subnode();
-
-  if (sort_by) {
-    this.do_sort(this, sort_by, sort_desc);
-  }
-  else {
-    this.do_sort(this, "_fix_idx", sort_desc);
+  remove_subnode() {
+    for (var i = this.ipobjs.length; i--;) {
+      if (this.ipobjs[i]._depth > 0) {
+        this.remove_at(i);
+      }
+    }
   }
 
-  this.restore_subnode(this);
-};
+  restore_subnode(nodes) {
+    for (let i = 0; i < nodes.length; i++) {
+      let node = nodes[i];
+      let idx = i;
 
-ipobjlist.prototype.apply_ipobj = function (ipobj) {
-  let oldobj = this.get_root_node(ipobj.id);
+      node._visible_child.forEach((child) => {
+        if (child._visible_child.lehgth > 0) {
+          this.restore_subnode(child);
+        }
 
-  if (oldobj) {
-    let v = oldobj._visible_child;
-    oldobj.assign(ipobj);
-    oldobj.visible_child = v;
-    return;
+        idx++;
+        this.insert_at(idx, child);
+      });
+    }
   }
 
-  let newobj = ipobj.clone_deep();
-  this.unshift(newobj);
-  this.normalize_nodes(this, 0);
+  sort_data(sort_by, sort_desc) {
+    //print_json(expanded_items, "current Last Status");
+
+    this.remove_subnode();
+
+    if (sort_by) {
+      this.do_sort(this.ipobjs, sort_by, sort_desc);
+    }
+    else {
+      this.do_sort(this.ipobjs, "_fix_idx", sort_desc);
+    }
+
+    this.restore_subnode(this.ipobjs);
+  }
+
+  apply_ipobj(ipobj) {
+    let oldobj = this.get_root_node(ipobj.id);
+
+    if (oldobj) {
+      let v = oldobj._visible_child;
+      oldobj.assign(ipobj);
+      oldobj.visible_child = v;
+      return;
+    }
+
+    let newobj = ipobj.clone_deep();
+    this.unshift(newobj);
+    this.normalize_nodes();
+  }
+
 }
 
 ////////////////////////////

@@ -77,13 +77,6 @@
                 <b-form-select ref="ref_subobj" multiple :select-size="5" @focusout.native="on_focus_out" v-model="selected_subobj"
                   key="subobj" name="subobj" v-validate="'subobj_len'" :state="validate_state('subobj')" :options="local_subobj_list" />
 
-                <!-- <m-select ref="ref_subobj" multiple :select-size="5"
-                  data-vv-value-path="local_ipobj.children"
-                  :value="selected_subobj"
-                  key="subobj" name="subobj" v-validate="{required: true, min_value: 1}" 
-                  :state="validate_state('subobj')"
-                  :options="local_ipobj.children" /> -->
-
                 <b-col sm="2" class="align-self-center">
                   <div>
                     <span>
@@ -217,6 +210,7 @@ export default {
 
   mounted: function () {
   },
+
   watch: {
     local_show() {
       if (this.local_show) {
