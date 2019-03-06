@@ -17,6 +17,7 @@ export const netobj_fields = [
     thStyle: { width: "100px", maxWidth: "200px", minWidth: "50px" },
   },
 
+  /*
   {
     key: "name",
     label: "Name",
@@ -24,6 +25,7 @@ export const netobj_fields = [
     sortable: true,
     thStyle: { width: "50px", maxWidth: "100px", minWidth: "50px" },
   },
+  */
 
   {
     key: "type",
@@ -79,7 +81,7 @@ export const netobj_fields = [
 export const netipobj_data = [
   {
     id: "netobj-1",
-    name: "WebServer",
+    // name: "WebServer",
     type: "range", // range, netmask, group
     ipaddr_ver: "4",
     ipaddr_start: "1.1.1.1",
@@ -94,7 +96,7 @@ export const netipobj_data = [
     children: [
       {
         id: "netobj-6",
-        name: "WebServer6",
+        // name: "WebServer6",
         type: "group", // range, netmask, group
         ipaddr_ver: "",
         ipaddr_start: "",
@@ -108,7 +110,7 @@ export const netipobj_data = [
       },
       {
         id: "netobj-3",
-        name: "WebServer3",
+        // name: "WebServer3",
         created_date: '1549529217446',
         type: "netmask", // range, netmask, group
         ipaddr_ver: "4",
@@ -123,7 +125,7 @@ export const netipobj_data = [
         children: [
           {
             id: "netobj-5",
-            name: "WebServer5",
+            // name: "WebServer5",
             created_date: '1549529617446',
             ipaddr_ver: "",
             type: "group", // range, netmask, group
@@ -141,7 +143,7 @@ export const netipobj_data = [
   },
   {
     id: "netobj-4",
-    name: "WebServer4",
+    // name: "WebServer4",
     created_date: '1549520617446',
     type: "group", // range, netmask, group
     ipaddr_ver: "",
@@ -155,7 +157,7 @@ export const netipobj_data = [
   },
   {
     id: "netobj-2",
-    name: "WebServer1",
+    // name: "WebServer1",
     created_date: '1549521617446',
     type: "netmask", // range, netmask, group
     ipaddr_ver: "4",

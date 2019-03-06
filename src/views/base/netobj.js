@@ -1,11 +1,13 @@
 import * as lodash from "lodash";
 import * as utils from "./utils.js";
 import "./enum.js";
+import { nsobj_base } from "./nsobjbase.js";
 
 ////////////////////////////////
 
 export var ipobj_type = lodash.enum("group", "netmask", "range");
 export var ipobj_ipver = lodash.enum("v4", "v6");
+export var ipobj_protocol = lodash.enum("icmp=1", "tcp=6", "udp=17", "all=255");
 // export var ipnode_visible = lodash.enum("none", "hide", "show");
 
 export const ipobj_type_list = [
@@ -19,57 +21,40 @@ export const ipobj_ipver_list = [
   { text: "IPv6", value: ipobj_ipver.v6 },
 ];
 
-export class ipobj {
+
+export class ipobj extends nsobj_base {
   constructor(id) {
-    this.id = id;
-    this.name = "";
+    super(id);
     this.type = ipobj_type.netmask;
+
+    // for network
     this.ipaddr_ver = ipobj_ipver.v4;
     this.ipaddr_start = "";
     this.ipaddr_end = "";
-    this.netmask = "";
-    this.created_date = "";
-    this.desc = "";
+    this.netmask = 0;
+
+    // for port
+    this.port_start = 0;
+    this.port_end = 0;
+
+    // for protocol
+    this.protocol = 0;
+
+    // for group
     this.children = [];
 
     // for internal
-    // bootstrap table에서 _로 시작하는 property는 검색에서 제외.
-    this._selected = false;
     this._depth = 0;
     this._parent_id = [];
     this._visible_child = [];
-    // sort 시 원래의 위치를 기억하기 위해서 사용. node 가 변경 되면 갱신 해야 한다.
-    this._fix_idx = -1;
   }
 
   init_internal_data() {
-    this._selected = false;
+    super.init_internal_data();
+
     this._depth = 0;
     this._parent_id = [];
     this._visible_child = [];
-    this._fix_idx = -1;
-  }
-
-  init_id() {
-    let id = Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
-    this.id = "id-" + id.toString();
-  }
-
-  init_created_date() {
-    this.created_date = Date.now().toString();
-  }
-
-  clone_deep() {
-    return lodash.cloneDeep(this);
-  }
-
-  assign(from) {
-    lodash.assign(this, from);
-  }
-
-  reset() {
-    let n = new ipobj("");
-    this.assign(n);
   }
 
   // handle child
@@ -148,7 +133,7 @@ export class ipobjlist {
     let idx = this.get_node_index(item);
     let n = item.clone_deep();
 
-    n.name = n.name + "_cloned"
+    // n.name = n.name + "_cloned"
     n.init_internal_data();
     n.init_created_date()
     n.init_id()
@@ -161,9 +146,8 @@ export class ipobjlist {
     let len = this.ipobjs.length;
     for (let i = len - 1; i >= 0; i--) {
       let item = this.ipobjs[i];
-      // console.log("cur.name=%s", item.name);
 
-      if (item.id == ditem.id && item.name == ditem.name) {
+      if (item.id == ditem.id /* && item.name == ditem.name */) {
         this.remove_at(i);
       }
       else if (item.children && item.children.length > 0) {
@@ -420,41 +404,50 @@ export class ipobjlist {
 
 export function init_sample_ipobj(ipobjlist) {
   let a = new ipobj();
-  a.id = "netobj-a";
-  a.name = "WebServer1";
+  a.id = "id-ssh-server";
+  // a.name = "ssh-server";
+  a.desc = "SSH Server";
+  a.created_date = "1549529617446";
+
   a.type = ipobj_type.range;
   a.ipaddr_ver = ipobj_ipver.v4;
-  a.ipaddr_start = "1.1.1.1";
-  a.ipaddr_end = "1.1.1.254";
-  a.netmask = "";
-  a.created_date = "1549529617446";
-  a.desc = "network object 1";
+  a.ipaddr_start = "204.152.188.196";
+  a.ipaddr_end = "204.152.188.196";
+  a.protocol = ipobj_protocol.tcp;
+  a.port_start = 22;
+  a.port_end = 22;
 
   let b = new ipobj();
-  b.id = "netobj-b";
-  b.name = "WebServer2";
-  b.type = ipobj_type.netmask;
-  b.ipaddr_ver = ipobj_ipver.v4;
-  b.ipaddr_start = "2.1.1.1";
-  b.ipaddr_end = "";
-  b.netmask = "24";
+  b.id = "id-web-server";
+  // b.name = "WebServer2";
+  b.desc = "Web server rule";
   b.created_date = "1559929617446";
-  b.desc = "network object 2";
+
+  b.type = ipobj_type.range;
+  b.ipaddr_ver = ipobj_ipver.v4;
+  b.ipaddr_start = "0.0.0.0";
+  b.ipaddr_end = "0.0.0.0";
+  b.protocol = ipobj_protocol.tcp;
+  b.port_start = 80;
+  b.port_end = 80;
 
   let c = new ipobj();
-  c.id = "netobj-c";
-  c.name = "WebServer3";
-  c.type = ipobj_type.netmask;
-  c.ipaddr_ver = ipobj_ipver.v4;
-  c.ipaddr_start = "9.1.1.1";
-  c.ipaddr_end = "";
-  c.netmask = "24";
+  c.id = "id-any-any";
+  // c.name = "Any-Any";
+  c.desc = "Any network";
   c.created_date = "1539129617446";
-  c.desc = "network object 3";
+
+  c.type = ipobj_type.range;
+  c.ipaddr_ver = ipobj_ipver.v4;
+  c.ipaddr_start = "0.0.0.0";
+  c.ipaddr_end = "0.0.0.0";
+  c.protocol = ipobj_protocol.all;
+  c.port_start = 0;
+  c.port_end = 65535;
 
   let d = new ipobj();
   d.id = "netobj-d";
-  d.name = "WebServer4";
+  // d.name = "WebServer4";
   d.type = ipobj_type.range;
   d.ipaddr_ver = ipobj_ipver.v4;
   d.ipaddr_start = "192.168.1.1";
@@ -465,7 +458,7 @@ export function init_sample_ipobj(ipobjlist) {
 
   let e = new ipobj();
   e.id = "netobj-e";
-  e.name = "WebServer5";
+  // e.name = "WebServer5";
   e.type = ipobj_type.range;
   e.ipaddr_ver = ipobj_ipver.v4;
   e.ipaddr_start = "172.1.1.1";
@@ -476,7 +469,7 @@ export function init_sample_ipobj(ipobjlist) {
 
   let f = new ipobj();
   f.id = "netobj-f";
-  f.name = "Group6";
+  // f.name = "Group6";
   f.type = ipobj_type.group;
   f.ipaddr_ver = ipobj_ipver.v4;
   f.ipaddr_start = "";
@@ -497,5 +490,5 @@ export function init_sample_ipobj(ipobjlist) {
   a.add_child(f);
   e.add_child(d);
 
-  // utils.print_json(a, "a");
+  utils.print_json(a, "a");
 }

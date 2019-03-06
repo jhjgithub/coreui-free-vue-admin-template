@@ -40,12 +40,6 @@
         @eventResetSelect="on_reset_select" />
     </div>
 
-    <!-- <b-table striped hover small fixed show-empty ref="net_ip_obj_table" :items="get_items" :fields="fields" 
-    :sort-by.sync="sort_by" :sort-desc.sync="sort_desc" :sort-direction="sort_dir" 
-    @sort-changed="sorting_changed" :current-page="current_page"
-    :per-page="per_page" thead-class="table-head" class="table-area" :filter="search_keyword" @filtered="on_filtered"
-    :no-provider-paging=true :no-provider-filtering=true > -->
-
     <b-table striped hover small fixed show-empty ref="net_ip_obj_table" :items="get_items" :fields="fields"  
     :sort-by.sync="sort_by" :sort-desc.sync="sort_desc" :sort-direction="sort_dir" 
     @sort-changed="sorting_changed" :current-page="current_page"
@@ -122,7 +116,7 @@
     <b-modal title="Do you really DELETE object(s) ?" class="modal-danger" centered  v-model="show_netobjdel_confirm" @ok="on_delete_confirmed" ok-variant="danger" :no-close-on-backdrop=false >
       <template v-for="(f, idx) in selected_item.items">
         <b-container fluid :key="idx">
-        <b-row class="mb-1 text-center justify-content-md-center" :key="idx">{{f.name}} </b-row>
+        <b-row class="mb-1 text-center justify-content-md-center" :key="idx">{{f.id}} </b-row>
         </b-container>
       </template>
 
@@ -137,6 +131,7 @@
 import * as utils from "./utils.js";
 import { netobj_fields, netipobj_data } from "./netobj_data_bstreetable.js";
 import * as netobj from  "./netobj.js";
+import * as nsrule from  "./nsrule.js";
 
 import "../../fa-config.js";
 import NetIpObjInput from "./NetIpObjInput";
@@ -186,6 +181,7 @@ export default {
   },
 
   mounted: function () {
+    nsrule.init_sample_nsruleset();
   },
 
   computed: {
@@ -240,7 +236,7 @@ export default {
           let node = this.items.get_root_node(i);
           let info = {
             value: node.id,
-            text: node.name
+            // text: node.name
           };
 
           this.netipobj_subobj_list.push(info);
@@ -263,7 +259,7 @@ export default {
     on_delete() {
       this.selected_item.items.forEach(item => {
         if (item._depth == 0) {
-          this.show_netobjdel_contents += item.name;
+          this.show_netobjdel_contents += item.id;
         }
       });
 
@@ -315,6 +311,7 @@ export default {
     },
 
     select_row(item) {
+      console.log(item);
       item._selected = !item._selected;
       let idx = this.selected_item.items.indexOf(item);
 
