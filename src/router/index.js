@@ -19,7 +19,7 @@ const Forms = () => import('@/views/base/Forms')
 const Switches = () => import('@/views/base/Switches')
 const Tables = () => import('@/views/base/Tables')
 const Tabs = () => import('@/views/base/Tabs')
-const NetobjBsTreeTable = () => import('@/views/base/NetobjBsTreeTable')
+const IpobjTable = () => import('@/views/base/IpobjTable')
 const Breadcrumbs = () => import('@/views/base/Breadcrumbs')
 const Carousels = () => import('@/views/base/Carousels')
 const Collapses = () => import('@/views/base/Collapses')
@@ -129,14 +129,14 @@ export default new Router({
         {
           path: 'networkobject',
           name: 'NetworkObject',
-          redirect: '/networkobject/bstreetable',
+          redirect: '/networkobject/ipobjtable',
           component: {
             render (c) { return c('router-view') }
           },
           children: [
             {
-              path: 'bstreetable',
-              component: NetobjBsTreeTable,
+              path: 'ipobjtable',
+              component: IpobjTable,
             },
           ]          
         },

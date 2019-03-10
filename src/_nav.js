@@ -57,8 +57,8 @@ export default {
       icon: 'icon-puzzle',
       children: [
         {
-          name: 'bsTreeTable',
-          url: '/networkobject/bstreetable',
+          name: 'IP Address',
+          url: '/networkobject/ipobjtable',
           icon: 'icon-puzzle'
         },
       ]

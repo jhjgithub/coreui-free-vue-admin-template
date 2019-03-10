@@ -1,8 +1,8 @@
 import * as lodash from "lodash";
-import * as utils from "./utils.js";
+// import * as utils from "./utils.js";
 import "./enum.js";
-import { nsobj_base } from "./nsobjbase.js";
-import * as netobj from "./netobj.js"
+import * as baseclass from "./baseclass.js";
+// import * as policyobjs from "./policyobjs.js"
 
 
 ////////////////////////////////
@@ -15,38 +15,45 @@ export var spolicy_act_nat = lodash.enum("snat", "dnat", "bnat");
 export var spolicy_type_snat = lodash.enum("napt", "map", "hash", "redir");
 export var spolicy_type_dnat = lodash.enum("map", "hash", "redir");
 
+export var spolicy_options = lodash.enum("log");
 export var nat_options = lodash.enum("arp_proxy", "dynamic_ip");
 
-export class natinfo extends nsobj_base {
+export class natinfo extends baseclass.baseobj {
   constructor(id) {
     super(id);
     this.nat_type = spolicy_type_snat.napt;
     this.options = [];
-    this.nic = "";
-    this.nat_ip = [];     //0: start ip, 1: end ip
-    this.nat_port = [];   // 0: start port, 1: end port
+    // this.nic = "";
+    this.nat_network = [];     //0: ipobj, 1: svcobj
   }
 }
 
-export class spolicy extends nsobj_base {
+export class spolicy extends baseclass.baseobj {
   constructor(id) {
     super(id);
 
     this.stype = spolicy_type.firewall;
-    this.actions = [];
-    this.network = [];    // 0: src, 1: dst
-    this.nic = [];          // objidx.max
     this.enable = true;
-    this.nat_info = [];   // 0: snat, 1: dnat
+    this.actions = [];
+    this.nic = [];          // 0: inbound NIC, 1: outbound NIC
+    this.src_network = [];  // 0: ipobj, 1: svcobj
+    this.dst_network = [];  // 0: ipobj, 1: svcobj
+    this.schedule = [];
+    this.options = [
+      spolicy_options.log,
+    ];
+
+    this.natinfo = [];     // 0: snat, 1: dnat
   }
 }
 
-export const nsruleset_VER = 1.0;
-export const nsruleset_ID = "NetShield";
-export class nsruleset {
+export const NSRULESET_VER = 1.0;
+export const NSRULESET_ID = "NetShield";
+
+export class spolicyset {
   constructor() {
-    this.ver = nsruleset_VER;
-    this.id = nsruleset_ID;
+    this.ver = NSRULESET_VER;
+    this.id = NSRULESET_ID;
     this.desc = "This is NetShield Rules";
     this.firewall = [];
     this.nat = [];
@@ -56,7 +63,7 @@ export class nsruleset {
 ///////////////////////////////////////////////
 
 export function init_sample_nsruleset() {
-  let r = new nsruleset();
+  let r = new spolicyset();
 
   // for ssh
   let f1 = new spolicy();

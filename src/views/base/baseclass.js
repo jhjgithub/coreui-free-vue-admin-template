@@ -2,7 +2,7 @@ import * as lodash from "lodash";
 
 ////////////////////////////////
 
-export class nsobj_base {
+export class baseobj {
   constructor(id) {
     if (!id) {
       this.init_id();

@@ -114,13 +114,12 @@
 
 <script>
 import * as lodash from 'lodash'
-import * as netobj from "./netobj.js";
+import * as policyobjs from "./policyobjs.js";
 import * as utils from "./utils.js";
 
 
 export default {
   components: {
-    // MSelect,
   },
   props: {
     ipobj: {
@@ -147,17 +146,17 @@ export default {
   },
   data() {
     return {
-      local_ipobj: new netobj.ipobj(),
+      local_ipobj: new policyobjs.ipobj(),
       local_subobj_list: [],
       local_selected_items: this.selected_item.items,
       local_show: false,
       local_created_date: "",
-      ipobj_type: netobj.ipobj_type,
-      ipobj_ipver: netobj.ipobj_ipver,
-      title: "New Network Object",
+      ipobj_type: policyobjs.ipobj_type,
+      ipobj_ipver: policyobjs.ipobj_ipver,
+      title: "New IP Address Object",
       selected_subobj: [],
-      ipobj_type_list: netobj.ipobj_type_list,
-      ipobj_ipver_list: netobj.ipobj_ipver_list,
+      ipobj_type_list: policyobjs.ipobj_type_list,
+      ipobj_ipver_list: policyobjs.ipobj_ipver_list,
     };
   },
 
@@ -165,7 +164,7 @@ export default {
     this.$validator.extend('child_len', {
       getMessage: field => field + ' needs at least a child.',
       validate: value => {
-        if (this.local_ipobj.type == netobj.ipobj_type.group) {
+        if (this.local_ipobj.type == policyobjs.ipobj_type.group) {
           let l = this.local_ipobj.children.length;
           return l > 0;
         }
@@ -181,7 +180,7 @@ export default {
       let v = true;
       let r = false;
 
-      if (this.local_ipobj.type == netobj.ipobj_type.group) {
+      if (this.local_ipobj.type == policyobjs.ipobj_type.group) {
         let l = this.local_subobj_list.length;
         v = l > 0;
         r = true;
@@ -217,12 +216,12 @@ export default {
         this.$nextTick(function () {
           // local_show myself
           if (this.ipobj) {
-            this.title = "Edit Network Object";
-            this.init_local_netipobj(this.ipobj);
+            this.title = "Edit IP Address Object";
+            this.init_local_ipobj(this.ipobj);
             this.reset_select();
           }
           else {
-            this.init_local_netipobj(null);
+            this.init_local_ipobj(null);
           }
 
           this.update_subobj_btn_state();
@@ -230,7 +229,7 @@ export default {
       }
       else {
         // hide myself
-        this.local_netipobj = new netobj.ipobj();
+        this.local_ipobj = new policyobjs.ipobj();
         this.selected_subobj = [];
         this.local_subobj_list = [];
       }
@@ -253,7 +252,7 @@ export default {
   computed: {},
 
   methods: {
-    init_local_netipobj(obj) {
+    init_local_ipobj(obj) {
       if (obj) {
         this.local_ipobj = obj.clone_deep();
         this.local_ipobj._selected = false;
@@ -261,7 +260,7 @@ export default {
       }
       else {
         // new
-        let a = new netobj.ipobj();
+        let a = new policyobjs.ipobj();
         a.init_id()
         a.init_created_date();
         this.local_ipobj = a;
@@ -280,12 +279,12 @@ export default {
         ipobj.children.push(c.value);
       });
 
-      if (ipobj.type == netobj.ipobj_type.group) {
+      if (ipobj.type == policyobjs.ipobj_type.group) {
         ipobj.ipaddr_start = "";
         ipobj.ipaddr_end = "";
         ipobj.netmask = "";
       }
-      else if (ipobj.type == netobj.ipobj_type.netmask) {
+      else if (ipobj.type == policyobjs.ipobj_type.netmask) {
         ipobj.ipaddr_end = "";
       }
       else {
@@ -302,7 +301,7 @@ export default {
         }
 
         this.normalize();
-        this.$emit("eventSubmitNetIpObjInput", this.local_ipobj);
+        this.$emit("eventSubmitIpObjInput", this.local_ipobj);
       });
     },
 
@@ -310,7 +309,7 @@ export default {
       let f = this.veeFields[ref];
 
       if (f && (f.dirty || f.validated)) {
-        if (ref == 'subobj' && this.local_ipobj.type != netobj.ipobj_type.group) {
+        if (ref == 'subobj' && this.local_ipobj.type != policyobjs.ipobj_type.group) {
           return null;
         }
 
@@ -326,7 +325,7 @@ export default {
     },
 
     on_close(evt) {
-      this.$emit("eventCloseNetIpObjInput");
+      this.$emit("eventCloseIpObjInput");
     },
 
     reset_select() {
@@ -335,7 +334,7 @@ export default {
 
     on_reset(evt) {
       evt.preventDefault();
-      this.init_local_netipobj(null);
+      this.init_local_ipobj(null);
 
       /* Trick to reset/clear native browser form validation state */
       this.local_show = false;

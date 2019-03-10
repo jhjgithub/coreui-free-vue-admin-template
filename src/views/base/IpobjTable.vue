@@ -34,13 +34,13 @@
 
     <!-- Subobject List -->
     <div class="row justify-content-center align-items-center">
-      <net-ip-obj-input ref="ref_netipobj_input" style="width: 90%" :show="netipobj_input_show" 
-        :selected_item="selected_item" :subobj_list="netipobj_subobj_list"
-        :ipobj="last_selected_item" @eventSubmitNetIpObjInput="on_submit_netipobj_input" @eventCloseNetIpObjInput="on_close_netipobj_input"
+      <ipobj-input ref="ref_ipobj_input" style="width: 90%" :show="ipobj_input_show" 
+        :selected_item="selected_item" :subobj_list="ipobj_subobj_list"
+        :ipobj="last_selected_item" @eventSubmitIpObjInput="on_submit_ipobj_input" @eventCloseIpObjInput="on_close_ipobj_input"
         @eventResetSelect="on_reset_select" />
     </div>
 
-    <b-table striped hover small fixed show-empty ref="net_ip_obj_table" :items="get_items" :fields="fields"  
+    <b-table striped hover small fixed show-empty ref="ref_ipobj_table" :items="get_items" :fields="fields"  
     :sort-by.sync="sort_by" :sort-desc.sync="sort_desc" :sort-direction="sort_dir" 
     @sort-changed="sorting_changed" :current-page="current_page"
     :per-page="per_page" thead-class="table-head" class="table-area" :filter="search_keyword" 
@@ -113,7 +113,7 @@
 
     <b-pagination align="center" size="sm" :total-rows="total_rows" :per-page="per_page" v-model="current_page" class="page-nav" />
 
-    <b-modal title="Do you really DELETE object(s) ?" class="modal-danger" centered  v-model="show_netobjdel_confirm" @ok="on_delete_confirmed" ok-variant="danger" :no-close-on-backdrop=false >
+    <b-modal title="Do you really DELETE object(s) ?" class="modal-danger" centered  v-model="show_ipobjdel_confirm" @ok="on_delete_confirmed" ok-variant="danger" :no-close-on-backdrop=false >
       <template v-for="(f, idx) in selected_item.items">
         <b-container fluid :key="idx">
         <b-row class="mb-1 text-center justify-content-md-center" :key="idx">{{f.id}} </b-row>
@@ -129,16 +129,16 @@
 <script>
 
 import * as utils from "./utils.js";
-import { netobj_fields, netipobj_data } from "./netobj_data_bstreetable.js";
-import * as netobj from  "./netobj.js";
-import * as nsrule from  "./nsrule.js";
+import { ipobj_fields } from "./objfields.js";
+import * as policyobjs from  "./policyobjs.js";
+// import * as nsrule from  "./nsrules.js";
 
 import "../../fa-config.js";
-import NetIpObjInput from "./NetIpObjInput";
+import IpobjInput from "./IpobjInput";
 
 export default {
   components: {
-    NetIpObjInput,
+    IpobjInput,
   },
 
   data: function () {
@@ -150,11 +150,11 @@ export default {
       sort_dir: 'last',
       sort_changed: 0,
 
-      netipobj_input_show: false,
-      netipobj_subobj_list: [],
+      ipobj_input_show: false,
+      ipobj_subobj_list: [],
 
-      ipobj_type_list: netobj.ipobj_type_list,
-      ipobj_ipver_list: netobj.ipobj_ipver_list,
+      ipobj_type_list: policyobjs.ipobj_type_list,
+      ipobj_ipver_list: policyobjs.ipobj_ipver_list,
 
       selected_item: { items: [] },
       last_selected_item: null,
@@ -162,15 +162,15 @@ export default {
       indeterminate: false,
       sort_icon: "sort-amount-up",
 
-      fields: netobj_fields,
+      fields: ipobj_fields,
       items: [],
       current_page: 2,
       per_page: 10,
       total_rows: 0,
       page_options: [5, 10, 15],
 
-      show_netobjdel_confirm: false,
-      show_netobjdel_contents: "",
+      show_ipobjdel_confirm: false,
+      show_ipobjdel_contents: "",
       transProps: {
         name: 'flip-list'
       },
@@ -181,7 +181,7 @@ export default {
   },
 
   mounted: function () {
-    nsrule.init_sample_nsruleset();
+    // nsrule.init_sample_nsruleset();
   },
 
   computed: {
@@ -194,7 +194,7 @@ export default {
     update_btn_state() {
       let len = this.selected_item.items.length;
 
-      if (this.netipobj_input_show) {
+      if (this.ipobj_input_show) {
         this.$refs.btn_add.disabled = true;
         this.$refs.btn_edit.disabled = true;
         this.$refs.btn_clone.disabled = true;
@@ -214,8 +214,8 @@ export default {
       }
     },
 
-    change_netipobj_dlg(is_show) {
-      this.netipobj_input_show = is_show;
+    change_ipobj_dlg(is_show) {
+      this.ipobj_input_show = is_show;
       this.update_btn_state();
     },
 
@@ -224,14 +224,14 @@ export default {
       this.toggle_select_all(false);
 
       this.$root.$emit('bv::hide::tooltip');
-      this.change_netipobj_dlg(true);
+      this.change_ipobj_dlg(true);
     },
 
     on_edit() {
       this.$root.$emit('bv::hide::tooltip');
       if (this.last_selected_item && this.last_selected_item.children.length > 0) {
         let c = this.last_selected_item.children;
-        this.netipobj_subobj_list = [];
+        this.ipobj_subobj_list = [];
         c.forEach(i => {
           let node = this.items.get_root_node(i);
           let info = {
@@ -239,11 +239,11 @@ export default {
             // text: node.name
           };
 
-          this.netipobj_subobj_list.push(info);
+          this.ipobj_subobj_list.push(info);
         });
       }
 
-      this.change_netipobj_dlg(true);
+      this.change_ipobj_dlg(true);
     },
 
     on_clone() {
@@ -253,21 +253,21 @@ export default {
         }
       });
 
-      this.$refs.net_ip_obj_table.refresh();
+      this.$refs.ref_ipobj_table.refresh();
     },
 
     on_delete() {
       this.selected_item.items.forEach(item => {
         if (item._depth == 0) {
-          this.show_netobjdel_contents += item.id;
+          this.show_ipobjdel_contents += item.id;
         }
       });
 
-      this.show_netobjdel_confirm = true;
+      this.show_ipobjdel_confirm = true;
     },
 
     on_delete_confirmed() {
-      this.show_netobjdel_confirm = false;
+      this.show_ipobjdel_confirm = false;
       this.selected_item.items.forEach(item => {
         if (item._depth == 0) {
           this.items.remove_item(item);
@@ -278,21 +278,22 @@ export default {
         }
       });
 
-      this.$refs.net_ip_obj_table.refresh();
+      this.$refs.ref_ipobj_table.refresh();
     },
 
-    on_submit_netipobj_input(ipobj) {
+    on_submit_ipobj_input(ipobj) {
       // utils.print_json(ipobj, "submitted ipobj:");
-      this.items.apply_ipobj(ipobj);
-      this.$refs.net_ip_obj_table.refresh();
+      this.items.apply_obj(ipobj);
+      this.$refs.ref_ipobj_table.refresh();
     },
-    on_close_netipobj_input() {
-      //console.log("close netobj");
+
+    on_close_ipobj_input() {
+      //console.log("close policyobjs");
       // todo reset contexts in child
 
       this.indeterminate = false;
       this.toggle_select_all(false);
-      this.change_netipobj_dlg(false);
+      this.change_ipobj_dlg(false);
     },
     on_reset_select() {
       this.indeterminate = false;
@@ -336,8 +337,8 @@ export default {
       }
 
       let selcnt = 0;
-      for (var i = 0; i < this.items.ipobjs.length; i++) {
-        if (this.items.ipobjs[i]._selected) {
+      for (var i = 0; i < this.items.length; i++) {
+        if (this.items.elements[i]._selected) {
           selcnt ++;
         }
       }
@@ -346,7 +347,7 @@ export default {
         this.select_all = false;
         this.indeterminate = false;
       }
-      else if (selcnt == this.items.ipobjs.length) {
+      else if (selcnt == this.items.length) {
         this.select_all = true;
         this.indeterminate = false;
       }
@@ -361,8 +362,8 @@ export default {
     toggle_select_all(checked) {
       this.select_all = checked;
       if (this.select_all) {
-        for (var i = 0; i < this.items.ipobjs.length; i++) {
-          let item = this.items.ipobjs[i];
+        for (var i = 0; i < this.items.length; i++) {
+          let item = this.items.elements[i];
           item._selected = true;
 
           if (this.last_selected_item == null) {
@@ -376,8 +377,8 @@ export default {
       }
       else {
         this.last_selected_item = null;
-        for (var i = 0; i < this.items.ipobjs.length; i++) {
-          let item = this.items.ipobjs[i];
+        for (var i = 0; i < this.items.length; i++) {
+          let item = this.items.elements[i];
           item._selected = false;
 
           let idx = this.selected_item.items.indexOf(item);
@@ -416,7 +417,7 @@ export default {
       // console.log("clicked first_name:" + item.id);
       // toggle_child(this.items, item.obj_id);
       this.items.toggle_child(item);
-      this.$refs.net_ip_obj_table.refresh();
+      this.$refs.ref_ipobj_table.refresh();
     },
 
     on_filtered(filteredItems) {
@@ -477,16 +478,16 @@ export default {
 
     get_items(ctx, callback) {
       if (this.items.length < 1) {
-        let l = new netobj.ipobjlist();
+        let l = new policyobjs.objset();
         this.items = l;
 
-        netobj.init_sample_ipobj(this.items);
+        policyobjs.init_sample_ipobj(this.items);
         this.items.normalize_nodes();
         this.update_btn_state();
       }
 
-      this.total_rows = this.items.ipobjs.length;
-      return this.items.ipobjs;
+      this.total_rows = this.items.length;
+      return this.items.elements;
     },
 
     show_datetime(value) {
@@ -496,15 +497,6 @@ export default {
 
       return s;
     },
-
-    // rowClass(item, type) {
-    //   if (!item) 
-    //     return
-    //   if (item.id == "netobj-b") {
-    //     return 'hide_row'
-    //   }
-    // },
-
   }
 };
 
