@@ -130,7 +130,7 @@
 
 import * as utils from "./utils.js";
 import { ipobj_fields } from "./objfields.js";
-import * as policyobjs from  "./policyobjs.js";
+import * as objclass from  "./objclass.js";
 // import * as nsrule from  "./nsrules.js";
 
 import "../../fa-config.js";
@@ -153,8 +153,8 @@ export default {
       ipobj_input_show: false,
       ipobj_subobj_list: [],
 
-      ipobj_type_list: policyobjs.ipobj_type_list,
-      ipobj_ipver_list: policyobjs.ipobj_ipver_list,
+      ipobj_type_list: objclass.ipobj_type_list,
+      ipobj_ipver_list: objclass.ipobj_ipver_list,
 
       selected_item: { items: [] },
       last_selected_item: null,
@@ -288,7 +288,7 @@ export default {
     },
 
     on_close_ipobj_input() {
-      //console.log("close policyobjs");
+      //console.log("close objclass");
       // todo reset contexts in child
 
       this.indeterminate = false;
@@ -478,10 +478,10 @@ export default {
 
     get_items(ctx, callback) {
       if (this.items.length < 1) {
-        let l = new policyobjs.objset();
+        let l = new objclass.objset();
         this.items = l;
 
-        policyobjs.init_sample_ipobj(this.items);
+        objclass.init_sample_ipobj(this.items);
         this.items.normalize_nodes();
         this.update_btn_state();
       }
