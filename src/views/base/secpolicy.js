@@ -2,7 +2,7 @@ import * as lodash from "lodash";
 // import * as utils from "./utils.js";
 import "./enum.js";
 import * as baseclass from "./baseclass.js";
-// import * as policyobjs from "./policyobjs.js"
+// import * as objclass from "./objclass.js"
 
 
 ////////////////////////////////

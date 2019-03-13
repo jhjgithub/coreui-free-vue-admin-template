@@ -17,7 +17,10 @@ export const ipobj_type_list = [
   { text: "Range", value: ipobj_type.range },
 ];
 
-export const ipobj_ipver_list = [{ text: "IPv4", value: ipobj_ipver.v4 }, { text: "IPv6", value: ipobj_ipver.v6 }];
+export const ipobj_ipver_list = [
+  { text: "IPv4", value: ipobj_ipver.v4 },
+  { text: "IPv6", value: ipobj_ipver.v6 }
+];
 
 export class ipobj extends baseclass.baseobj {
   constructor(id) {
