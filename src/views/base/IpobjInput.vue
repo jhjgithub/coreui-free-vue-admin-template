@@ -114,7 +114,7 @@
 
 <script>
 import * as lodash from 'lodash'
-import * as policyobjs from "./policyobjs.js";
+import * as objclass from "./objclass.js";
 import * as utils from "./utils.js";
 
 
@@ -146,17 +146,17 @@ export default {
   },
   data() {
     return {
-      local_ipobj: new policyobjs.ipobj(),
+      local_ipobj: new objclass.ipobj(),
       local_subobj_list: [],
       local_selected_items: this.selected_item.items,
       local_show: false,
       local_created_date: "",
-      ipobj_type: policyobjs.ipobj_type,
-      ipobj_ipver: policyobjs.ipobj_ipver,
+      ipobj_type: objclass.ipobj_type,
+      ipobj_ipver: objclass.ipobj_ipver,
       title: "New IP Address Object",
       selected_subobj: [],
-      ipobj_type_list: policyobjs.ipobj_type_list,
-      ipobj_ipver_list: policyobjs.ipobj_ipver_list,
+      ipobj_type_list: objclass.ipobj_type_list,
+      ipobj_ipver_list: objclass.ipobj_ipver_list,
     };
   },
 
@@ -164,7 +164,7 @@ export default {
     this.$validator.extend('child_len', {
       getMessage: field => field + ' needs at least a child.',
       validate: value => {
-        if (this.local_ipobj.type == policyobjs.ipobj_type.group) {
+        if (this.local_ipobj.type == objclass.ipobj_type.group) {
           let l = this.local_ipobj.children.length;
           return l > 0;
         }
@@ -180,7 +180,7 @@ export default {
       let v = true;
       let r = false;
 
-      if (this.local_ipobj.type == policyobjs.ipobj_type.group) {
+      if (this.local_ipobj.type == objclass.ipobj_type.group) {
         let l = this.local_subobj_list.length;
         v = l > 0;
         r = true;
@@ -229,7 +229,7 @@ export default {
       }
       else {
         // hide myself
-        this.local_ipobj = new policyobjs.ipobj();
+        this.local_ipobj = new objclass.ipobj();
         this.selected_subobj = [];
         this.local_subobj_list = [];
       }
@@ -260,7 +260,7 @@ export default {
       }
       else {
         // new
-        let a = new policyobjs.ipobj();
+        let a = new objclass.ipobj();
         a.init_id()
         a.init_created_date();
         this.local_ipobj = a;
@@ -279,12 +279,12 @@ export default {
         ipobj.children.push(c.value);
       });
 
-      if (ipobj.type == policyobjs.ipobj_type.group) {
+      if (ipobj.type == objclass.ipobj_type.group) {
         ipobj.ipaddr_start = "";
         ipobj.ipaddr_end = "";
         ipobj.netmask = "";
       }
-      else if (ipobj.type == policyobjs.ipobj_type.netmask) {
+      else if (ipobj.type == objclass.ipobj_type.netmask) {
         ipobj.ipaddr_end = "";
       }
       else {
@@ -309,7 +309,7 @@ export default {
       let f = this.veeFields[ref];
 
       if (f && (f.dirty || f.validated)) {
-        if (ref == 'subobj' && this.local_ipobj.type != policyobjs.ipobj_type.group) {
+        if (ref == 'subobj' && this.local_ipobj.type != objclass.ipobj_type.group) {
           return null;
         }
 
