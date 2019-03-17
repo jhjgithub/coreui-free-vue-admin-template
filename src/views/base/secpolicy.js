@@ -35,10 +35,13 @@ export class spolicy extends baseclass.baseobj {
     this.stype = spolicy_type.firewall;
     this.enable = true;
     this.actions = [];
-    this.nic = [];          // 0: inbound NIC, 1: outbound NIC
-    this.src_network = [];  // 0: ipobj, 1: svcobj
-    this.dst_network = [];  // 0: ipobj, 1: svcobj
-    this.schedule = [];
+    this.innic = null;
+    this.outnic = null;
+    this.srcnet = null;
+    this.srcport = 65536;
+    this.dstnet = null;
+    this.dstport = 65536;
+    this.schedule = null;
     this.options = [
       spolicy_options.log,
     ];
@@ -62,18 +65,24 @@ export class spolicyset {
 
 ///////////////////////////////////////////////
 
-export function init_sample_nsruleset() {
+export function init_sample_spolicyset() {
   let r = new spolicyset();
+
 
   // for ssh
   let f1 = new spolicy();
-  f1.stype = spolicy_type.firewall;
-  f1.network[objidx.start] = "id-any-any";
-  f1.network[objidx.end] = "id-ssh-server";
-  f1.actions[0] = spolicy_act_fw.allow;
-  f1.nic[objidx.start] = "dpdk0";
-  f1.nic[objidx.end] = "dpdk0";
 
+  f1.name = "ssh Server";
+  f1.stype = spolicy_type.firewall;
+  f1.srcnet = "id-any-any";
+  f1.srcport = 65536;
+  f1.dstnet = "id-ssh-server";
+  f1.dstport = 22;
+  f1.actions.push(spolicy_act_fw.allow);
+  f1.innic = "eth0";
+  f1.outnic = "any";
+
+  /*
   let f2 = new spolicy();
   f2.stype = spolicy_type.firewall;
   f2.network[objidx.start] = "id-any-any";
@@ -89,8 +98,10 @@ export function init_sample_nsruleset() {
   f3.actions[0] = spolicy_act_fw.deny;
   f3.nic[objidx.start] = "any";
   f3.nic[objidx.end] = "any";
+  */
 
   r.firewall.push(f1);
+  /*
   r.firewall.push(f2);
   r.firewall.push(f3);
 
@@ -102,6 +113,9 @@ export function init_sample_nsruleset() {
   r.nat.push(n1);
   r.nat.push(n2);
   r.nat.push(n3);
+  */
 
-  console.log(r);
+  // console.log(r);
+
+  return r;
 }

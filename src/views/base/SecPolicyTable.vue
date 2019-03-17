@@ -64,39 +64,22 @@
         <b-form-checkbox @click.native.stop v-model="row.item._selected" @change="select_row(row.item)" />
       </template>
 
-      <template slot="id" slot-scope="row">
+      <!-- <template slot="id" slot-scope="row">
         <div :style="get_left_padding(row.item)">
           <span>
             <font-awesome-icon :class="get_expand_icon_class(row.item)" @click.stop="toggle_show_child(row.item)" :icon="get_expand_icon(row.item)" size="lg" />
           </span>
           <span> {{row.item.id}} </span>
         </div>
+      </template> -->
+
+      <template slot="action" slot-scope="row">
+        {{show_action(row)}}
       </template>
 
-      <template slot="name1" slot-scope="row">
-        <!-- <b-card> -->
-          <b-row class="mb-2">
-            <!-- <b-col sm="2" class="text-sm-right"> -->
-              <b>Name:</b>
-            <!-- </b-col> -->
-            <!-- <b-col>{{ row.item.desc }}</b-col> -->
-          </b-row>
-          <!-- <b-row align-h="end"> -->
-          <b-row >
-            <b>{{ row.item.desc }}</b>
-            <!-- <b-col cols="1"> -->
-              <!-- <b-button size="sm" @click="row.toggleDetails">Hide</b-button> -->
-            <!-- </b-col> -->
-          </b-row>
-        <!-- </b-card> -->
-      </template>
-
-      <template slot="type" slot-scope="row">
-        {{ipobj_type_list[row.item.type].text}}
-      </template>
-
-      <template slot="ipaddr_ver" slot-scope="row">
-        {{ipobj_ipver_list[row.item.ipaddr_ver].text}}
+      <template slot="nics" slot-scope="row">
+        <!-- {{row.item.innic}} -> {{row.item.outnic}}  -->
+        {{show_nic(row)}}
       </template>
 
       <template slot="details" slot-scope="row">
@@ -141,7 +124,7 @@
 import * as utils from "./utils.js";
 import { secpolicy_fields } from "./objfields.js";
 import * as objclass from  "./objclass.js";
-// import * as nsrule from  "./nsrules.js";
+import * as secpolicy from  "./secpolicy.js";
 
 import "../../fa-config.js";
 import IpobjInput from "./IpobjInput";
@@ -153,7 +136,7 @@ export default {
 
   data: function () {
     return {
-      caption: "Network Objects",
+      caption: "Firewall Policies",
       search_keyword: "",
       sort_by: null,
       sort_desc: false,
@@ -163,8 +146,7 @@ export default {
       ipobj_input_show: false,
       ipobj_subobj_list: [],
 
-      ipobj_type_list: objclass.ipobj_type_list,
-      ipobj_ipver_list: objclass.ipobj_ipver_list,
+      // spolicy_act_fw: secpolicy.spolicy_act_fw,
 
       selected_item: { items: [] },
       last_selected_item: null,
@@ -174,6 +156,7 @@ export default {
 
       fields: secpolicy_fields,
       items: [],
+      spolicyset: null,
       current_page: 2,
       per_page: 10,
       total_rows: 0,
@@ -197,10 +180,6 @@ export default {
   computed: {
   },
   methods: {
-    get_sort_by() {
-      return this.sort_by;
-    },
-
     update_btn_state() {
       let len = this.selected_item.items.length;
 
@@ -487,19 +466,70 @@ export default {
     },
 
     get_items(ctx, callback) {
-      if (this.items.length < 1) {
-        let l = new objclass.objset();
-        this.items = l;
-
-        objclass.init_sample_ipobj(this.items);
-        this.items.normalize_nodes();
-        this.update_btn_state();
+      if (this.spolicyset == null) {
+        this.spolicyset = secpolicy.init_sample_spolicyset();
       }
 
-      this.total_rows = this.items.length;
-      return this.items.elements;
+      this.items = this.spolicyset.firewall;
+      this.total_rows = this.spolicyset.firewall.length;
+      return this.items;
     },
 
+    get_sort_by() {
+      return this.sort_by;
+    },
+
+    ////////////////
+    /// formatter
+    show_srcnet(value, key, row) {
+      let sp = row.srcport.toString();
+
+      if (row.srcport == 65536) {
+        sp = "any";
+      }
+
+      return value + ":" + sp;
+    },
+
+    show_dstnet(value, key, row) {
+      let dp = row.dstport.toString();
+
+      if (row.dstport == 65536) {
+        dp = "any";
+      }
+      return value + ":" + dp;
+    },
+
+    show_nic(row) {
+      if (!row) {
+        return
+      }
+
+      return row.item.innic + "->" + row.item.outnic;
+    },
+    
+    show_action(row) {
+      return secpolicy.spolicy_act_fw[row.item.actions[0]];
+    },
+
+    show_schedule(value, key, row) {
+      if (value) {
+        return "Timer";
+      }
+      else {
+        return "N/A";
+      }
+    },
+
+    show_log(value, key, row) {
+      if (row.options[0] == secpolicy.spolicy_options.log) {
+        return "On";
+      }
+      else {
+        return "Off";
+      }
+    },
+    
     show_datetime(value) {
       let v = Number(value);
       let d = new Date(v);
@@ -507,6 +537,7 @@ export default {
 
       return s;
     },
+    ////////////////
   }
 };
 

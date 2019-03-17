@@ -9,6 +9,7 @@ import BootstrapVue from 'bootstrap-vue'
 import App from './App'
 import router from './router'
 import VeeValidate from 'vee-validate'
+import store from './store'
 
 Vue.use(VeeValidate, {
   inject: true,
@@ -20,6 +21,7 @@ Vue.use(BootstrapVue);
 new Vue({
   el: '#app',
   router,
+  store,
   template: '<App/>',
   components: {
     App
