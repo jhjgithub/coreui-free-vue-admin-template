@@ -220,11 +220,28 @@ export default {
     },
 
     on_new() {
-      this.indeterminate = false;
-      this.toggle_select_all(false);
+      let j = {
+        id: 0,
+      title: "joke 3",
+      content: "joke 333",
+      };
 
-      this.$root.$emit('bv::hide::tooltip');
-      this.change_ipobj_dlg(true);
+      let joke = this.$store.state.jokelist.JokeList;
+      console.log(joke);
+
+      let l = this.$store.state.joke.list;
+      console.log(l);
+
+      this.$store.dispatch('addJoke',j);
+      this.$store.dispatch('delJoke', 1);
+      joke = this.$store.state.jokelist.JokeList
+      console.log(joke);
+
+      // this.indeterminate = false;
+      // this.toggle_select_all(false);
+
+      // this.$root.$emit('bv::hide::tooltip');
+      // this.change_ipobj_dlg(true);
     },
 
     on_edit() {

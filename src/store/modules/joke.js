@@ -1,7 +1,12 @@
 import restHelper from "../../api/restHelper";
 
 const state = {
-  list: [],
+  list: [
+    {
+      id: 1,
+      text: "tttt",
+    },
+  ],
 };
 
 const actions = {

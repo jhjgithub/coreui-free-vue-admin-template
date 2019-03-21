@@ -2,13 +2,13 @@ const state = {
   JokeList: [
     {
       id: 1,
-      title: "和i好啊",
-      content: "内容内容内容内容内容内容内容内容内容",
+      title: "joke 1",
+      content: "joke 111111",
     },
     {
       id: 2,
-      title: "和i好22啊",
-      content: "内容内333容内容内容内容内容内容内容内容容内容内容内容内容内容内容内容容内容内容内容内容内容内容内容",
+      title: "joke 2",
+      content: "joke 22222",
     },
   ],
 };
