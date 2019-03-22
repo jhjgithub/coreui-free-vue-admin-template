@@ -301,12 +301,12 @@ export class objset {
 
     if (oldobj) {
       let v = oldobj._visible_child;
-      oldobj.assign(node);
+      utils.assign_deep(oldobj, node);
       oldobj.visible_child = v;
       return;
     }
 
-    let newobj = node.clone_deep();
+    let newobj = utils.clone_deep(node);
     this.unshift(newobj);
     this.normalize_nodes();
   }
