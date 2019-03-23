@@ -121,10 +121,11 @@
 
 <script>
 
-import * as utils from "./utils.js";
+import * as ipobjview from "../../nslib/spolicy";
 import { secpolicy_fields } from "./objfields.js";
-import * as objclass from  "./objclass.js";
-import * as secpolicy from  "./secpolicy.js";
+
+// import * as secpolicy from  "./secpolicy.js";
+// import * as objclass from  "./objclass.js";
 
 import "../../fa-config.js";
 import IpobjInput from "./IpobjInput";

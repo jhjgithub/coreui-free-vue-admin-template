@@ -35,7 +35,7 @@
     <!-- Subobject List -->
     <div class="row justify-content-center align-items-center">
       <ipobj-input ref="ref_ipobj_input" style="width: 90%" :show="ipobj_input_show" 
-        :selected_item="selected_item" :subobj_list="ipobj_subobj_list"
+        :selected_ipobjs="selected_item" :sub_ipobjs="subobj_list"
         :ipobj="last_selected_item" @eventSubmitIpObjInput="on_submit_ipobj_input" @eventCloseIpObjInput="on_close_ipobj_input"
         @eventResetSelect="on_reset_select" />
     </div>
@@ -44,8 +44,13 @@
     :sort-by.sync="sort_by" :sort-desc.sync="sort_desc" :sort-direction="sort_dir" 
     @sort-changed="sorting_changed" :current-page="current_page"
     :per-page="per_page" thead-class="table-head" class="table-area" :filter="search_keyword" 
-    @filtered="on_filtered" :no-provider-paging=false :no-provider-filtering=true
+    @filtered="on_filtered" :no-provider-paging=false :no-provider-filtering=true :busy=isbusy 
     >
+      <div slot="table-busy" class="text-center text-danger my-2">
+        <b-spinner class="align-middle" />
+        <strong>Loading...</strong>
+      </div>
+
       <!-- Table Header -->
       <template v-for="(f, idx) in fields" :slot="'HEAD_' + f.key" slot-scope="row">
         <!-- Checkbox column -->
@@ -82,11 +87,11 @@
       </template>
 
       <template slot="type" slot-scope="row">
-        {{ipobj_type_list[row.item.type].text}}
+        {{iptype_list[row.item.type].text}}
       </template>
 
       <template slot="ipaddr_ver" slot-scope="row">
-        {{ipobj_ipver_list[row.item.ipaddr_ver].text}}
+        {{ipver_list[row.item.ipaddr_ver].text}}
       </template>
 
       <template slot="details" slot-scope="row">
@@ -128,11 +133,12 @@
 
 <script>
 
-import * as utils from "./utils.js";
-import { ipobj_fields } from "./objfields.js";
+import * as ipobj from "../../nslib/ipobj";
+import * as ipobjview from "../../nslib/ipobjView";
 import * as objset from  "../../nslib/objset";
-import * as objclass from  "./objclass.js";
-// import * as nsrule from  "./nsrules.js";
+import * as misc from "../../nslib/misc.js";
+import { ipobj_fields } from "./objfields.js";
+
 
 import "../../fa-config.js";
 import IpobjInput from "./IpobjInput";
@@ -152,10 +158,10 @@ export default {
       sort_changed: 0,
 
       ipobj_input_show: false,
-      ipobj_subobj_list: [],
+      subobj_list: [],
 
-      ipobj_type_list: objclass.ipobj_type_list,
-      ipobj_ipver_list: objclass.ipobj_ipver_list,
+      iptype_list: ipobj.iptype_list,
+      ipver_list: ipobj.ipver_list,
 
       selected_item: { items: [] },
       last_selected_item: null,
@@ -164,8 +170,9 @@ export default {
       sort_icon: "sort-amount-up",
 
       fields: ipobj_fields,
-      ipobjset: null,
+      ipobjset: new objset.objset(),
       // items: [],
+      isbusy: false,
       current_page: 2,
       per_page: 10,
       total_rows: 0,
@@ -183,14 +190,23 @@ export default {
   },
 
   mounted: function () {
+    var self = this;
 
-    this.$store.dispatch('get_ipobj');
-    let l = this.$store.state.ipobjstore.elements;
+    self.isbusy = true;
 
-    this.ipobjset = new objset.objset();
-    this.ipobjset.set_items(l);
+    this.$store.dispatch('refresh_ipobj').then(function(res) {
+      var l = self.$store.state.ipobjstore.elements;
 
-    console.log(this.ipobjset);
+      self.ipobjset.set_items(l);
+      self.total_rows = self.ipobjset.length;
+      self.isbusy = false;
+
+      self.$nextTick(function () {
+        self.$refs.ref_ipobj_table.refresh();
+        self.update_btn_state();
+      });
+
+    });
   },
 
   computed: {
@@ -198,11 +214,6 @@ export default {
 
   methods: {
     get_items(ctx, callback) {
-      if (!this.ipobjset) {
-        console.log("ipobjset os null");
-        return null;
-      }
-
       this.total_rows = this.ipobjset.length;
       return this.ipobjset.elements;
     },
@@ -240,35 +251,18 @@ export default {
     },
 
     on_new() {
-      let j = {
-        id: 0,
-      title: "joke 3",
-      content: "joke 333",
-      };
+      this.indeterminate = false;
+      this.toggle_select_all(false);
 
-      let joke = this.$store.state.jokelist.JokeList;
-      console.log(joke);
-
-      let l = this.$store.state.joke.list;
-      console.log(l);
-
-      this.$store.dispatch('addJoke',j);
-      this.$store.dispatch('delJoke', 1);
-      joke = this.$store.state.jokelist.JokeList
-      console.log(joke);
-
-      // this.indeterminate = false;
-      // this.toggle_select_all(false);
-
-      // this.$root.$emit('bv::hide::tooltip');
-      // this.change_ipobj_dlg(true);
+      this.$root.$emit('bv::hide::tooltip');
+      this.change_ipobj_dlg(true);
     },
 
     on_edit() {
       this.$root.$emit('bv::hide::tooltip');
       if (this.last_selected_item && this.last_selected_item.children.length > 0) {
         let c = this.last_selected_item.children;
-        this.ipobj_subobj_list = [];
+        this.subobj_list = [];
         c.forEach(i => {
           let node = this.ipobjset.get_root_node(i);
           let info = {
@@ -276,7 +270,7 @@ export default {
             // text: node.name
           };
 
-          this.ipobj_subobj_list.push(info);
+          this.subobj_list.push(info);
         });
       }
 
@@ -318,14 +312,14 @@ export default {
       this.$refs.ref_ipobj_table.refresh();
     },
 
-    on_submit_ipobj_input(ipobj) {
-      // utils.print_json(ipobj, "submitted ipobj:");
-      this.ipobjset.apply_obj(ipobj);
+    on_submit_ipobj_input(new_ipobj) {
+      misc.print_json(ipobj, "submitted ipobj:");
+      this.ipobjset.apply_obj(new_ipobj);
       this.$refs.ref_ipobj_table.refresh();
     },
 
     on_close_ipobj_input() {
-      //console.log("close objclass");
+      //console.log("close ipobj");
       // todo reset contexts in child
 
       this.indeterminate = false;
@@ -353,7 +347,6 @@ export default {
     },
 
     select_row(item) {
-      console.log(item);
       item._selected = !item._selected;
       let idx = this.selected_item.items.indexOf(item);
 

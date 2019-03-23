@@ -10,13 +10,13 @@ import "./enum.js";
 export var iptype = lodash.enum("group", "netmask", "range");
 export var ipver = lodash.enum("v4", "v6");
 
-export const ipobj_type_list = [
+export const iptype_list = [
   { text: "Group", value: iptype.group },
   { text: "Netmask", value: iptype.netmask },
   { text: "Range", value: iptype.range },
 ];
 
-export const ipobj_ipver_list = [
+export const ipver_list = [
   { text: "IPv4", value: ipver.v4 },
   { text: "IPv6", value: ipver.v6 }
 ];

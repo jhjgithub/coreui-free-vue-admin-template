@@ -3,13 +3,19 @@ import axios from "axios";
 
 export default {
 
-  get_ipobj: function (cb) {
-    var tmp = Date.parse(new Date()).toString();
-    tmp = tmp.substr(0, 10);
+  refresh_ipobj: function (cb) {
+    // var tmp = Date.parse(new Date()).toString();
+    // tmp = tmp.substr(0, 10);
 
-    var url = "http://japi.juhe.cn/joke/content/list.from?sort=&page=&pagesize=20&time=" + tmp + "&key=4938e9af16277c6209ca00a683d96849";
-    axios.get("https://bird.ioliu.cn/v1/?url=" + url).then(function (data) {
-      cb(data.data.result.data);
+    var url = "http://localhost:3000/ipobjs";
+    axios.get(url).then(function (result) {
+      if (result.status == 200) {
+        // console.log(result.data);
+        cb(result.data);
+      }
+      else {
+        console.log(result);
+      }
     });
   },
 

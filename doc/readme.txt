@@ -14,3 +14,7 @@ This solves changing font face, but not font size. The line heights are hard-cod
 C:\Users\정지호\AppData\Local\Programs\Microsoft VS Code\resources\app\out\vs\workbench\workbench.main.css
 .part>.content
 { font-family: D2Coding, Courier New, Consolas, monospace; font-size: 16px; }
+
+
+### API 서버 실행 방법:
+E:\src\vue\json-server> json-server --watch db.json

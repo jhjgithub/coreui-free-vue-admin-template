@@ -48,22 +48,22 @@
               <b-input-group size="sm" class="mb-2">
                 <b-input-group-text class="right-side-label" slot="prepend">Address Type</b-input-group-text>
                 <b-form-radio-group buttons button-variant="outline-secondary" class="ml-1" size="sm" v-model="local_ipobj.type"
-                  :options="ipobj_type_list" @input="on_change_objtype" />
-                <b-form-radio-group v-if="local_ipobj.type != ipobj_type.group" class="ml-1" buttons button-variant="outline-secondary"
-                  size="sm" v-model="local_ipobj.ipaddr_ver" :options="ipobj_ipver_list" />
+                  :options="iptype_list" @input="on_change_objtype" />
+                <b-form-radio-group v-if="local_ipobj.type != iptype.group" class="ml-1" buttons button-variant="outline-secondary"
+                  size="sm" v-model="local_ipobj.ipaddr_ver" :options="ipver_list" />
               </b-input-group>
             </b-row>
 
             <b-row>
               <b-input-group size="sm" class="mb-2">
                 <b-input-group-text class="right-side-label" slot="prepend">IP Address</b-input-group-text>
-                <b-form-input :disabled="local_ipobj.type === ipobj_type.group" class="ip_addr" size="sm" type="text" key="start_ip"
+                <b-form-input :disabled="local_ipobj.type === iptype.group" class="ip_addr" size="sm" type="text" key="start_ip"
                   name="start_ip" v-model="local_ipobj.ipaddr_start" v-validate="{ip: true, required: true}" :state="validate_state('start_ip')"
                   placeholder="Enter IP address" />
-                <b-form-input v-if="local_ipobj.type === ipobj_type.netmask" class="ip_mask ml-1" size="sm" type="text" key="mask"
+                <b-form-input v-if="local_ipobj.type === iptype.netmask" class="ip_mask ml-1" size="sm" type="text" key="mask"
                   name="mask" v-model="local_ipobj.netmask" v-validate="{between:[1,32], required: true} " :state="validate_state('mask')"
                   placeholder="Netmask" />
-                <b-form-input v-if="local_ipobj.type === ipobj_type.range" class="ip_addr ml-1" size="sm" type="text" key="end_ip"
+                <b-form-input v-if="local_ipobj.type === iptype.range" class="ip_addr ml-1" size="sm" type="text" key="end_ip"
                   name="end_ip" v-model="local_ipobj.ipaddr_end" v-validate="{ip: true, required: true}" :state="validate_state('end_ip')"
                   placeholder="Enter IP address" />
               </b-input-group>
@@ -74,8 +74,8 @@
                 <b-input-group-text class="right-side-label" slot="prepend">Subobject</b-input-group-text>
                 <!-- Subobj -->
 
-                <b-form-select ref="ref_subobj" multiple :select-size="5" @focusout.native="on_focus_out" v-model="selected_subobj"
-                  key="subobj" name="subobj" v-validate="'subobj_len'" :state="validate_state('subobj')" :options="local_subobj_list" />
+                <b-form-select ref="ref_subobj" multiple :select-size="5" @focusout.native="on_focus_out" v-model="selected_subipobjs"
+                  key="subobj" name="subobj" v-validate="'subobj_len'" :state="validate_state('subobj')" :options="local_sub_ipobjs" />
 
                 <b-col sm="2" class="align-self-center">
                   <div>
@@ -113,9 +113,9 @@
 </template>
 
 <script>
-import * as lodash from 'lodash'
-import * as objclass from "./objclass.js";
-import * as utils from "./utils.js";
+import {iptype, iptype_list, ipver, ipver_list} from "../../nslib/ipobj";
+import * as ipobjview from "../../nslib/ipobjView";
+import * as misc from "../../nslib/misc.js";
 
 
 export default {
@@ -126,7 +126,7 @@ export default {
       type: Object,
       default: () => { }
     },
-    subobj_list: {
+    sub_ipobjs: {
       tyep: Array,
       default: () => []
     },
@@ -138,25 +138,24 @@ export default {
       type: String,
       default: "new",
     },
-    selected_item: {
+    selected_ipobjs: {
       type: Object,
       default: () => { }
     }
-    // subobj: []
   },
   data() {
     return {
-      local_ipobj: new objclass.ipobj(),
-      local_subobj_list: [],
-      local_selected_items: this.selected_item.items,
+      local_ipobj: new ipobjview.ipobjView(),
+      local_sub_ipobjs: [],
+      local_selected_ipobjs: this.selected_ipobjs.items,
       local_show: false,
       local_created_date: "",
-      ipobj_type: objclass.ipobj_type,
-      ipobj_ipver: objclass.ipobj_ipver,
+      iptype: iptype,
+      ipver: ipver,
       title: "New IP Address Object",
-      selected_subobj: [],
-      ipobj_type_list: objclass.ipobj_type_list,
-      ipobj_ipver_list: objclass.ipobj_ipver_list,
+      selected_subipobjs: [],
+      iptype_list: iptype_list,
+      ipver_list: ipver_list,
     };
   },
 
@@ -164,7 +163,7 @@ export default {
     this.$validator.extend('child_len', {
       getMessage: field => field + ' needs at least a child.',
       validate: value => {
-        if (this.local_ipobj.type == objclass.ipobj_type.group) {
+        if (this.local_ipobj.type == iptype.group) {
           let l = this.local_ipobj.children.length;
           return l > 0;
         }
@@ -180,8 +179,8 @@ export default {
       let v = true;
       let r = false;
 
-      if (this.local_ipobj.type == objclass.ipobj_type.group) {
-        let l = this.local_subobj_list.length;
+      if (this.local_ipobj.type == iptype.group) {
+        let l = this.local_sub_ipobjs.length;
         v = l > 0;
         r = true;
       }
@@ -229,22 +228,22 @@ export default {
       }
       else {
         // hide myself
-        this.local_ipobj = new objclass.ipobj();
-        this.selected_subobj = [];
-        this.local_subobj_list = [];
+        this.local_ipobj = new ipobjview.ipobjView();
+        this.selected_subipobjs = [];
+        this.local_sub_ipobjs = [];
       }
     },
     show(new_val, old_val) {
       this.local_show = this.show;
     },
-    selected_item: {
+    selected_ipobjs: {
       // immediate: true,
       deep: true,
       handler(new_val, old_val) {
         this.update_subobj_btn_state();
       }
     },
-    selected_subobj(new_val, old_val) {
+    selected_subipobjs(new_val, old_val) {
       this.update_subobj_btn_state();
     }
   },
@@ -254,13 +253,13 @@ export default {
   methods: {
     init_local_ipobj(obj) {
       if (obj) {
-        this.local_ipobj = obj.clone_deep();
+        this.local_ipobj = misc.clone_deep(obj);
         this.local_ipobj._selected = false;
-        this.local_subobj_list = this.subobj_list;
+        this.local_sub_ipobjs = this.sub_ipobjs;
       }
       else {
         // new
-        let a = new objclass.ipobj();
+        let a = new ipobjview.ipobjView();
         a.init_id()
         a.init_created_date();
         this.local_ipobj = a;
@@ -275,16 +274,16 @@ export default {
     normalize() {
       let ipobj = this.local_ipobj;
       ipobj.children = [];
-      this.local_subobj_list.forEach((c) => {
+      this.local_sub_ipobjs.forEach((c) => {
         ipobj.children.push(c.value);
       });
 
-      if (ipobj.type == objclass.ipobj_type.group) {
+      if (ipobj.type == iptype.group) {
         ipobj.ipaddr_start = "";
         ipobj.ipaddr_end = "";
         ipobj.netmask = "";
       }
-      else if (ipobj.type == objclass.ipobj_type.netmask) {
+      else if (ipobj.type == iptype.netmask) {
         ipobj.ipaddr_end = "";
       }
       else {
@@ -309,7 +308,7 @@ export default {
       let f = this.veeFields[ref];
 
       if (f && (f.dirty || f.validated)) {
-        if (ref == 'subobj' && this.local_ipobj.type != objclass.ipobj_type.group) {
+        if (ref == 'subobj' && this.local_ipobj.type != iptype.group) {
           return null;
         }
 
@@ -344,24 +343,24 @@ export default {
     },
 
     on_add_subobj() {
-      let len = Object.keys(this.local_selected_items).length;
+      let len = Object.keys(this.local_selected_ipobjs).length;
       for (let i = 0; i < len; i++) {
-        let name = this.local_selected_items[i].name;
-        let id = this.local_selected_items[i].id;
+        let name = this.local_selected_ipobjs[i].name;
+        let id = this.local_selected_ipobjs[i].id;
 
         let c = {
           value: id,
           text: name,
         };
 
-        let e = this.local_subobj_list.find(item => item.value === id);
+        let e = this.local_sub_ipobjs.find(item => item.value === id);
         if (!e) {
-          this.local_subobj_list.push(c);
+          this.local_sub_ipobjs.push(c);
         }
       }
 
-      if (this.selected_subobj.length == 0) {
-        this.selected_subobj[0] = this.local_subobj_list[0];
+      if (this.selected_subipobjs.length == 0) {
+        this.selected_subipobjs[0] = this.local_sub_ipobjs[0];
       }
 
       if (this.validate_state('subobj' != null)) {
@@ -372,12 +371,12 @@ export default {
     },
 
     on_del_subobj() {
-      let len = this.selected_subobj.length;
+      let len = this.selected_subipobjs.length;
       let first_idx = 0;
 
       for (let i = 0; i < len; i++) {
-        let id = this.selected_subobj[i];
-        let idx = this.local_subobj_list.findIndex(item => item.value === id);
+        let id = this.selected_subipobjs[i];
+        let idx = this.local_sub_ipobjs.findIndex(item => item.value === id);
 
         if (idx == -1) {
           continue;
@@ -387,18 +386,18 @@ export default {
           first_idx = idx;
         }
 
-        this.local_subobj_list.splice(idx, 1);
+        this.local_sub_ipobjs.splice(idx, 1);
       }
 
-      this.selected_subobj = [];
-      len = this.local_subobj_list.length;
+      this.selected_subipobjs = [];
+      len = this.local_sub_ipobjs.length;
 
       if (len > 0) {
         if (first_idx >= len) {
           first_idx = len - 1;
         }
 
-        this.selected_subobj[0] = this.local_subobj_list[first_idx];
+        this.selected_subipobjs[0] = this.local_sub_ipobjs[first_idx];
       }
 
       this.$validator.validate('subobj');
@@ -406,12 +405,12 @@ export default {
     },
 
     on_moveup_subobj(event) {
-      let len = this.selected_subobj.length;
+      let len = this.selected_subipobjs.length;
       for (let i = 0; i < len; i++) {
-        let id = this.selected_subobj[i];
-        let idx = this.local_subobj_list.findIndex(item => item.value === id);
+        let id = this.selected_subipobjs[i];
+        let idx = this.local_sub_ipobjs.findIndex(item => item.value === id);
         if (idx > 0) {
-          utils.array_move(this.local_subobj_list, idx, idx - 1);
+          misc.array_move(this.local_sub_ipobjs, idx, idx - 1);
         }
         else if (i == 0 && idx == 0) {
           return;
@@ -420,14 +419,14 @@ export default {
     },
 
     on_movedown_subobj(event) {
-      let len = this.selected_subobj.length;
-      let max_idx = this.local_subobj_list.length - 1;
+      let len = this.selected_subipobjs.length;
+      let max_idx = this.local_sub_ipobjs.length - 1;
 
       for (let i = len - 1; i >= 0; i--) {
-        let id = this.selected_subobj[i];
-        let idx = this.local_subobj_list.findIndex(item => item.value === id);
+        let id = this.selected_subipobjs[i];
+        let idx = this.local_sub_ipobjs.findIndex(item => item.value === id);
         if (idx < max_idx) {
-          utils.array_move(this.local_subobj_list, idx, idx + 1);
+          misc.array_move(this.local_sub_ipobjs, idx, idx + 1);
         }
         else if (i == len - 1) {
           return;
@@ -438,7 +437,7 @@ export default {
     on_focus_out() {
       // var vm = this;
       // setTimeout(function() {
-      //   vm.selected_subobj = [];
+      //   vm.selected_subipobjs = [];
       // }, 300);
     },
 
@@ -447,16 +446,16 @@ export default {
         return;
       }
 
-      let len = Object.keys(this.local_selected_items).length;
+      let len = Object.keys(this.local_selected_ipobjs).length;
 
       if (this.$refs.ref_add_subobj)
         this.$refs.ref_add_subobj.disabled = len <= 0;
       if (this.$refs.ref_del_subobj)
-        this.$refs.ref_del_subobj.disabled = this.selected_subobj.length <= 0;
+        this.$refs.ref_del_subobj.disabled = this.selected_subipobjs.length <= 0;
       if (this.$refs.ref_up_subobj)
-        this.$refs.ref_up_subobj.disabled = this.selected_subobj.length <= 0;
+        this.$refs.ref_up_subobj.disabled = this.selected_subipobjs.length <= 0;
       if (this.$refs.ref_down_subobj)
-        this.$refs.ref_down_subobj.disabled = this.selected_subobj.length <= 0;
+        this.$refs.ref_down_subobj.disabled = this.selected_subipobjs.length <= 0;
     }
   },
 

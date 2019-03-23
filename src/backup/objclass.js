@@ -1,8 +1,7 @@
 import * as lodash from "lodash";
-import * as utils from "./utils.js";
+import * as misc from "../../nslib/misc.js";
 import "./enum.js";
 import * as baseclass from "./baseclass.js";
-
 
 /////////////////////////////////////////////////////////////////////////
 
@@ -17,10 +16,7 @@ export const ipobj_type_list = [
   { text: "Range", value: ipobj_type.range },
 ];
 
-export const ipobj_ipver_list = [
-  { text: "IPv4", value: ipobj_ipver.v4 },
-  { text: "IPv6", value: ipobj_ipver.v6 }
-];
+export const ipobj_ipver_list = [{ text: "IPv4", value: ipobj_ipver.v4 }, { text: "IPv6", value: ipobj_ipver.v6 }];
 
 export class ipobj extends baseclass.baseobj {
   constructor(id) {
@@ -213,7 +209,7 @@ export class objset {
       });
     }
 
-    // utils.print_json(parent, "after child parent");
+    // misc.print_json(parent, "after child parent");
 
     let idx = this.get_node_index(node);
     this.remove_at(idx);
@@ -236,8 +232,8 @@ export class objset {
           c._depth = parent._depth + 1;
           c._fix_idx = -1;
 
-          utils.array_empty(c._parent_id);
-          utils.array_empty(c._visible_child);
+          misc.array_empty(c._parent_id);
+          misc.array_empty(c._visible_child);
 
           // set parent id
           c._parent_id.push(parent.id);
@@ -267,7 +263,7 @@ export class objset {
       this.remove_at(i);
     });
 
-    utils.array_empty(parent._visible_child);
+    misc.array_empty(parent._visible_child);
   }
 
   normalize_nodes(nodes = null, depth = 0) {

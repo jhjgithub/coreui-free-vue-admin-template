@@ -108,7 +108,7 @@ export class objset {
       });
     }
 
-    // miscs.print_json(parent, "after child parent");
+    // misc.print_json(parent, "after child parent");
 
     let idx = this.get_node_index(node);
     this.remove_at(idx);
@@ -131,8 +131,8 @@ export class objset {
           c._depth = parent._depth + 1;
           c._fix_idx = -1;
 
-          miscs.array_empty(c._parent_id);
-          miscs.array_empty(c._visible_child);
+          misc.array_empty(c._parent_id);
+          misc.array_empty(c._visible_child);
 
           // set parent id
           c._parent_id.push(parent.id);
@@ -162,7 +162,7 @@ export class objset {
       this.remove_at(i);
     });
 
-    miscs.array_empty(parent._visible_child);
+    misc.array_empty(parent._visible_child);
   }
 
   normalize_nodes(nodes = null, depth = 0) {
@@ -312,13 +312,13 @@ export class objset {
 
     if (oldobj) {
       let v = oldobj._visible_child;
-      miscs.assign_deep(oldobj, node);
+      misc.assign_deep(oldobj, node);
       oldobj.visible_child = v;
       return;
     }
 
-    let newobj = miscs.clone_deep(node);
-    this.unshift(newobj);
+    let newobj = misc.clone_deep(node);
+    this.elements.unshift(newobj);
     this.normalize_nodes();
   }
 }

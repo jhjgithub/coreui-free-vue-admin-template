@@ -1,8 +1,13 @@
+import axios from "axios";
 import restHelper from "../../api/restHelper";
 import * as ipobj from "../../nslib/ipobj";
 
 const state = {
   elements: [],
+};
+
+const getters = {
+  get_all_ipobj() {},
 };
 
 const actions = {
@@ -18,13 +23,30 @@ const actions = {
     });
   },
 
-  get_ipobj({ commit }) {
-    // restHelper.get_ipobj(function(res) {
-    //   commit("GET_IPOBJ", { res });
+  refresh_ipobj({ commit }) {
+    // restHelper.refresh_ipobj(function(res) {
+    //   commit("REFRESH_IPOBJ", { res });
     // });
 
-    let res = init_sample_ipobj();
-    commit("GET_IPOBJ", { res });
+    return new Promise((resolve, reject) => {
+      var url = "http://localhost:3000/ipobjs";
+      axios.get(url)
+        .then(function (result) {
+          // console.log(result);
+          const data = result.data;
+          if (result.status == 200) {
+            commit("REFRESH_IPOBJ", { data });
+          }
+          else {
+            console.log(result);
+          }
+
+          resolve(result);
+        })
+        .catch(function(err) {
+          reject(err);
+        });
+    });
   },
 };
 
@@ -40,12 +62,14 @@ const mutations = {
     // }
   },
 
-  GET_IPOBJ(state, { res }) {
-    state.elements = res;
+  REFRESH_IPOBJ(state, res) {
+    state.elements = res.data;
+    // state.elements = init_sample_ipobj();
   },
 };
 
 export default {
+  getters,
   state,
   actions,
   mutations,
