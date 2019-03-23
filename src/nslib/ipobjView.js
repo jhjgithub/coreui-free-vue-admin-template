@@ -1,4 +1,4 @@
-import * as ipobj from "ipobj";
+import * as ipobj from "./ipobj";
 
 // import * as lodash from "lodash";
 // import "./enum.js";
@@ -7,7 +7,7 @@ import * as ipobj from "ipobj";
 
 /////////////////////////////////////////////////////////////////////////
 
-export class ipobjExt extends ipobj.ipobj {
+export class ipobjView extends ipobj.ipobj {
   constructor(id) {
     super(id);
 

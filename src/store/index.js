@@ -6,6 +6,8 @@ import imgs from "./modules/imgs";
 import jokelist from "./modules/jokelist";
 import today from "./modules/today";
 import user from "./modules/user";
+import ipobjstore from "./modules/ipobjstore";
+import svcobjstore from "./modules/svcobjstore";
 
 Vue.use(Vuex);
 
@@ -17,5 +19,7 @@ export default new Vuex.Store({
     jokelist,
     today,
     user,
+    ipobjstore,
+    svcobjstore,
   },
 });

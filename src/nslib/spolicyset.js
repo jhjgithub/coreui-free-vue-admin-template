@@ -10,13 +10,13 @@ import * as spolicy from "spolicy.js";
 
 ///////////////////////////////////////////////////////
 
-export const NSRULESET_VER = 1.0;
-export const NSRULESET_ID = "NetShield";
+export const NS_RULESET_VER = 1.0;
+export const NS_RULESET_ID = "NetShield";
 
 export class spolicyset {
   constructor() {
-    this.ver = NSRULESET_VER;
-    this.id = NSRULESET_ID;
+    this.ver = NS_RULESET_VER;
+    this.id = NS_RULESET_ID;
     this.desc = "This is NetShield Rules";
     this.firewall = [];
     this.nat = [];

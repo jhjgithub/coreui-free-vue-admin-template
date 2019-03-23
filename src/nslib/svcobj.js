@@ -1,18 +1,20 @@
 import * as lodash from "lodash";
 import "./enum.js";
 
+// import "./enum.js";
 // import * as utils from "./utils.js";
 // import * as baseclass from "./baseclass.js";
 
 /////////////////////////////////////////////////////////////////////////
 
-export var svcobj_type = lodash.enum("single", "ragne", "group");
-export var svcobj_protocol = lodash.enum("icmp=1", "tcp=6", "udp=17", "all=255");
+export var svctype = lodash.enum("single", "ragne", "group");
+export var svcprotocol = lodash.enum("icmp=1", "tcp=6", "udp=17", "all=255");
+export var any_port = 0;
 
 export const svcobj_type_list = [
-  { text: "Signle", value: svcobj_type.single },
-  { text: "Range", value: svcobj_type.range },
-  { text: "Group", value: svcobj_type.group },
+  { text: "Signle", value: svctype.single },
+  { text: "Range", value: svctype.range },
+  { text: "Group", value: svctype.group },
 ];
 
 export class svcobj {
@@ -21,12 +23,10 @@ export class svcobj {
     this.name = "";
     this.created_date = "";
     this.desc = "";
-    this.type = svcobj_type.single;
+    this.type = svctype.single;
 
-    this.protocol = svcobj_protocol.tcp;
-    this.port_start = 0;
-    this.port_end = 0;
-
+    this.protocol = svcprotocol.tcp;
+    this.port_start = any_port;
+    this.port_end = any_port;
   }
-
 }

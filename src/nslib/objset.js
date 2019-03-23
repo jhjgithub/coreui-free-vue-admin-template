@@ -1,7 +1,8 @@
 // import * as lodash from "lodash";
 // import "./enum.js";
-import * as utils from "./utils.js";
 
+import * as ipobjview from "./ipobjView";
+import * as misc from "./misc.js";
 
 /////////////////////////////////////////////////////////
 
@@ -40,6 +41,16 @@ export class objset {
     });
 
     return i;
+  }
+
+  set_items(items) {
+    let len = items.length;
+
+    for (let i = 0; i < len; i++) {
+      let item = new ipobjview.ipobjView();
+      misc.assign_deep(item, items[i]);
+      this.push(item);
+    }
   }
 
   clone_item(node) {
@@ -97,7 +108,7 @@ export class objset {
       });
     }
 
-    // utils.print_json(parent, "after child parent");
+    // miscs.print_json(parent, "after child parent");
 
     let idx = this.get_node_index(node);
     this.remove_at(idx);
@@ -120,8 +131,8 @@ export class objset {
           c._depth = parent._depth + 1;
           c._fix_idx = -1;
 
-          utils.array_empty(c._parent_id);
-          utils.array_empty(c._visible_child);
+          miscs.array_empty(c._parent_id);
+          miscs.array_empty(c._visible_child);
 
           // set parent id
           c._parent_id.push(parent.id);
@@ -151,7 +162,7 @@ export class objset {
       this.remove_at(i);
     });
 
-    utils.array_empty(parent._visible_child);
+    miscs.array_empty(parent._visible_child);
   }
 
   normalize_nodes(nodes = null, depth = 0) {
@@ -301,12 +312,12 @@ export class objset {
 
     if (oldobj) {
       let v = oldobj._visible_child;
-      utils.assign_deep(oldobj, node);
+      miscs.assign_deep(oldobj, node);
       oldobj.visible_child = v;
       return;
     }
 
-    let newobj = utils.clone_deep(node);
+    let newobj = miscs.clone_deep(node);
     this.unshift(newobj);
     this.normalize_nodes();
   }

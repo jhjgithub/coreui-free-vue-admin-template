@@ -130,6 +130,7 @@
 
 import * as utils from "./utils.js";
 import { ipobj_fields } from "./objfields.js";
+import * as objset from  "../../nslib/objset";
 import * as objclass from  "./objclass.js";
 // import * as nsrule from  "./nsrules.js";
 
@@ -163,7 +164,8 @@ export default {
       sort_icon: "sort-amount-up",
 
       fields: ipobj_fields,
-      items: [],
+      ipobjset: null,
+      // items: [],
       current_page: 2,
       per_page: 10,
       total_rows: 0,
@@ -181,12 +183,30 @@ export default {
   },
 
   mounted: function () {
-    // nsrule.init_sample_nsruleset();
+
+    this.$store.dispatch('get_ipobj');
+    let l = this.$store.state.ipobjstore.elements;
+
+    this.ipobjset = new objset.objset();
+    this.ipobjset.set_items(l);
+
+    console.log(this.ipobjset);
   },
 
   computed: {
   },
+
   methods: {
+    get_items(ctx, callback) {
+      if (!this.ipobjset) {
+        console.log("ipobjset os null");
+        return null;
+      }
+
+      this.total_rows = this.ipobjset.length;
+      return this.ipobjset.elements;
+    },
+
     get_sort_by() {
       return this.sort_by;
     },
@@ -250,7 +270,7 @@ export default {
         let c = this.last_selected_item.children;
         this.ipobj_subobj_list = [];
         c.forEach(i => {
-          let node = this.items.get_root_node(i);
+          let node = this.ipobjset.get_root_node(i);
           let info = {
             value: node.id,
             // text: node.name
@@ -266,7 +286,7 @@ export default {
     on_clone() {
       this.selected_item.items.forEach(item => {
         if (item._depth == 0) {
-          this.items.clone_item(item);
+          this.ipobjset.clone_item(item);
         }
       });
 
@@ -287,11 +307,11 @@ export default {
       this.show_ipobjdel_confirm = false;
       this.selected_item.items.forEach(item => {
         if (item._depth == 0) {
-          this.items.remove_item(item);
+          this.ipobjset.remove_item(item);
         }
         else {
           // subitem은 edit에서 편집해야 한다.
-          // this.items.remove_child_item(item);
+          // this.ipobjset.remove_child_item(item);
         }
       });
 
@@ -300,7 +320,7 @@ export default {
 
     on_submit_ipobj_input(ipobj) {
       // utils.print_json(ipobj, "submitted ipobj:");
-      this.items.apply_obj(ipobj);
+      this.ipobjset.apply_obj(ipobj);
       this.$refs.ref_ipobj_table.refresh();
     },
 
@@ -318,12 +338,16 @@ export default {
     },
 
     get_selected_items() {
-      for (var i = 0; i < this.items.length; i++) {
+      /*
+      let items = this.ipobjset.elements;
+
+      for (var i = 0; i < this.ipobjset.length; i++) {
         item = items[i];
         if (item._selected) {
           return item;
         }
       }
+      */
 
       return null;
     },
@@ -354,8 +378,8 @@ export default {
       }
 
       let selcnt = 0;
-      for (var i = 0; i < this.items.length; i++) {
-        if (this.items.elements[i]._selected) {
+      for (var i = 0; i < this.ipobjset.length; i++) {
+        if (this.ipobjset.elements[i]._selected) {
           selcnt ++;
         }
       }
@@ -364,7 +388,7 @@ export default {
         this.select_all = false;
         this.indeterminate = false;
       }
-      else if (selcnt == this.items.length) {
+      else if (selcnt == this.ipobjset.length) {
         this.select_all = true;
         this.indeterminate = false;
       }
@@ -379,8 +403,8 @@ export default {
     toggle_select_all(checked) {
       this.select_all = checked;
       if (this.select_all) {
-        for (var i = 0; i < this.items.length; i++) {
-          let item = this.items.elements[i];
+        for (var i = 0; i < this.ipobjset.length; i++) {
+          let item = this.ipobjset.elements[i];
           item._selected = true;
 
           if (this.last_selected_item == null) {
@@ -394,8 +418,8 @@ export default {
       }
       else {
         this.last_selected_item = null;
-        for (var i = 0; i < this.items.length; i++) {
-          let item = this.items.elements[i];
+        for (var i = 0; i < this.ipobjset.length; i++) {
+          let item = this.ipobjset.elements[i];
           item._selected = false;
 
           let idx = this.selected_item.items.indexOf(item);
@@ -430,10 +454,10 @@ export default {
     },
 
     toggle_show_child(item) {
-      // console.log(this.items);
+      // console.log(this.ipobjset);
       // console.log("clicked first_name:" + item.id);
-      // toggle_child(this.items, item.obj_id);
-      this.items.toggle_child(item);
+      // toggle_child(this.ipobjset, item.obj_id);
+      this.ipobjset.toggle_child(item);
       this.$refs.ref_ipobj_table.refresh();
     },
 
@@ -455,8 +479,8 @@ export default {
         this.sort_desc = false;
         this.sort_by = null;
 
-        this.items.sort_data(null, false);
-        // sort_data(this.items, null, false);
+        this.ipobjset.sort_data(null, false);
+        // sort_data(this.ipobjset, null, false);
 
         return
       }
@@ -489,22 +513,8 @@ export default {
         this.sort_icon = "sort-amount-up";
       }
 
-      this.items.sort_data(this.sort_by, this.sort_desc);
-      // sort_data(this.items, this.sort_by, this.sort_desc);
-    },
-
-    get_items(ctx, callback) {
-      if (this.items.length < 1) {
-        let l = new objclass.objset();
-        this.items = l;
-
-        objclass.init_sample_ipobj(this.items);
-        this.items.normalize_nodes();
-        this.update_btn_state();
-      }
-
-      this.total_rows = this.items.length;
-      return this.items.elements;
+      this.ipobjset.sort_data(this.sort_by, this.sort_desc);
+      // sort_data(this.ipobjset, this.sort_by, this.sort_desc);
     },
 
     show_datetime(value) {

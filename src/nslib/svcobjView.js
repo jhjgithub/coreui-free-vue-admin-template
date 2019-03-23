@@ -8,7 +8,7 @@ import * as svcobj from "svcobj"
 
 /////////////////////////////////////////////////////////////////////////
 
-export class svcobjExt extends svcobj {
+export class svcobjView extends svcobj {
   constructor(id) {
     super(id);
 

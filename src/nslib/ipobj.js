@@ -7,18 +7,18 @@ import "./enum.js";
 
 /////////////////////////////////////////////////////////////////////////
 
-export var ipobj_type = lodash.enum("group", "netmask", "range");
-export var ipobj_ipver = lodash.enum("v4", "v6");
+export var iptype = lodash.enum("group", "netmask", "range");
+export var ipver = lodash.enum("v4", "v6");
 
 export const ipobj_type_list = [
-  { text: "Group", value: ipobj_type.group },
-  { text: "Netmask", value: ipobj_type.netmask },
-  { text: "Range", value: ipobj_type.range },
+  { text: "Group", value: iptype.group },
+  { text: "Netmask", value: iptype.netmask },
+  { text: "Range", value: iptype.range },
 ];
 
 export const ipobj_ipver_list = [
-  { text: "IPv4", value: ipobj_ipver.v4 },
-  { text: "IPv6", value: ipobj_ipver.v6 }
+  { text: "IPv4", value: ipver.v4 },
+  { text: "IPv6", value: ipver.v6 }
 ];
 
 export class ipobj {
@@ -27,10 +27,10 @@ export class ipobj {
     this.name = "";
     this.created_date = "";
     this.desc = "";
-    this.type = ipobj_type.netmask;
+    this.type = iptype.netmask;
 
     // for network
-    this.ipaddr_ver = ipobj_ipver.v4;
+    this.ipaddr_ver = ipver.v4;
     this.ipaddr_start = "";
     this.ipaddr_end = "";
     this.netmask = 0;
