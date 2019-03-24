@@ -7,7 +7,9 @@ const state = {
 };
 
 const getters = {
-  get_all_ipobj() {},
+  get_ipobj(state) {
+    return state.elements;
+  },
 };
 
 const actions = {
@@ -23,17 +25,57 @@ const actions = {
     });
   },
 
+  async refresh_ipobj_async({ commit }) {
+    var url = "http://localhost:3000/ipobjs";
+
+    let result = await restHelper.async_get(url);
+
+    if (result.status == 200) {
+      const data = result.data;
+      commit("REFRESH_IPOBJ", { data });
+    }
+
+    return result;
+  },
+
+  async refresh_ipobj_async1({ commit }) {
+    var url = "http://localhost:3000/ipobjs";
+
+    try {
+      let result = await axios.get(url);
+
+      if (result.status == 200) {
+        const data = result.data;
+
+        console.log(data);
+
+        commit("REFRESH_IPOBJ", { data });
+        // return result.data;
+      }
+      else {
+        console.log(result);
+      }
+    }
+    catch (error) {
+      console.log(error);
+    }
+
+    return null;
+  },
+
   refresh_ipobj({ commit }) {
     // restHelper.refresh_ipobj(function(res) {
     //   commit("REFRESH_IPOBJ", { res });
     // });
 
+    var url = "http://localhost:3000/ipobjs";
+
     return new Promise((resolve, reject) => {
-      var url = "http://localhost:3000/ipobjs";
-      axios.get(url)
-        .then(function (result) {
-          // console.log(result);
+      axios
+        .get(url)
+        .then(function(result) {
           const data = result.data;
+
           if (result.status == 200) {
             commit("REFRESH_IPOBJ", { data });
           }
@@ -63,6 +105,7 @@ const mutations = {
   },
 
   REFRESH_IPOBJ(state, res) {
+    // console.log("Refresh ipobj ");
     state.elements = res.data;
     // state.elements = init_sample_ipobj();
   },

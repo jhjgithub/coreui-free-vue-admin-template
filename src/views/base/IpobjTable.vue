@@ -132,6 +132,7 @@
 
 
 <script>
+import { mapGetters } from 'vuex'
 
 import * as ipobj from "../../nslib/ipobj";
 import * as ipobjview from "../../nslib/ipobjView";
@@ -139,6 +140,7 @@ import * as objset from  "../../nslib/objset";
 import * as misc from "../../nslib/misc.js";
 import { ipobj_fields } from "./objfields.js";
 
+import restHelper from "../../api/restHelper";
 
 import "../../fa-config.js";
 import IpobjInput from "./IpobjInput";
@@ -190,26 +192,42 @@ export default {
   },
 
   mounted: function () {
-    var self = this;
+    this.isbusy = true;
 
-    self.isbusy = true;
+    var l = this.$store.state.ipobjstore.elements;
+    if (l && l.length > 0) {
+      var l = this.$store.state.ipobjstore.elements;
 
-    this.$store.dispatch('refresh_ipobj').then(function(res) {
-      var l = self.$store.state.ipobjstore.elements;
+      this.ipobjset.set_items(l);
+      this.total_rows = this.ipobjset.length;
+      this.isbusy = false;
+      this.$refs.ref_ipobj_table.refresh();
+      this.update_btn_state();
+    }
+    else {
+      console.log("Refresh ipobj at IpobjTable !");
 
-      self.ipobjset.set_items(l);
-      self.total_rows = self.ipobjset.length;
-      self.isbusy = false;
+      this.$store.dispatch('refresh_ipobj_async').then(res => {
+        var l = this.$store.state.ipobjstore.elements;
 
-      self.$nextTick(function () {
-        self.$refs.ref_ipobj_table.refresh();
-        self.update_btn_state();
+        this.ipobjset.set_items(l);
+        this.total_rows = this.ipobjset.length;
+        this.isbusy = false;
+
+        this.$nextTick(function () {
+          this.$refs.ref_ipobj_table.refresh();
+          this.update_btn_state();
+        });
+
       });
+    }
 
-    });
   },
 
   computed: {
+    ...mapGetters([
+      'get_ipobj'
+    ]),
   },
 
   methods: {

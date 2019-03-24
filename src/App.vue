@@ -4,7 +4,15 @@
 
 <script>
 export default {
-  name: 'app'
+  name: 'app',
+  mounted: function () {
+    // console.log("run app mounted !!!!");
+    this.$store.dispatch('refresh_ipobj_async').then(res => {
+      // console.log("updated ipobjs");
+      // console.log(res);
+
+    });
+  },
 }
 </script>
 

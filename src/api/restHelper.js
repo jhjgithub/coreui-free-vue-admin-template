@@ -2,6 +2,33 @@ import axios from "axios";
 
 
 export default {
+  // axios & async
+  // https://ryulog.tistory.com/139
+
+  async get_ipobj(url) {
+    try{
+      let response = await axios.get(url);
+      console.log(response);
+      return response;
+    }
+    catch (error) {
+      console.log(error);
+    }
+  
+    return null;
+  },
+
+  async async_get(url) {
+    try {
+      let result = await axios.get(url);
+      // console.log(result);
+      return result;
+    }
+    catch (error) {
+      console.log(error);
+      return error;
+    }
+  },
 
   refresh_ipobj: function (cb) {
     // var tmp = Date.parse(new Date()).toString();
@@ -18,8 +45,6 @@ export default {
       }
     });
   },
-
-
 
 
   getnews: function(cb) {
