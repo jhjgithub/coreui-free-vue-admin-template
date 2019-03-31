@@ -1,12 +1,12 @@
 // import * as lodash from "lodash";
 // import "./enum.js";
 
-import * as ipobjview from "./ipobjView";
+import * as ipobjview from "./ipobjview";
 import * as misc from "./misc.js";
 
 /////////////////////////////////////////////////////////
 
-export class objset {
+export class ObjSet {
   constructor() {
     this.elements = [];
   }
@@ -47,7 +47,7 @@ export class objset {
     let len = items.length;
 
     for (let i = 0; i < len; i++) {
-      let item = new ipobjview.ipobjView();
+      let item = new ipobjview.IpObjView();
       misc.assign_deep(item, items[i]);
       this.push(item);
     }

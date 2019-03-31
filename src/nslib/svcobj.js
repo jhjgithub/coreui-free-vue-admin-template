@@ -1,14 +1,13 @@
-import * as lodash from "lodash";
-import "./enum.js";
+// import * as lodash from "lodash";
+import Enum from "./enum.js";
 
-// import "./enum.js";
-// import * as utils from "./utils.js";
-// import * as baseclass from "./baseclass.js";
 
 /////////////////////////////////////////////////////////////////////////
 
-export var svctype = lodash.enum("single", "ragne", "group");
-export var svcprotocol = lodash.enum("icmp=1", "tcp=6", "udp=17", "all=255");
+// export var svctype = lodash.enum("single", "ragne", "group");
+// export var svcprotocol = lodash.enum("icmp=1", "tcp=6", "udp=17", "all=255");
+export var svctype = Enum("single", "ragne", "group");
+export var svcprotocol = Enum("icmp=1", "tcp=6", "udp=17", "all=255");
 export var any_port = 0;
 
 export const svcobj_type_list = [
@@ -17,7 +16,7 @@ export const svcobj_type_list = [
   { text: "Group", value: svctype.group },
 ];
 
-export class svcobj {
+export class SvcObj {
   constructor(id) {
     this.id = id;
     this.name = "";

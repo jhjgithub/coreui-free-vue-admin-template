@@ -123,7 +123,7 @@ export default {
 function init_sample_ipobj() {
   let ipobjset = [];
 
-  let a = new ipobj.ipobj();
+  let a = new ipobj.IpObj();
   a.id = "id-ssh-server";
   a.name = "ssh-server";
   a.desc = "SSH Server";
@@ -134,7 +134,7 @@ function init_sample_ipobj() {
   a.ipaddr_end = "204.152.188.196";
   ipobjset.push(a);
 
-  let b = new ipobj.ipobj();
+  let b = new ipobj.IpObj();
   b.id = "id-web-server";
   b.name = "WebServer2";
   b.desc = "Web server rule";
@@ -145,7 +145,7 @@ function init_sample_ipobj() {
   b.ipaddr_end = "0.0.0.0";
   ipobjset.push(b);
 
-  let c = new ipobj.ipobj();
+  let c = new ipobj.IpObj();
   c.id = "id-any-any";
   c.name = "Any-Any";
   c.desc = "Any network";

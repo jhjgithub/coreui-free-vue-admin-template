@@ -114,7 +114,7 @@
 
 <script>
 import {iptype, iptype_list, ipver, ipver_list} from "../../nslib/ipobj";
-import * as ipobjview from "../../nslib/ipobjView";
+import * as ipobjview from "../../nslib/ipobjview";
 import * as misc from "../../nslib/misc.js";
 
 
@@ -145,7 +145,7 @@ export default {
   },
   data() {
     return {
-      local_ipobj: new ipobjview.ipobjView(),
+      local_ipobj: new ipobjview.IpObjView(),
       local_sub_ipobjs: [],
       local_selected_ipobjs: this.selected_ipobjs.items,
       local_show: false,
@@ -259,7 +259,7 @@ export default {
       }
       else {
         // new
-        let a = new ipobjview.ipobjView();
+        let a = new ipobjview.IpObjView();
         a.init_id()
         a.init_created_date();
         this.local_ipobj = a;

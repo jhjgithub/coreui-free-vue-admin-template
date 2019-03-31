@@ -18,3 +18,6 @@ C:\Users\정지호\AppData\Local\Programs\Microsoft VS Code\resources\app\out\vs
 
 ### API 서버 실행 방법:
 E:\src\vue\json-server> json-server --watch db.json
+
+
+

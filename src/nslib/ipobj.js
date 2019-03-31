@@ -1,14 +1,11 @@
-import * as lodash from "lodash";
-import "./enum.js";
-
-// import * as utils from "./utils.js";
-// import * as baseclass from "./baseclass.js";
+// import * as lodash from "lodash";
+import Enum from "./enum.js";
 
 
 /////////////////////////////////////////////////////////////////////////
 
-export var iptype = lodash.enum("group", "netmask", "range");
-export var ipver = lodash.enum("v4", "v6");
+export var iptype = Enum("group", "netmask", "range");
+export var ipver = Enum("v4", "v6");
 
 export const iptype_list = [
   { text: "Group", value: iptype.group },
@@ -16,12 +13,9 @@ export const iptype_list = [
   { text: "Range", value: iptype.range },
 ];
 
-export const ipver_list = [
-  { text: "IPv4", value: ipver.v4 },
-  { text: "IPv6", value: ipver.v6 }
-];
+export const ipver_list = [{ text: "IPv4", value: ipver.v4 }, { text: "IPv6", value: ipver.v6 }];
 
-export class ipobj {
+export class IpObj {
   constructor(id) {
     this.id = id;
     this.name = "";

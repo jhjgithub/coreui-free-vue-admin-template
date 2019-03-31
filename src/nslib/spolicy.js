@@ -19,7 +19,7 @@ export var spolicy_any_port = 65536;
 export var spolicy_options = lodash.enum("log");
 export var nat_options = lodash.enum("arp_proxy", "dynamic_ip");
 
-export class natinfo {
+export class NatInfo {
   constructor(id) {
     this.id = id;
     this.ntype = spolicy_type_snat.napt;
@@ -30,7 +30,7 @@ export class natinfo {
 }
 
 // security policy
-export class spolicy {
+export class SecurityPolicy {
   constructor(id) {
     this.id = id;
     this.name = "";

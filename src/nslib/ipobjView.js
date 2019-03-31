@@ -1,13 +1,8 @@
 import * as ipobj from "./ipobj";
 
-// import * as lodash from "lodash";
-// import "./enum.js";
-// import * as utils from "./utils.js";
-// import * as baseclass from "./baseclass.js";
-
 /////////////////////////////////////////////////////////////////////////
 
-export class ipobjView extends ipobj.ipobj {
+export class IpObjView extends ipobj.IpObj {
   constructor(id) {
     super(id);
 

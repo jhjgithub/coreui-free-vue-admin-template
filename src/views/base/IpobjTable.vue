@@ -135,7 +135,7 @@
 import { mapGetters } from 'vuex'
 
 import * as ipobj from "../../nslib/ipobj";
-import * as ipobjview from "../../nslib/ipobjView";
+import * as ipobjview from "../../nslib/ipobjview";
 import * as objset from  "../../nslib/objset";
 import * as misc from "../../nslib/misc.js";
 import { ipobj_fields } from "./objfields.js";
@@ -172,7 +172,7 @@ export default {
       sort_icon: "sort-amount-up",
 
       fields: ipobj_fields,
-      ipobjset: new objset.objset(),
+      ipobjset: new objset.ObjSet(),
       // items: [],
       isbusy: false,
       current_page: 2,
@@ -203,6 +203,7 @@ export default {
       this.isbusy = false;
       this.$refs.ref_ipobj_table.refresh();
       this.update_btn_state();
+      // console.log(this.ipobjset);
     }
     else {
       console.log("Refresh ipobj at IpobjTable !");
@@ -217,6 +218,7 @@ export default {
         this.$nextTick(function () {
           this.$refs.ref_ipobj_table.refresh();
           this.update_btn_state();
+          // console.log(this.ipobjset);
         });
 
       });

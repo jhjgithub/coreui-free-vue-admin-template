@@ -1,14 +1,8 @@
 import * as svcobj from "svcobj"
 
-// import * as lodash from "lodash";
-// import * as utils from "./utils.js";
-// import "./enum.js";
-// import * as baseclass from "./baseclass.js";
-
-
 /////////////////////////////////////////////////////////////////////////
 
-export class svcobjView extends svcobj {
+export class SvcObjView extends svcobj.SvcObj {
   constructor(id) {
     super(id);
 

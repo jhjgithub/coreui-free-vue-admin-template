@@ -56,7 +56,7 @@ export default {
 function init_sample_svcobj() {
   let svcobjset = [];
 
-  let a = new svcobj();
+  let a = new svcobj.SvcObj();
   a.id = "id-ssh-svc";
   a.name = "ssh-svc";
   a.desc = "SSH svc";
@@ -67,7 +67,7 @@ function init_sample_svcobj() {
   a.port_end = 22;
   svcobjset.push(a);
 
-  let b = new svcobj();
+  let b = new svcobj.SvcObj();
   b.id = "id-web-svc";
   b.name = "web-svc";
   b.desc = "Web svc";
@@ -78,7 +78,7 @@ function init_sample_svcobj() {
   b.port_end = 80;
   svcobjset.push(b);
 
-  let c = new svcobj();
+  let c = new svcobj.SvcObj();
   c.id = "id-any-any";
   c.name = "Any-Any";
   c.desc = "Any service";

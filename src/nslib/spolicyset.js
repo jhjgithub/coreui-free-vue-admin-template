@@ -13,7 +13,7 @@ import * as spolicy from "spolicy.js";
 export const NS_RULESET_VER = 1.0;
 export const NS_RULESET_ID = "NetShield";
 
-export class spolicyset {
+export class SecurityPolicySet {
   constructor() {
     this.ver = NS_RULESET_VER;
     this.id = NS_RULESET_ID;
@@ -26,10 +26,10 @@ export class spolicyset {
 ///////////////////////////////////////////////
 
 export function init_sample_spolicyset() {
-  let r = new spolicyset();
+  let r = new SecurityPolicySet();
 
   // for ssh
-  let f1 = new spolicy.spolicy();
+  let f1 = new spolicy.SecurityPolicy();
 
   f1.name = "ssh Server";
   f1.stype = spolicy.spolicy_type.firewall;
