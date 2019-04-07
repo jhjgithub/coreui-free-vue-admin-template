@@ -78,7 +78,7 @@ export const ipobj_fields = [
   },
 ];
 
-export const secpolicy_fields = [
+export const spolicy_fields = [
   {
     key: "_selected",
     label: "",
@@ -91,7 +91,7 @@ export const secpolicy_fields = [
     label: "Name",
     icon: "user",
     sortable: true,
-    thStyle: { width: "200px", maxWidth: "100px", minWidth: "50px" },
+    thStyle: { width: "100px", maxWidth: "100px", minWidth: "50px" },
   },
   {
     key: "action",
@@ -104,23 +104,31 @@ export const secpolicy_fields = [
     key: "nics",
     label: "NICs",
     sortable: false,
-    formatter: 'show_nic',
-    thStyle: { width: "20px", maxWidth: "100px", minWidth: "50px" },
+    // formatter: 'show_nic',
+    thStyle: { width: "50px", maxWidth: "100px", minWidth: "50px" },
   },
   {
     key: "srcnet",
     label: "SRC Network",
     sortable: true,
-    formatter: 'show_srcnet',
+    // formatter: 'show_srcnet',
     thStyle: { width: "50px", maxWidth: "100px", minWidth: "50px" },
   },
   {
     key: "dstnet",
     label: "DST Network",
     sortable: true,
-    formatter: 'show_dstnet',
+    // formatter: 'show_dstnet',
     thStyle: { width: "50px", maxWidth: "100px", minWidth: "50px" },
   },
+  {
+    key: "options",
+    label: "Options",
+    sortable: false,
+    // formatter: 'show_options',
+    thStyle: { width: "50px", maxWidth: "100px", minWidth: "50px" },
+  },
+  /*
   {
     key: "schedule",
     label: "Schedule",
@@ -135,6 +143,7 @@ export const secpolicy_fields = [
     formatter: 'show_log',
     thStyle: { width: "50px", maxWidth: "100px", minWidth: "50px" },
   },
+  */
   {
     key: "created_date",
     label: "Created Date",

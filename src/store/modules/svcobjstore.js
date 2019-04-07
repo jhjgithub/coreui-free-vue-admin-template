@@ -1,8 +1,16 @@
+import axios from "axios";
 import restHelper from "../../api/restHelper";
 import * as svcobj from "../../nslib/svcobj";
+import * as misc from "../../nslib/misc";
 
 const state = {
   elements: [],
+};
+
+const getters = {
+  get_svcobj(state) {
+    return state.elements;
+  },
 };
 
 const actions = {
@@ -18,13 +26,42 @@ const actions = {
     });
   },
 
-  get_svcobj({ commit }) {
-    // restHelper.get_svcobj(function(res) {
-    //   commit("GET_SVCOBJ", { res });
-    // });
+  async refresh_svcobj_async({ commit }) {
+    var url = "http://localhost:3000/serviceobject";
 
-    let res = init_sample_svcobj();
-    commit("GET_SVCOBJ", { res });
+    let result = await restHelper.async_get(url);
+
+    if (result.status == 200) {
+      const data = result.data;
+      // misc.print_json(result.data, "refreshed svcobj:");
+      commit("REFRESH_SVCOBJ", { data });
+    }
+
+    return result;
+  },
+
+  refresh_spolicy({ commit }) {
+    var url = "http://localhost:3000/serviceobject";
+
+    return new Promise((resolve, reject) => {
+      axios
+        .get(url)
+        .then(function (result) {
+          const data = result.data;
+
+          if (result.status == 200) {
+            commit("REFRESH_SVCOBJ", { data });
+          }
+          else {
+            console.log(result);
+          }
+
+          resolve(result);
+        })
+        .catch(function (err) {
+          reject(err);
+        });
+    });
   },
 };
 
@@ -40,12 +77,14 @@ const mutations = {
     // }
   },
 
-  GET_SVCOBJ(state, { res }) {
-    state.elements = res;
+  REFRESH_SVCOBJ(state, res) {
+    state.elements = res.data;
   },
+
 };
 
 export default {
+  getters,
   state,
   actions,
   mutations,

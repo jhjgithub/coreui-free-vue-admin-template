@@ -1,5 +1,5 @@
 {
-  "ipobjs": [
+  "ipaddressobject": [
     {
       "id": "id-ssh-server",
       "name": "ssh-server",
@@ -31,6 +31,69 @@
       "ipaddr_end": "0.0.0.0"
     }
   ],
+  
+  "serviceobject": [
+    {
+      "id": "id-ssh-svc",
+      "name": "ssh-svc",
+      "desc": "SSH svc",
+      "created_date": "1549529617446",
+      "type": 0,
+      "protocol": 6,
+      "port_start": 22,
+      "port_end": 22
+    },
+    {
+      "id": "id-web-svc",
+      "name": "web-svc",
+      "desc": "Web svc",
+      "created_date": "1569529617446",
+      "type": 0,
+      "protocol": 6,
+      "port_start": 80,
+      "port_end": 80
+    }
+  ],
+
+  "securitypolicy": [
+    {
+      "id": "id-fw-1111",
+      "name": "ssh Server",
+      "created_date": "1509529617446",
+      "desc": "this is test",
+      "stype": 0,
+      "enable": true,
+      "actions": [0],
+      "innic": "eth0",
+      "outnic": "any",
+      "srcnet": "id-any-any",
+      "srcport": "any",
+      "dstnet": "id-ssh-server",
+      "dstport": "id-ssh-svc",
+      "schedule": 11,
+      "options": [0],
+      "natinfo": []
+    },
+    {
+      "id": "id-fw-web",
+      "name": "Web Server",
+      "created_date": "1539529617446",
+      "desc": "this is web",
+      "stype": 0,
+      "enable": false,
+      "actions": [ 1 ],
+      "innic": "eth0",
+      "outnic": "any",
+      "srcnet": "id-any-any",
+      "srcport": "any",
+      "dstnet": "id-web-server",
+      "dstport": "id-web-svc",
+      "schedule": null,
+      "options": [0],
+      "natinfo": []
+    }
+  ],
+
   "posts": [
     {
       "id": 1,

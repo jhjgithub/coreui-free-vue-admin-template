@@ -1,11 +1,6 @@
-import * as spolicy from "spolicy.js";
-
-// import * as lodash from "lodash";
-// import "./enum.js";
-
-// import * as utils from "./utils.js";
-// import * as baseclass from "./baseclass.js";
-// import * as objclass from "./objclass.js"
+import Enum from "./enum.js";
+import * as misc from "./misc.js";
+import * as spolicy from "./spolicy.js";
 
 
 ///////////////////////////////////////////////////////
@@ -18,9 +13,24 @@ export class SecurityPolicySet {
     this.ver = NS_RULESET_VER;
     this.id = NS_RULESET_ID;
     this.desc = "This is NetShield Rules";
-    this.firewall = [];
+    this.spolicy = [];
     this.nat = [];
   }
+
+  get spolicy_length() {
+    return this.spolicy.length;
+  }
+
+  set_spolicy_items(items) {
+    let len = items.length;
+
+    for (let i = 0; i < len; i++) {
+      let item = new spolicy.SecurityPolicy();
+      misc.assign_deep(item, items[i]);
+      this.spolicy.push(item);
+    }
+  }
+
 }
 
 ///////////////////////////////////////////////

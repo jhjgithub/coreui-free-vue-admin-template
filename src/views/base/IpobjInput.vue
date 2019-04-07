@@ -228,7 +228,7 @@ export default {
       }
       else {
         // hide myself
-        this.local_ipobj = new ipobjview.ipobjView();
+        this.local_ipobj = new ipobjview.IpObjView();
         this.selected_subipobjs = [];
         this.local_sub_ipobjs = [];
       }

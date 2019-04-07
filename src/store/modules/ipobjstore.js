@@ -1,6 +1,7 @@
 import axios from "axios";
 import restHelper from "../../api/restHelper";
 import * as ipobj from "../../nslib/ipobj";
+import * as misc from "../../nslib/misc";
 
 const state = {
   elements: [],
@@ -10,6 +11,22 @@ const getters = {
   get_ipobj(state) {
     return state.elements;
   },
+  get_ipobj_ip_address(state) {
+    return function (id) {
+      for (let i = 0; i < state.elements.length; i++) {
+        let item = state.elements[i];
+        if (item.id == id) {
+          // console.log(item);
+          if (item.ipaddr_start == "0.0.0.0") {
+            return "Any";
+          }
+          else {
+            return item.ipaddr_start + item.ipaddr_end;
+          }
+        }
+      }
+    }
+  }
 };
 
 const actions = {
@@ -26,12 +43,13 @@ const actions = {
   },
 
   async refresh_ipobj_async({ commit }) {
-    var url = "http://localhost:3000/ipobjs";
+    var url = "http://localhost:3000/ipaddressobject";
 
     let result = await restHelper.async_get(url);
 
     if (result.status == 200) {
       const data = result.data;
+      // misc.print_json(result.data, "refreshed ipobj:");
       commit("REFRESH_IPOBJ", { data });
     }
 
@@ -39,7 +57,7 @@ const actions = {
   },
 
   async refresh_ipobj_async1({ commit }) {
-    var url = "http://localhost:3000/ipobjs";
+    var url = "http://localhost:3000/ipaddressobject";
 
     try {
       let result = await axios.get(url);
@@ -68,7 +86,7 @@ const actions = {
     //   commit("REFRESH_IPOBJ", { res });
     // });
 
-    var url = "http://localhost:3000/ipobjs";
+    var url = "http://localhost:3000/ipaddressobject";
 
     return new Promise((resolve, reject) => {
       axios

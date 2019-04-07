@@ -22,6 +22,12 @@ import {
   faMinus,
   faCaretDown,
   faCaretUp,
+  faCaretRight,
+  faClock,
+  faSave,
+  faBan,
+  faEye,
+  faChevronRight,
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -43,6 +49,12 @@ library.add(
   faMinus,
   faCaretDown,
   faCaretUp,
+  faCaretRight,
+  faClock,
+  faSave,
+  faBan,
+  faEye,
+  faChevronRight,
 );
 
 import { 

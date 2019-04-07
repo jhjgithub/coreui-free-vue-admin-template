@@ -7,11 +7,16 @@ export default {
   name: 'app',
   mounted: function () {
     // console.log("run app mounted !!!!");
+
     this.$store.dispatch('refresh_ipobj_async').then(res => {
       // console.log("updated ipobjs");
       // console.log(res);
 
     });
+
+    this.$store.dispatch('refresh_svcobj_async');
+    this.$store.dispatch('refresh_spolicy_async');
+
   },
 }
 </script>

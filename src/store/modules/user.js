@@ -4,18 +4,6 @@ const state = {
       username: "11",
       password: "11",
     },
-    {
-      username: "啊a",
-      password: "啊啊",
-    },
-    {
-      username: "啊b",
-      password: "啊啊",
-    },
-    {
-      username: "啊c",
-      password: "啊啊",
-    },
   ],
   seccLogin: 0,
 };

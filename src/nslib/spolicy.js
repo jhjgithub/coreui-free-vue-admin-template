@@ -1,23 +1,18 @@
-import * as lodash from "lodash";
-import "./enum.js";
-
-// import * as utils from "./utils.js";
-// import * as baseclass from "./baseclass.js";
-// import * as objclass from "./objclass.js"
+import Enum from "./enum.js";
 
 ////////////////////////////////
 
-export var objidx = lodash.enum("start", "end", "max");
+export var objidx = Enum("start", "end", "max");
 
-export var spolicy_type = lodash.enum("firewall", "nat", "ips", "vpn");
-export var spolicy_act_fw = lodash.enum("allow", "deny");
-export var spolicy_act_nat = lodash.enum("snat", "dnat", "bnat");
-export var spolicy_type_snat = lodash.enum("napt", "map", "hash", "redir");
-export var spolicy_type_dnat = lodash.enum("map", "hash", "redir");
+export var spolicy_type = Enum("firewall", "nat", "ips", "vpn");
+export var spolicy_act_fw = Enum("allow", "deny");
+export var spolicy_act_nat = Enum("snat", "dnat", "bnat");
+export var spolicy_type_snat = Enum("napt", "map", "hash", "redir");
+export var spolicy_type_dnat = Enum("map", "hash", "redir");
 export var spolicy_any_port = 65536;
 
-export var spolicy_options = lodash.enum("log");
-export var nat_options = lodash.enum("arp_proxy", "dynamic_ip");
+export var spolicy_options = Enum("log");
+export var nat_options = Enum("arp_proxy", "dynamic_ip");
 
 export class NatInfo {
   constructor(id) {
@@ -49,5 +44,9 @@ export class SecurityPolicy {
     this.options = [spolicy_options.log];
 
     this.natinfo = []; // 0: snat, 1: dnat
+  }
+
+  get_ip_address() {
+
   }
 }

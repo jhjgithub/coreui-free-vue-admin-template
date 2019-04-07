@@ -32,12 +32,11 @@
       </b-row>
     </b-container>
 
-    <b-table striped hover small fixed show-empty ref="ref_ipobj_table" :items="get_items" :fields="fields"  
+    <b-table striped hover small fixed show-empty ref="ref_spocliy_table" :items="get_items" :fields="fields"  
     :sort-by.sync="sort_by" :sort-desc.sync="sort_desc" :sort-direction="sort_dir" 
     @sort-changed="sorting_changed" :current-page="current_page"
-    :per-page="per_page" thead-class="table-head" class="table-area" :filter="search_keyword" 
-    @filtered="on_filtered" :no-provider-paging=false :no-provider-filtering=true
-    >
+    :per-page="per_page" thead-class="spolicy-table-head" class="spolicy-table-area" :filter="search_keyword" :tbody-tr-class="show_row" 
+    @filtered="on_filtered" :no-provider-paging=false :no-provider-filtering=true>
       <!-- Table Header -->
       <template v-for="(f, idx) in fields" :slot="'HEAD_' + f.key" slot-scope="row">
         <!-- Checkbox column -->
@@ -64,23 +63,38 @@
         <b-form-checkbox @click.native.stop v-model="row.item._selected" @change="select_row(row.item)" />
       </template>
 
-      <!-- <template slot="id" slot-scope="row">
-        <div :style="get_left_padding(row.item)">
-          <span>
-            <font-awesome-icon :class="get_expand_icon_class(row.item)" @click.stop="toggle_show_child(row.item)" :icon="get_expand_icon(row.item)" size="lg" />
-          </span>
-          <span> {{row.item.id}} </span>
-        </div>
-      </template> -->
-
       <template slot="action" slot-scope="row">
-        {{show_action(row)}}
+        <!-- {{show_action(row)}} -->
+        <span v-for="(item, index) in show_action(row)" :key="'act_' + index">
+            <font-awesome-icon :icon="item" size="lg"/>
+        </span>
       </template>
 
       <template slot="nics" slot-scope="row">
-        <!-- {{row.item.innic}} -> {{row.item.outnic}}  -->
-        {{show_nic(row)}}
+        <!-- {{show_nic(row)}} -->
+        {{row.item.innic}}
+        <span>
+          <font-awesome-icon icon="caret-right" size="lg"/>
+        </span>
+        {{row.item.outnic}}
       </template>
+
+      <template slot="srcnet" slot-scope="row">
+        {{show_srcnet(row)}}
+      </template>
+
+      <template slot="dstnet" slot-scope="row">
+        {{show_dstnet(row)}}
+      </template>
+
+      <template slot="options" slot-scope="row">
+        <span v-for="(item, index) in show_options(row)" :key="'opt_' + index">
+            <font-awesome-icon :key="'opt_' + index" :icon="item" size="lg"/>
+        </span>
+      </template>
+
+      <!-- the rest of fields has the formatters -->
+
 
       <template slot="details" slot-scope="row">
         <font-awesome-icon style="cursor:pointer" @click.stop="row.toggleDetails" icon="info-circle" size="lg" />
@@ -106,7 +120,7 @@
 
     <b-pagination align="center" size="sm" :total-rows="total_rows" :per-page="per_page" v-model="current_page" class="page-nav" />
 
-    <b-modal title="Do you really DELETE object(s) ?" class="modal-danger" centered  v-model="show_ipobjdel_confirm" @ok="on_delete_confirmed" ok-variant="danger" :no-close-on-backdrop=false >
+    <b-modal title="Do you really DELETE object(s) ?" class="modal-danger" centered  v-model="show_spolicy_del_confirm" @ok="on_delete_confirmed" ok-variant="danger" :no-close-on-backdrop=false >
       <template v-for="(f, idx) in selected_item.items">
         <b-container fluid :key="idx">
         <b-row class="mb-1 text-center justify-content-md-center" :key="idx">{{f.id}} </b-row>
@@ -121,18 +135,15 @@
 
 <script>
 
-import * as ipobjview from "../../nslib/spolicy";
-import { secpolicy_fields } from "./objfields.js";
-
-// import * as secpolicy from  "./secpolicy.js";
-// import * as objclass from  "./objclass.js";
-
+import { spolicy_fields } from "./objfields.js";
+import * as spolicy from "../../nslib/spolicy.js";
+import * as spolicyset from  "../../nslib/spolicyset.js";
 import "../../fa-config.js";
-import IpobjInput from "./IpobjInput";
+// import IpobjInput from "./IpobjInput";
 
 export default {
   components: {
-    IpobjInput,
+    // IpobjInput,
   },
 
   data: function () {
@@ -144,10 +155,9 @@ export default {
       sort_dir: 'last',
       sort_changed: 0,
 
-      ipobj_input_show: false,
-      ipobj_subobj_list: [],
-
-      // spolicy_act_fw: secpolicy.spolicy_act_fw,
+      spolicy_input_show: false,
+      // ipobj_subobj_list: [],
+      spolicy_act_fw: spolicy.spolicy_act_fw,
 
       selected_item: { items: [] },
       last_selected_item: null,
@@ -155,16 +165,16 @@ export default {
       indeterminate: false,
       sort_icon: "sort-amount-up",
 
-      fields: secpolicy_fields,
+      fields: spolicy_fields,
       items: [],
-      spolicyset: null,
-      current_page: 2,
+      spolicyset: new spolicyset.SecurityPolicySet,
+      current_page: 1,
       per_page: 10,
       total_rows: 0,
       page_options: [5, 10, 15],
 
-      show_ipobjdel_confirm: false,
-      show_ipobjdel_contents: "",
+      show_spolicy_del_confirm: false,
+      show_spolicy_del_contents: "",
       transProps: {
         name: 'flip-list'
       },
@@ -176,15 +186,47 @@ export default {
 
   mounted: function () {
     // nsrule.init_sample_nsruleset();
+    this.isbusy = true;
+
+    var l = this.$store.state.spolicystore.elements;
+    if (l && l.length > 0) {
+      var l = this.$store.state.spolicystore.elements;
+
+      this.spolicyset.set_spolicy_items(l);
+      this.total_rows = this.spolicyset.spolicy_length;
+      this.isbusy = false;
+      this.$refs.ref_spocliy_table.refresh();
+      this.update_btn_state();
+      // console.log(this.spolicyset);
+    }
+    else {
+      console.log("Refresh spolicy !");
+
+      this.$store.dispatch('refresh_spolicy_async').then(res => {
+        var l = this.$store.state.spolicystore.elements;
+
+        this.spolicyset.set_spolicy_items(l);
+        this.total_rows = this.spolicyset.spolicy_length;
+        this.isbusy = false;
+
+        this.$nextTick(function () {
+          this.$refs.ref_spocliy_table.refresh();
+          this.update_btn_state();
+          // console.log(this.spolicyset);
+        });
+
+      });
+    }
   },
 
   computed: {
   },
+
   methods: {
     update_btn_state() {
       let len = this.selected_item.items.length;
 
-      if (this.ipobj_input_show) {
+      if (this.spolicy_input_show) {
         this.$refs.btn_add.disabled = true;
         this.$refs.btn_edit.disabled = true;
         this.$refs.btn_clone.disabled = true;
@@ -204,8 +246,8 @@ export default {
       }
     },
 
-    change_ipobj_dlg(is_show) {
-      this.ipobj_input_show = is_show;
+    change_spolicy_dlg(is_show) {
+      this.spolicy_input_show = is_show;
       this.update_btn_state();
     },
 
@@ -214,14 +256,17 @@ export default {
       this.toggle_select_all(false);
 
       this.$root.$emit('bv::hide::tooltip');
-      this.change_ipobj_dlg(true);
+      // this.change_spolicy_dlg(true);
+      console.log("OnNew for spolicy");
     },
 
     on_edit() {
+      console.log("OnEdit for spolicy");
+      /*
       this.$root.$emit('bv::hide::tooltip');
       if (this.last_selected_item && this.last_selected_item.children.length > 0) {
         let c = this.last_selected_item.children;
-        this.ipobj_subobj_list = [];
+
         c.forEach(i => {
           let node = this.items.get_root_node(i);
           let info = {
@@ -229,35 +274,42 @@ export default {
             // text: node.name
           };
 
-          this.ipobj_subobj_list.push(info);
+          // this.ipobj_subobj_list.push(info);
         });
       }
 
-      this.change_ipobj_dlg(true);
+      this.change_spolicy_dlg(true);
+      */
     },
 
     on_clone() {
+      /*
       this.selected_item.items.forEach(item => {
         if (item._depth == 0) {
           this.items.clone_item(item);
         }
       });
+      */
+      console.log("OnClone for spolicy");
 
-      this.$refs.ref_ipobj_table.refresh();
+      this.$refs.ref_spocliy_table.refresh();
     },
 
     on_delete() {
+      /*
       this.selected_item.items.forEach(item => {
         if (item._depth == 0) {
-          this.show_ipobjdel_contents += item.id;
+          this.show_spolicy_del_contents += item.id;
         }
       });
+      */
+      console.log("OnDelete for spolicy");
 
-      this.show_ipobjdel_confirm = true;
+      this.show_spolicy_del_confirm = true;
     },
 
     on_delete_confirmed() {
-      this.show_ipobjdel_confirm = false;
+      this.show_spolicy_del_confirm = false;
       this.selected_item.items.forEach(item => {
         if (item._depth == 0) {
           this.items.remove_item(item);
@@ -268,13 +320,14 @@ export default {
         }
       });
 
-      this.$refs.ref_ipobj_table.refresh();
+      this.$refs.ref_spocliy_table.refresh();
     },
 
+    /*
     on_submit_ipobj_input(ipobj) {
       // utils.print_json(ipobj, "submitted ipobj:");
       this.items.apply_obj(ipobj);
-      this.$refs.ref_ipobj_table.refresh();
+      this.$refs.ref_spocliy_table.refresh();
     },
 
     on_close_ipobj_input() {
@@ -283,12 +336,14 @@ export default {
 
       this.indeterminate = false;
       this.toggle_select_all(false);
-      this.change_ipobj_dlg(false);
+      this.change_spolicy_dlg(false);
     },
+
     on_reset_select() {
       this.indeterminate = false;
       this.toggle_select_all(false);
     },
+    */
 
     get_selected_items() {
       for (var i = 0; i < this.items.length; i++) {
@@ -407,7 +462,7 @@ export default {
       // console.log("clicked first_name:" + item.id);
       // toggle_child(this.items, item.obj_id);
       this.items.toggle_child(item);
-      this.$refs.ref_ipobj_table.refresh();
+      this.$refs.ref_spocliy_table.refresh();
     },
 
     on_filtered(filteredItems) {
@@ -467,12 +522,8 @@ export default {
     },
 
     get_items(ctx, callback) {
-      if (this.spolicyset == null) {
-        this.spolicyset = secpolicy.init_sample_spolicyset();
-      }
-
-      this.items = this.spolicyset.firewall;
-      this.total_rows = this.spolicyset.firewall.length;
+      this.items = this.spolicyset.spolicy;
+      this.total_rows = this.spolicyset.spolicy_length;
       return this.items;
     },
 
@@ -482,23 +533,30 @@ export default {
 
     ////////////////
     /// formatter
-    show_srcnet(value, key, row) {
-      let sp = row.srcport.toString();
+    show_srcnet(row) {
+      let item = row.item;
+      let sp = item.srcport.toString();
 
-      if (row.srcport == 65536) {
-        sp = "any";
+      if (item.srcport == 65536) {
+        sp = "Any";
       }
 
-      return value + ":" + sp;
+      // let ipaddr = this.$store.getters.get_ipobj_ip_address(item.srcnet);
+      let ipaddr = item.srcnet;
+      return ipaddr + ":" + sp;
     },
 
-    show_dstnet(value, key, row) {
-      let dp = row.dstport.toString();
+    show_dstnet(row) {
+      let item = row.item;
+      let dp = item.dstport.toString();
 
-      if (row.dstport == 65536) {
+      if (item.dstport == 65536) {
         dp = "any";
       }
-      return value + ":" + dp;
+
+      // let ipaddr = this.$store.getters.get_ipobj_ip_address(item.dstnet);
+      let ipaddr = item.dstnet;
+      return ipaddr + ":" + dp;
     },
 
     show_nic(row) {
@@ -510,9 +568,40 @@ export default {
     },
     
     show_action(row) {
-      return secpolicy.spolicy_act_fw[row.item.actions[0]];
+      let iname = [];
+      if (row.item.actions[0] == 0) 
+        iname.push("eye");
+      else if (row.item.actions[0] == 1) 
+        iname.push("ban");
+
+      return iname;
+      // return spolicy.spolicy_act_fw[row.item.actions[0]];
     },
 
+    show_options(row) {
+      let opt = [];
+      let item = row.item;
+
+      if (item.options[0] == spolicy.spolicy_options.log) {
+        opt.push("save");
+      }
+
+      if (item.schedule) {
+        opt.push("clock");
+      }
+
+      return opt;
+    },
+
+    show_row(item, type) {
+      if (!item) 
+        return
+
+      if (!item.enable)
+        return 'table-inactive'
+    },
+
+    /* 
     show_schedule(value, key, row) {
       if (value) {
         return "Timer";
@@ -523,13 +612,14 @@ export default {
     },
 
     show_log(value, key, row) {
-      if (row.options[0] == secpolicy.spolicy_options.log) {
+      if (row.options[0] == spolicy.spolicy_options.log) {
         return "On";
       }
       else {
         return "Off";
       }
     },
+    */
     
     show_datetime(value) {
       let v = Number(value);
@@ -556,7 +646,7 @@ export default {
 }
 
 /* for table header */
-.table-head {
+.spolicy-table-head {
   padding: 0;
   margin: 0;
   color: rgba(29, 28, 28, 0.753);
@@ -564,6 +654,11 @@ export default {
   font-style: normal;
   text-align: justify;
   vertical-align: middle;
+}
+
+.table-inactive td {
+    /* background-color: #ececec; */
+    color: #b9b9b9;
 }
 
 /* for table header text */
@@ -669,7 +764,7 @@ table.b-table > tfoot > tr > th.sorting_desc::before {
   text-align: center;
 }
 
-.table-area {
+.spolicy-table-area {
   /* padding-bottom: 0px; */
   margin: 0;
 }

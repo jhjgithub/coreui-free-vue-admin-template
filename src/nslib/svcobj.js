@@ -1,11 +1,7 @@
-// import * as lodash from "lodash";
 import Enum from "./enum.js";
-
 
 /////////////////////////////////////////////////////////////////////////
 
-// export var svctype = lodash.enum("single", "ragne", "group");
-// export var svcprotocol = lodash.enum("icmp=1", "tcp=6", "udp=17", "all=255");
 export var svctype = Enum("single", "ragne", "group");
 export var svcprotocol = Enum("icmp=1", "tcp=6", "udp=17", "all=255");
 export var any_port = 0;

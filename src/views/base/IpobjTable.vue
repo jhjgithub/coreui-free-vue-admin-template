@@ -135,7 +135,7 @@
 import { mapGetters } from 'vuex'
 
 import * as ipobj from "../../nslib/ipobj";
-import * as ipobjview from "../../nslib/ipobjview";
+// import * as ipobjview from "../../nslib/ipobjview";
 import * as objset from  "../../nslib/objset";
 import * as misc from "../../nslib/misc.js";
 import { ipobj_fields } from "./objfields.js";
