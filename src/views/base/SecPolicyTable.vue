@@ -66,7 +66,9 @@
       <template slot="action" slot-scope="row">
         <!-- {{show_action(row)}} -->
         <span v-for="(item, index) in show_action(row)" :key="'act_' + index">
-            <font-awesome-icon :icon="item" size="lg"/>
+            <!-- <font-awesome-icon :icon="item" size="lg"/> -->
+            <!-- <v-icon name="beer1"/> -->
+             <IconFirst class="first-icon"/>
         </span>
       </template>
 
@@ -141,9 +143,21 @@ import * as spolicyset from  "../../nslib/spolicyset.js";
 import "../../fa-config.js";
 // import IpobjInput from "./IpobjInput";
 
+// import 'vue-awesome/icons'
+
+import Icon from 'vue-awesome/components/Icon';
+import "../../svg/custom-icon.js";
+
+// import IconFirst from '../../svg/trace.svg';
+
+
 export default {
   components: {
     // IpobjInput,
+    'v-icon': Icon,
+    // IconFirst,
+
+    // traceIcon,
   },
 
   data: function () {
@@ -570,7 +584,8 @@ export default {
     show_action(row) {
       let iname = [];
       if (row.item.actions[0] == 0) 
-        iname.push("eye");
+        // iname.push("eye");
+        iname.push("lock-open");
       else if (row.item.actions[0] == 1) 
         iname.push("ban");
 
